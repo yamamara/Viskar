@@ -1,3 +1,5 @@
+import { modules as defaultModules, type Module } from "./lessons-data"
+
 // Local storage utilities for managing app state
 export interface Student {
   id: string
@@ -26,6 +28,11 @@ export interface ClassCode {
 }
 
 export const storage = {
+  // Module methods
+  getModules: (): Module[] => {
+    return defaultModules
+  },
+
   // Student methods
   getStudent: (classCode: string): Student | null => {
     if (typeof window === "undefined") return null
@@ -99,6 +106,22 @@ export const storage = {
       }
     }
     return teachers
+  },
+
+  markStageCompleted(classCode: string, moduleId: number, lessonId: number, stageId: number) {
+    const student = this.getStudent(classCode)
+    const key = `${moduleId}-${lessonId}-${stageId}`
+
+    if (student === null) {
+      console.error(`Student ${classCode} not found`)
+      return
+    }
+
+    if (!student.completedStages.includes(key)) {
+      student.completedStages.push(key)
+    }
+
+    this.setStudent(student)
   },
 
   getAllStudentsForClass: (classCode: string): Student[] => {

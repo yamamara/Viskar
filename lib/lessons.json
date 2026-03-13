@@ -1,0 +1,418 @@
+[
+  {
+    "id": 1,
+    "title": "Getting Started & Variables",
+    "description": "Learn the basics of Python, including printing to the screen, variables, strings, and numbers, mirroring Chapters 1 and 2 of Python Crash Course.",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "Hello World!",
+        "description": "Run your first Python program and learn what really happens when you run a file.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "What Happens When You Run Your Code",
+            "description": "Understanding the Python Interpreter and the print() function.",
+            "instructions": "A long-held belief in the programming world is that printing a `Hello world!` message to the screen as your first program in a new language will bring you luck.\n\nIn Python, you can write the Hello World program in one line:\n\n### Syntax:\n```python\nprint(\"Hello world!\")\n```\n\nWhen you run this code, your editor runs the file through the Python interpreter, which reads through the program and determines what each word in the program means. For example, when the interpreter sees the word `print`, it prints to the screen whatever is inside the parentheses."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Your First Program",
+            "description": "Write a program that prints a message to the screen.",
+            "instructions": "Try to print the message `Hello Python world!` exactly as shown below.\n\n### Sample Output:\n```text\nHello Python world!\n```",
+            "starterCode": "# Write your print statement here\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "Hello Python world!",
+                "description": "Should print 'Hello Python world!'"
+              }
+            ],
+            "hint": "Make sure you use double quotes inside the print() function parentheses and match the spelling exactly."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Variables",
+        "description": "Learn how to store and change data using variables.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "Naming and Using Variables",
+            "description": "Adding variables to your programs.",
+            "instructions": "Let's try using a variable. Every variable holds a value, which is the information associated with that variable.\n\n### Example:\n```python\nmessage = \"Hello Python world!\"\nprint(message)\n```\n\nWhen you're using variables in Python, you need to adhere to a few rules and guidelines:\n- Variable names can contain only letters, numbers, and underscores.\n- Spaces are not allowed in variable names, but underscores can be used to separate words (e.g., `greeting_message`).\n- Variable names should be short but descriptive."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 2-1: Simple Message",
+            "description": "Store a message in a variable, and then print that message.",
+            "instructions": "Create a variable named `message` and assign it the string value `\"I am learning Python!\"`. Then, print that variable.\n\n### Sample Output:\n```text\nI am learning Python!\n```",
+            "starterCode": "# Create your variable and print it\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "I am learning Python!",
+                "description": "Should print 'I am learning Python!'"
+              }
+            ],
+            "hint": "Use the = sign to assign the string to the variable, then pass the variable name into print()."
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Strings",
+        "description": "Learn to manipulate text data using string methods.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "Changing Case in a String",
+            "description": "Using string methods like title(), upper(), and lower().",
+            "instructions": "A string is simply a series of characters. Anything inside quotes is considered a string in Python.\n\nOne of the simplest tasks you can do with strings is change the case of the words in a string using methods. A method is an action that Python can perform on a piece of data.\n\n### Example:\n```python\nname = \"ada lovelace\"\nprint(name.title())\nprint(name.upper())\n```\n\n`title()` displays each word in titlecase, where each word begins with a capital letter. `upper()` changes a string to all uppercase."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 2-4: Name Cases",
+            "description": "Print a name in different cases.",
+            "instructions": "Store the name `\"eric matthes\"` in a variable called `name`. Print the name in lowercase, then in uppercase, and finally in titlecase, each on a new line.",
+            "starterCode": "name = \"eric matthes\"\n# Print the name in lower, upper, and title cases\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "eric matthes\nERIC MATTHES\nEric Matthes",
+                "description": "Prints lowercase, uppercase, and titlecase versions of the name."
+              }
+            ],
+            "hint": "Use print(name.lower()), print(name.upper()), and print(name.title())."
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Numbers",
+        "description": "Learn to work with integers and floats.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "Integers and Floats",
+            "description": "Using math operations in Python.",
+            "instructions": "Numbers are used quite often in programming. You can add (+), subtract (-), multiply (*), and divide (/) integers in Python.\n\n### Example:\n```python\nprint(2 + 3)\nprint(3 ** 2) # Exponents are represented by two asterisks\n```\n\nPython calls any number with a decimal point a float. You can combine operations, and Python supports the order of operations."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 2-8: Number Eight",
+            "description": "Write operations that result in the number 8.",
+            "instructions": "Write addition, subtraction, multiplication, and division operations that each result in the number `8`. Be sure to enclose your operations in print statements to see the results. Your output should be four lines, each displaying the number 8 or 8.0.",
+            "starterCode": "# Write your operations inside print statements\nprint(5 + 3)\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "8\n8\n8\n8.0",
+                "description": "Prints 8 (or 8.0) four times using different operators."
+              }
+            ],
+            "hint": "Use +, -, *, and / in four separate print statements. For division, 16 / 2 will output 8.0."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Introducing Lists",
+    "description": "Learn what lists are and how to work with the individual elements in a list, mirroring Chapter 3 of Python Crash Course.",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "What is a List?",
+        "description": "Learn how to define a list and access its elements.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "Accessing Elements in a List",
+            "description": "Using index positions to access list items.",
+            "instructions": "A list is a collection of items in a particular order. In Python, square brackets (`[]`) indicate a list, and individual elements are separated by commas.\n\n### Example:\n```python\nbicycles = ['trek', 'cannondale', 'redline', 'specialized']\n```\n\nLists are ordered collections, so you can access any element by telling Python the position, or index, of the item. **Index Positions Start at 0, Not 1.**\n\n### Example Access:\n```python\nprint(bicycles[0].title()) # Outputs 'Trek'\nprint(bicycles[-1]) # Outputs the last item ('specialized')\n```"
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 3-1: Names",
+            "description": "Accessing individual elements in a list.",
+            "instructions": "We have created a list of names for you. Print the first name and the third name from the list, each on a new line.",
+            "starterCode": "names = ['Alice', 'Bob', 'Charlie', 'David']\n# Print the first and third names\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "Alice\nCharlie",
+                "description": "Prints the elements at index 0 and 2."
+              }
+            ],
+            "hint": "Remember that indexes start at 0. So the first name is names[0]."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Modifying Lists",
+        "description": "Learn how to change, add, and remove elements from a list.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "Appending and Removing",
+            "description": "Using append(), insert(), del, pop(), and remove().",
+            "instructions": "Most lists you create will be dynamic, meaning you'll build a list and then add and remove elements from it as your program runs.\n\n### Adding Elements:\n- `.append('ducati')`: Adds to the end of the list.\n- `.insert(0, 'ducati')`: Adds to a specific position.\n\n### Removing Elements:\n- `del motorcycles[0]`: Removes an item if you know its index.\n- `.pop()`: Removes the last item in a list, but lets you work with it.\n- `.remove('ducati')`: Removes an item by value."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 3-4: Guest List",
+            "description": "Create a list and add to it.",
+            "instructions": "Start with an empty list called `guests`. Append `'Einstein'` to it. Then append `'Curie'`. Then insert `'Tesla'` at the beginning of the list (index 0). Finally, print the entire list.",
+            "starterCode": "guests = []\n# Add your guests here\n\n# Print the list\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "['Tesla', 'Einstein', 'Curie']",
+                "description": "Prints the properly formatted list."
+              }
+            ],
+            "hint": "Use guests.append() for the first two, and guests.insert(0, 'Tesla') for the third."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Working with Lists",
+    "description": "Learn how to loop through lists efficiently and create numerical lists, mirroring Chapter 4.",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "Looping Through an Entire List",
+        "description": "Using for loops to automate repetitive tasks.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "The For Loop",
+            "description": "Taking the same action with every item in a list.",
+            "instructions": "When you want to do the same action with every item in a list, you can use Python's `for` loop.\n\n### Example:\n```python\nmagicians = ['alice', 'david', 'carolina']\nfor magician in magicians:\n    print(magician.title() + \", that was a great trick!\")\nprint(\"Thank you, everyone.\")\n```\n\nPython uses indentation to determine when one line of code is connected to the line above it. Any lines of code after the `for` loop that are not indented are executed once without repetition."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 4-1: Pizzas",
+            "description": "Loop through a list of pizzas.",
+            "instructions": "Given a list of pizzas, use a `for` loop to print the name of each pizza.",
+            "starterCode": "pizzas = ['pepperoni', 'margherita', 'hawaiian']\n# Write your for loop here\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "pepperoni\nmargherita\nhawaiian",
+                "description": "Prints each pizza on a new line."
+              }
+            ],
+            "hint": "Use the syntax `for pizza in pizzas:` and remember to indent your `print()` statement."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "if StatementsSFKFKFK",
+    "description": "Examine conditions and decide which actions to take, mirroring Chapter 5.",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "Conditional Tests",
+        "description": "Learn to write expressions that evaluate to True or False.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "Equality and Inequality",
+            "description": "Comparing values in Python.",
+            "instructions": "At the heart of every `if` statement is an expression that can be evaluated as `True` or `False` and is called a conditional test.\n\n### Examples:\n- **Equality**: `car == 'bmw'`\n- **Inequality**: `car != 'audi'`\n- **Numerical**: `age >= 18`\n- **Multiple Conditions**: `age >= 21 and age_1 >= 21` or `age >= 21 or age_1 >= 21`\n- **In a List**: `'mushrooms' in requested_toppings`"
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "if-elif-else Chains",
+            "description": "Use an if-elif-else chain to test multiple situations.",
+            "instructions": "Create a variable called `alien_color` and set it to `'yellow'`. Write an `if-elif-else` chain:\n- If the color is `'green'`, print `5 points`\n- If the color is `'yellow'`, print `10 points`\n- If the color is `'red'`, print `15 points`",
+            "starterCode": "alien_color = 'yellow'\n# Write your if-elif-else chain here\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "10 points",
+                "description": "Correctly matches the 'yellow' condition."
+              }
+            ],
+            "hint": "Use `if alien_color == 'green':` followed by `elif alien_color == 'yellow':`."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Dictionaries",
+    "description": "Learn how to use Python dictionaries to connect related pieces of information, mirroring Chapter 6.",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "Working with Dictionaries",
+        "description": "Store information as key-value pairs.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "A Simple Dictionary",
+            "description": "Accessing and modifying key-value pairs.",
+            "instructions": "A dictionary in Python is a collection of key-value pairs. Each key is connected to a value, and you can use a key to access the value associated with that key.\n\n### Example:\n```python\nalien_0 = {'color': 'green', 'points': 5}\nprint(alien_0['color']) # Prints 'green'\n```\n\nYou can add new pairs dynamically:\n```python\nalien_0['x_position'] = 0\n```"
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 6-1: Person",
+            "description": "Use a dictionary to store information.",
+            "instructions": "Create a dictionary called `person` with the keys `'first_name'`, `'last_name'`, and `'age'`. Set their values to `'Eric'`, `'Matthes'`, and `43` respectively. Print the person's first name by accessing it from the dictionary.",
+            "starterCode": "# Create the dictionary and print the first name\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "Eric",
+                "description": "Prints the value associated with 'first_name'."
+              }
+            ],
+            "hint": "Use `person = {'first_name': 'Eric', ...}` and `print(person['first_name'])`."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "User Input and while Loops",
+    "description": "Learn to keep programs running as long as certain conditions are true, mirroring Chapter 7.",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "Introducing while Loops",
+        "description": "Run blocks of code repeatedly while a condition is True.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "The while Loop in Action",
+            "description": "Using while to count or act until a condition changes.",
+            "instructions": "The `for` loop takes a collection of items and executes a block of code once for each item in the collection. In contrast, the `while` loop runs as long as, or while, a certain condition is true.\n\n### Example:\n```python\ncurrent_number = 1\nwhile current_number <= 5:\n    print(current_number)\n    current_number += 1\n```\n\nYou can use the `break` statement to exit a loop immediately, or `continue` to return to the beginning of the loop."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Counting with a while Loop",
+            "description": "Write a basic while loop to print numbers.",
+            "instructions": "Write a `while` loop that counts from 1 to 3 and prints each number on a new line.",
+            "starterCode": "number = 1\n# Write your while loop here\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "1\n2\n3",
+                "description": "Counts from 1 to 3."
+              }
+            ],
+            "hint": "The loop condition should be `number <= 3`. Don't forget to do `number += 1` inside the loop!"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Functions",
+    "description": "Write named blocks of code that do one specific job, mirroring Chapter 8.",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "Defining a Function",
+        "description": "Learn to write your own functions and pass arguments to them.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "Arguments and Parameters",
+            "description": "Passing information to a function.",
+            "instructions": "Functions are named blocks of code that are designed to do one specific job. When you want to perform a particular task that you've defined in a function, you *call* the name of the function.\n\n### Example:\n```python\ndef greet_user(username):\n    \"\"\"Display a simple greeting.\"\"\"\n    print(\"Hello, \" + username.title() + \"!\")\n\ngreet_user('jesse')\n```\n\nThe variable `username` in the definition is a *parameter*. The value `'jesse'` passed in the call is an *argument*."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 8-1: Message",
+            "description": "Write and call a simple function.",
+            "instructions": "Write a function called `display_message()` that prints the exact sentence `\"I am learning about functions!\"`. Then, call the function.",
+            "starterCode": "# Define your function here\n\n\n# Call your function here\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "I am learning about functions!",
+                "description": "Defines and calls the function properly."
+              }
+            ],
+            "hint": "Start with `def display_message():` and remember to call it afterwards with `display_message()`."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Classes",
+    "description": "Learn object-oriented programming to model real-world situations, mirroring Chapter 9.",
+    "lessons": [
+      {
+        "id": 1,
+        "title": "Creating and Using a Class",
+        "description": "Learn how to define a class and create instances from it.",
+        "stages": [
+          {
+            "id": 1,
+            "type": "lesson",
+            "title": "The __init__() Method",
+            "description": "Initializing object attributes.",
+            "instructions": "In object-oriented programming you write *classes* that represent real-world things and situations, and you create *objects* based on these classes.\n\n### Example:\n```python\nclass Dog():\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\n    def sit(self):\n        print(self.name.title() + \" is now sitting.\")\n\nmy_dog = Dog('willie', 6)\nmy_dog.sit()\n```\nThe `__init__()` method is a special method Python runs automatically whenever we create a new instance based on the class. Variables prefixed with `self` are available to every method in the class and are called *attributes*."
+          },
+          {
+            "id": 2,
+            "type": "exercise",
+            "title": "Exercise 9-1: Restaurant",
+            "description": "Make a class and call its method.",
+            "instructions": "Make a class called `Restaurant`. The `__init__()` method should store a `restaurant_name`. Make a method called `open_restaurant()` that prints `\"[restaurant_name] is open!\"`. Finally, make an instance called `restaurant` passing `'Luigis'` as the name, and call the `open_restaurant()` method.",
+            "starterCode": "class Restaurant():\n    # Write your __init__ and open_restaurant methods here\n\n\n# Create the instance and call the method here\n",
+            "testCases": [
+              {
+                "input": "",
+                "expectedOutput": "Luigis is open!",
+                "description": "Defines the class, instantiates it, and prints the open message."
+              }
+            ],
+            "hint": "Your open_restaurant method should use `print(self.restaurant_name + \" is open!\")`."
+          }
+        ]
+      }
+    ]
+  }
+]

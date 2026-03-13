@@ -2,80 +2,129 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
+import { AlertCircle } from "lucide-react"
+import { fetchJson } from "@/lib/client-api"
+import { loadStudentSession, persistStudentSession } from "@/lib/student-session"
+import type { StudentRecord, StudentRosterEntry } from "@/lib/app-types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { storage } from "@/lib/storage"
-import { AlertCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+interface ClassRosterResponse {
+  classCode: string
+  students: StudentRosterEntry[]
+}
 
 export function ClassCodeForm() {
   const [classCode, setClassCode] = useState("")
+  const [loadedClassCode, setLoadedClassCode] = useState("")
+  const [students, setStudents] = useState<StudentRosterEntry[]>([])
+  const [selectedStudentId, setSelectedStudentId] = useState("")
   const [studentName, setStudentName] = useState("")
+  const [isNewStudent, setIsNewStudent] = useState(false)
   const [error, setError] = useState("")
-  const [showNameInput, setShowNameInput] = useState(false)
+  const [isLoadingRoster, setIsLoadingRoster] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+  const hasLoadedRoster = loadedClassCode.length > 0 && loadedClassCode === classCode.trim().toUpperCase()
+  const hasStudents = students.length > 0
+  const rememberedStudentId = useMemo(() => loadStudentSession(classCode.trim().toUpperCase()), [classCode])
 
-    if (!classCode.trim()) {
+  const resetRosterState = () => {
+    setLoadedClassCode("")
+    setStudents([])
+    setSelectedStudentId("")
+    setStudentName("")
+    setIsNewStudent(false)
+  }
+
+  const lookupClass = async () => {
+    const upperCode = classCode.trim().toUpperCase()
+    if (!upperCode) {
       setError("Please enter a class code")
       return
     }
 
-    const upperCode = classCode.trim().toUpperCase()
+    setIsLoadingRoster(true)
+    setError("")
+    try {
+      const roster = await fetchJson<ClassRosterResponse>(`/api/classes/${upperCode}/students`)
+      setLoadedClassCode(roster.classCode)
+      setStudents(roster.students)
+      setIsNewStudent(roster.students.length === 0)
 
-    // Check if class code exists
-    const classData = storage.getClassCode(upperCode)
+      if (rememberedStudentId && roster.students.some((student) => student.id === rememberedStudentId)) {
+        setSelectedStudentId(rememberedStudentId)
+      } else {
+        setSelectedStudentId("")
+      }
+    } catch (lookupError) {
+      const message = lookupError instanceof Error ? lookupError.message : "Failed to load class"
+      resetRosterState()
+      setError(message)
+    } finally {
+      setIsLoadingRoster(false)
+    }
+  }
 
-    if (!classData) {
-      setError("Invalid class code. Please check with your teacher.")
+  const continueExistingStudent = () => {
+    if (!selectedStudentId) {
+      setError("Select your name to continue.")
       return
     }
 
-    // Check if student already exists
-    const existingStudent = storage.getStudent(upperCode)
+    persistStudentSession(loadedClassCode, selectedStudentId)
+    router.push(`/learn?code=${loadedClassCode}`)
+  }
 
-    if (existingStudent) {
-      // Student already registered, redirect to app
-      router.push(`/learn?code=${upperCode}`)
-      return
-    }
-
-    // Show name input for new students
-    if (!showNameInput) {
-      setShowNameInput(true)
-      return
-    }
-
+  const joinAsNewStudent = async () => {
     if (!studentName.trim()) {
       setError("Please enter your name")
       return
     }
 
-    // Create new student
-    const newStudent = {
-      id: `student_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      name: studentName.trim(),
-      classCode: upperCode,
-      currentModule: 1,
-      currentLesson: 1,
-      currentStage: 1,
-      completedStages: [],
-      createdAt: new Date().toISOString(),
+    setIsSubmitting(true)
+    setError("")
+    try {
+      const student = await fetchJson<StudentRecord>("/api/students/join", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          classCode: loadedClassCode,
+          name: studentName.trim(),
+        }),
+      })
+
+      persistStudentSession(loadedClassCode, student.id)
+      router.push(`/learn?code=${loadedClassCode}`)
+    } catch (joinError) {
+      const message = joinError instanceof Error ? joinError.message : "Failed to join class"
+      setError(message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!hasLoadedRoster) {
+      await lookupClass()
+      return
     }
 
-    storage.setStudent(newStudent)
+    if (isNewStudent) {
+      await joinAsNewStudent()
+      return
+    }
 
-    // Add student to class
-    classData.students.push(newStudent.id)
-    storage.setClassCode(classData)
-
-    // Redirect to learning app
-    router.push(`/learn?code=${upperCode}`)
+    continueExistingStudent()
   }
 
   return (
@@ -90,19 +139,60 @@ export function ClassCodeForm() {
           placeholder="Enter your class code"
           value={classCode}
           onChange={(e) => {
-            setClassCode(e.target.value.toUpperCase())
+            const nextCode = e.target.value.toUpperCase()
+            setClassCode(nextCode)
             setError("")
+            if (loadedClassCode && nextCode.trim().toUpperCase() !== loadedClassCode) {
+              resetRosterState()
+            }
           }}
           className="text-center text-lg tracking-wider font-mono h-12 transition-all duration-200 focus:scale-[1.02]"
           maxLength={6}
-          disabled={showNameInput}
+          disabled={isLoadingRoster || isSubmitting}
         />
       </div>
 
-      {showNameInput && (
+      {hasLoadedRoster && !isNewStudent && (
+        <div className="space-y-3 animate-in">
+          <Label htmlFor="studentSelect" className="text-sm font-medium">
+            Continue As
+          </Label>
+          <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
+            <SelectTrigger id="studentSelect" className="w-full h-11">
+              <SelectValue placeholder="Choose your name" />
+            </SelectTrigger>
+            <SelectContent>
+              {students.map((student) => (
+                <SelectItem key={student.id} value={student.id}>
+                  {student.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={() => {
+                setIsNewStudent(true)
+                setError("")
+              }}
+              disabled={isSubmitting}
+            >
+              New Student
+            </Button>
+            <Button type="button" variant="ghost" className="px-4" onClick={resetRosterState} disabled={isSubmitting}>
+              Change Code
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {hasLoadedRoster && (isNewStudent || !hasStudents) && (
         <div className="space-y-3 animate-in">
           <Label htmlFor="studentName" className="text-sm font-medium">
-            Your Name
+            Add Yourself To The Class
           </Label>
           <Input
             id="studentName"
@@ -115,7 +205,27 @@ export function ClassCodeForm() {
             }}
             className="h-11 transition-all duration-200"
             autoFocus
+            disabled={isSubmitting}
           />
+          {hasStudents && (
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setIsNewStudent(false)
+                  setError("")
+                }}
+                disabled={isSubmitting}
+              >
+                Back To Student List
+              </Button>
+              <Button type="button" variant="ghost" className="px-4" onClick={resetRosterState} disabled={isSubmitting}>
+                Change Code
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
@@ -130,24 +240,10 @@ export function ClassCodeForm() {
         type="submit"
         className="w-full h-12 text-base font-medium shadow-elegant hover:shadow-elegant-lg transition-all duration-300"
         size="lg"
+        disabled={isLoadingRoster || isSubmitting}
       >
-        {showNameInput ? "Start Learning" : "Continue"}
+        {!hasLoadedRoster ? "Find Class" : isNewStudent || !hasStudents ? "Join And Start Learning" : "Continue Learning"}
       </Button>
-
-      {showNameInput && (
-        <Button
-          type="button"
-          variant="ghost"
-          className="w-full h-11 transition-all duration-300"
-          onClick={() => {
-            setShowNameInput(false)
-            setStudentName("")
-            setError("")
-          }}
-        >
-          Back
-        </Button>
-      )}
     </form>
   )
 }

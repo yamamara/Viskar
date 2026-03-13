@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Play, RotateCcw, Loader2, CheckCircle2, XCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { TestCase } from "@/lib/lessons-data"
+import { getPyodide } from "@/lib/pyodide"
 
 interface PythonIDEProps {
   starterCode: string
@@ -15,71 +16,17 @@ interface PythonIDEProps {
 }
 
 const PYTHON_KEYWORDS = [
-  "and",
-  "as",
-  "assert",
-  "break",
-  "class",
-  "continue",
-  "def",
-  "del",
-  "elif",
-  "else",
-  "except",
-  "False",
-  "finally",
-  "for",
-  "from",
-  "global",
-  "if",
-  "import",
-  "in",
-  "is",
-  "lambda",
-  "None",
-  "nonlocal",
-  "not",
-  "or",
-  "pass",
-  "raise",
-  "return",
-  "True",
-  "try",
-  "while",
-  "with",
-  "yield",
+  "and", "as", "assert", "break", "class", "continue", "def", "del", "elif",
+  "else", "except", "False", "finally", "for", "from", "global", "if",
+  "import", "in", "is", "lambda", "None", "nonlocal", "not", "or", "pass",
+  "raise", "return", "True", "try", "while", "with", "yield",
 ]
 
 const PYTHON_BUILTINS = [
-  "print",
-  "input",
-  "len",
-  "range",
-  "str",
-  "int",
-  "float",
-  "list",
-  "dict",
-  "tuple",
-  "set",
-  "abs",
-  "max",
-  "min",
-  "sum",
-  "sorted",
-  "reversed",
-  "enumerate",
-  "zip",
-  "map",
-  "filter",
-  "any",
-  "all",
-  "type",
-  "isinstance",
-  "open",
-  "read",
-  "write",
-  "append",
+  "print", "input", "len", "range", "str", "int", "float", "list", "dict",
+  "tuple", "set", "abs", "max", "min", "sum", "sorted", "reversed",
+  "enumerate", "zip", "map", "filter", "any", "all", "type", "isinstance",
+  "open", "read", "write", "append",
 ]
 
 export function PythonIDE({ starterCode, testCases, onSuccess, className }: PythonIDEProps) {
@@ -100,7 +47,17 @@ export function PythonIDE({ starterCode, testCases, onSuccess, className }: Pyth
   const [cursorPosition, setCursorPosition] = useState({ top: 0, left: 0 })
 
   useEffect(() => {
-    loadPyodide()
+    let mounted = true;
+    getPyodide().then(pyodide => {
+      if (mounted) {
+        pyodideRef.current = pyodide
+        setPyodideLoading(false)
+      }
+    }).catch(err => {
+      console.error("Failed to load Pyodide:", err)
+      if (mounted) setPyodideLoading(false)
+    })
+    return () => { mounted = false }
   }, [])
 
   useEffect(() => {
@@ -123,42 +80,6 @@ export function PythonIDE({ starterCode, testCases, onSuccess, className }: Pyth
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
-
-  const loadPyodide = async () => {
-    try {
-      // Load Pyodide from CDN
-      const script = document.createElement("script")
-      script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"
-      script.async = true
-
-      script.onload = async () => {
-        try {
-          // @ts-ignore - Pyodide is loaded globally
-          pyodideRef.current = await window.loadPyodide({
-            indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
-          })
-          setPyodideLoading(false)
-        } catch (err) {
-          console.error("[v0] Failed to initialize Pyodide:", err)
-          setPyodideLoading(false)
-        }
-      }
-
-      script.onerror = () => {
-        console.error("[v0] Failed to load Pyodide script")
-        setPyodideLoading(false)
-      }
-
-      document.head.appendChild(script)
-
-      return () => {
-        document.head.removeChild(script)
-      }
-    } catch (err) {
-      console.error("[v0] Error loading Pyodide:", err)
-      setPyodideLoading(false)
-    }
-  }
 
   const runCode = async () => {
     if (!pyodideRef.current) {

@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,8 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { storage } from "@/lib/storage"
 import { AlertCircle, GraduationCap } from "lucide-react"
+import { useTeacherAuth } from "@/components/teacher-auth-provider"
 
 export default function TeacherLoginPage() {
   const [loginEmail, setLoginEmail] = useState("")
@@ -19,9 +19,17 @@ export default function TeacherLoginPage() {
   const [signupPassword, setSignupPassword] = useState("")
   const [signupConfirm, setSignupConfirm] = useState("")
   const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const { login, signup, session, loading } = useTeacherAuth()
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!loading && session) {
+      router.replace("/teacher/dashboard")
+    }
+  }, [loading, router, session])
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
@@ -30,27 +38,23 @@ export default function TeacherLoginPage() {
       return
     }
 
-    const teacher = storage.getTeacher(loginEmail)
-
-    if (!teacher) {
-      setError("No account found with this email")
-      return
+    setIsSubmitting(true)
+    try {
+      await login(loginEmail, loginPassword)
+      router.push("/teacher/dashboard")
+    } catch (authError) {
+      const message = authError instanceof Error ? authError.message : "Failed to sign in"
+      if (message === "INVALID_LOGIN_CREDENTIALS") {
+        setError("Incorrect email or password")
+      } else {
+        setError(message)
+      }
+    } finally {
+      setIsSubmitting(false)
     }
-
-    if (teacher.password !== loginPassword) {
-      setError("Incorrect password")
-      return
-    }
-
-    // Store current teacher session
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("teacherEmail", loginEmail)
-    }
-
-    router.push("/teacher/dashboard")
   }
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
@@ -69,30 +73,20 @@ export default function TeacherLoginPage() {
       return
     }
 
-    // Check if teacher already exists
-    const existingTeacher = storage.getTeacher(signupEmail)
-    if (existingTeacher) {
-      setError("An account with this email already exists")
-      return
+    setIsSubmitting(true)
+    try {
+      await signup(signupEmail, signupPassword)
+      router.push("/teacher/dashboard")
+    } catch (authError) {
+      const message = authError instanceof Error ? authError.message : "Failed to create account"
+      if (message === "EMAIL_EXISTS") {
+        setError("An account with this email already exists")
+      } else {
+        setError(message)
+      }
+    } finally {
+      setIsSubmitting(false)
     }
-
-    // Create new teacher account
-    const newTeacher = {
-      id: `teacher_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      email: signupEmail,
-      password: signupPassword,
-      classCodes: [],
-      createdAt: new Date().toISOString(),
-    }
-
-    storage.setTeacher(newTeacher)
-
-    // Store current teacher session
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("teacherEmail", signupEmail)
-    }
-
-    router.push("/teacher/dashboard")
   }
 
   return (
@@ -103,7 +97,7 @@ export default function TeacherLoginPage() {
             <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center">
               <GraduationCap className="h-7 w-7 text-primary" />
             </div>
-            <span className="text-2xl font-bold text-foreground">PyLearn</span>
+            <span className="text-2xl font-bold text-foreground">Viskar</span>
           </Link>
           <h1 className="text-3xl font-bold text-foreground mb-2">Teacher Portal</h1>
           <p className="text-muted-foreground">Manage your classes and track student progress</p>
@@ -158,7 +152,7 @@ export default function TeacherLoginPage() {
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
                     Sign In
                   </Button>
                 </form>
@@ -215,7 +209,7 @@ export default function TeacherLoginPage() {
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
                     Create Account
                   </Button>
                 </form>

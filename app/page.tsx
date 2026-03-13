@@ -12,10 +12,7 @@ export default function LandingPage() {
       <div className="container mx-auto px-4 py-8 md:py-16 relative z-10">
         <header className="flex items-center justify-between mb-16 md:mb-24">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-elegant">
-              <Code2 className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl md:text-2xl font-bold text-foreground tracking-tight">PyLearn</span>
+            <span className="text-xl md:text-2xl font-bold text-foreground tracking-tight">[Viskar]</span>
           </div>
           <Link href="/teacher/login">
             <Button
@@ -32,15 +29,14 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 md:mb-20 animate-in">
             <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 md:mb-8 text-balance leading-[1.1] tracking-tight">
-              Learn Python Through
+              Learn Python With
+              <div></div>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary to-secondary">
-                {" "}
-                Interactive Lessons
+                [Viskar]
               </span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
-              Master Python programming with hands-on coding exercises, instant feedback, and guided lessons designed
-              for beginners.
+              The world's best interactive python course, with lessons designed for <strong>beginners</strong>
             </p>
           </div>
 
