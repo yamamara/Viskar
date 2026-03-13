@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AlertCircle, GraduationCap } from "lucide-react"
 import { useTeacherAuth } from "@/components/teacher-auth-provider"
+import { sendTeacherPasswordReset } from "@/lib/firebase-auth"
 
 export default function TeacherLoginPage() {
   const [loginEmail, setLoginEmail] = useState("")
@@ -19,6 +20,7 @@ export default function TeacherLoginPage() {
   const [signupPassword, setSignupPassword] = useState("")
   const [signupConfirm, setSignupConfirm] = useState("")
   const [error, setError] = useState("")
+  const [notice, setNotice] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
   const { login, signup, session, loading } = useTeacherAuth()
@@ -32,6 +34,7 @@ export default function TeacherLoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setNotice("")
 
     if (!loginEmail || !loginPassword) {
       setError("Please fill in all fields")
@@ -57,6 +60,7 @@ export default function TeacherLoginPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setNotice("")
 
     if (!signupEmail || !signupPassword || !signupConfirm) {
       setError("Please fill in all fields")
@@ -84,6 +88,27 @@ export default function TeacherLoginPage() {
       } else {
         setError(message)
       }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handlePasswordReset = async () => {
+    setError("")
+    setNotice("")
+
+    if (!loginEmail) {
+      setError("Enter your email first to reset your password")
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      await sendTeacherPasswordReset(loginEmail)
+      setNotice("Password reset email sent. Check your inbox.")
+    } catch (resetError) {
+      const message = resetError instanceof Error ? resetError.message : "Failed to send password reset email"
+      setError(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -152,8 +177,18 @@ export default function TeacherLoginPage() {
                     </div>
                   )}
 
+                  {notice && (
+                    <div className="text-sm text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                      <p>{notice}</p>
+                    </div>
+                  )}
+
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     Sign In
+                  </Button>
+
+                  <Button type="button" variant="link" className="w-full" onClick={handlePasswordReset} disabled={isSubmitting}>
+                    Forgot Password?
                   </Button>
                 </form>
               </TabsContent>

@@ -119,6 +119,18 @@ export async function logoutTeacher() {
   persistTeacherSession(null)
 }
 
+export async function sendTeacherPasswordReset(email: string) {
+  const response = await fetch("/api/auth/reset-password", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  })
+
+  return parseResponse<{ success: boolean }>(response)
+}
+
 export async function signInTeacher(email: string, password: string) {
   const response = await fetch("/api/auth/login", {
     method: "POST",
