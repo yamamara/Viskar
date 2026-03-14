@@ -1,4 +1,5 @@
 import { getValidTeacherIdToken } from "@/lib/firebase-auth"
+import { getCurrentStudentSession } from "@/lib/student-session"
 
 async function parseJson<T>(response: Response): Promise<T> {
   const payload = await response.json().catch(() => ({}))
@@ -27,6 +28,24 @@ export async function fetchTeacherJson<T>(input: RequestInfo | URL, init?: Reque
     headers: {
       ...(init?.headers || {}),
       Authorization: `Bearer ${token}`,
+    },
+  })
+
+  return parseJson<T>(response)
+}
+
+export async function fetchStudentJson<T>(classCode: string, input: RequestInfo | URL, init?: RequestInit) {
+  const session = getCurrentStudentSession(classCode)
+  if (!session?.studentId || !session.sessionToken) {
+    throw new Error("Missing student session")
+  }
+
+  const response = await fetch(input, {
+    ...init,
+    headers: {
+      ...(init?.headers || {}),
+      "X-Student-Id": session.studentId,
+      "X-Student-Session": session.sessionToken,
     },
   })
 

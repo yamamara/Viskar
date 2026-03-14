@@ -9,6 +9,16 @@ export interface StudentRecord {
   createdAt: string
 }
 
+export interface StudentClientSession {
+  studentId: string
+  sessionToken: string
+}
+
+export interface StudentJoinResponse {
+  student: StudentRecord
+  sessionToken: string
+}
+
 export interface StudentRosterEntry {
   id: string
   name: string

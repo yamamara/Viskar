@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { PythonIDE } from "@/components/python-ide"
 import { type Module } from "@/lib/lessons-data"
-import { fetchJson } from "@/lib/client-api"
+import { fetchJson, fetchStudentJson } from "@/lib/client-api"
 import { loadStudentSession, persistStudentSession } from "@/lib/student-session"
 import type { StudentRecord } from "@/lib/app-types"
 import { cn } from "@/lib/utils"
@@ -95,16 +95,14 @@ function LearnPageContent() {
       return null
     }
 
-    const studentId = loadStudentSession(classCode)
-    if (!studentId) {
+    const studentSession = loadStudentSession(classCode)
+    if (!studentSession?.studentId || !studentSession.sessionToken) {
       router.push("/")
       return null
     }
 
     try {
-      const studentRecord = await fetchJson<StudentRecord>(
-        `/api/students/session?classCode=${classCode}&studentId=${studentId}`,
-      )
+      const studentRecord = await fetchStudentJson<StudentRecord>(classCode, `/api/students/session?classCode=${classCode}`)
       setStudent(studentRecord)
       return studentRecord
     } catch {
@@ -130,13 +128,12 @@ function LearnPageContent() {
 
       setIsSavingProgress(true)
       try {
-        const updatedStudent = await fetchJson<StudentRecord>("/api/students/progress", {
+        const updatedStudent = await fetchStudentJson<StudentRecord>(student.classCode, "/api/students/progress", {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            studentId: student.id,
             classCode: student.classCode,
             currentModule,
             currentLesson,

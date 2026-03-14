@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto"
 import { NextResponse } from "next/server"
-import type { ClassRecord, StudentRecord } from "@/lib/app-types"
+import type { ClassRecord, StudentJoinResponse, StudentRecord } from "@/lib/app-types"
 import { getDocument, setDocument } from "@/lib/firestore-rest"
+import { createStoredStudentRecord, createStudentSessionToken, toPublicStudentRecord } from "@/lib/student-auth"
 
 export async function POST(request: Request) {
   try {
@@ -33,9 +34,16 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     }
 
-    await setDocument("students", studentRecord.id, studentRecord)
+    const sessionToken = createStudentSessionToken()
+    const storedStudent = createStoredStudentRecord(studentRecord, sessionToken)
+    await setDocument("students", studentRecord.id, storedStudent)
 
-    return NextResponse.json(studentRecord, { status: 201 })
+    const payload: StudentJoinResponse = {
+      student: toPublicStudentRecord(storedStudent),
+      sessionToken,
+    }
+
+    return NextResponse.json(payload, { status: 201 })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to join class"
     return NextResponse.json({ error: message }, { status: 500 })

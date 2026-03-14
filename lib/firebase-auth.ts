@@ -4,6 +4,7 @@ import type { TeacherSession } from "@/lib/app-types"
 
 const STORAGE_KEY = "viskar_teacher_session"
 const REFRESH_WINDOW_MS = 60_000
+let currentTeacherSession: TeacherSession | null = null
 
 interface AuthResponse {
   idToken: string
@@ -42,6 +43,14 @@ function toSession(data: AuthResponse): TeacherSession {
   }
 }
 
+export function getCurrentTeacherSession() {
+  return currentTeacherSession
+}
+
+export function setCurrentTeacherSession(session: TeacherSession | null) {
+  currentTeacherSession = session
+}
+
 export function loadStoredTeacherSession(): TeacherSession | null {
   if (typeof window === "undefined") return null
 
@@ -49,9 +58,12 @@ export function loadStoredTeacherSession(): TeacherSession | null {
   if (!raw) return null
 
   try {
-    return JSON.parse(raw) as TeacherSession
+    const session = JSON.parse(raw) as TeacherSession
+    currentTeacherSession = session
+    return session
   } catch {
     window.localStorage.removeItem(STORAGE_KEY)
+    currentTeacherSession = null
     return null
   }
 }
@@ -61,9 +73,11 @@ export function persistTeacherSession(session: TeacherSession | null) {
 
   if (!session) {
     window.localStorage.removeItem(STORAGE_KEY)
+    currentTeacherSession = null
     return
   }
 
+  currentTeacherSession = session
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
 }
 
@@ -108,7 +122,7 @@ export async function ensureFreshTeacherSession(session: TeacherSession): Promis
 }
 
 export async function getValidTeacherIdToken() {
-  const session = loadStoredTeacherSession()
+  const session = currentTeacherSession
   if (!session) return null
 
   const freshSession = await ensureFreshTeacherSession(session)

@@ -1,22 +1,23 @@
 import { NextResponse } from "next/server"
-import type { StudentRecord } from "@/lib/app-types"
-import { getDocument, setDocument } from "@/lib/firestore-rest"
+import { getAuthorizedStudent, saveStoredStudent, toPublicStudentRecord } from "@/lib/student-auth"
 
 export async function POST(request: Request) {
   try {
-    const { studentId, classCode } = await request.json()
+    const { classCode } = await request.json()
     const normalizedCode = String(classCode || "").trim().toUpperCase()
+    const studentId = String(request.headers.get("x-student-id") || "").trim()
+    const sessionToken = String(request.headers.get("x-student-session") || "").trim()
 
-    if (!studentId || !normalizedCode) {
-      return NextResponse.json({ error: "Student ID and class code are required" }, { status: 400 })
+    if (!studentId || !normalizedCode || !sessionToken) {
+      return NextResponse.json({ error: "Student session is required" }, { status: 401 })
     }
 
-    const student = await getDocument<StudentRecord>("students", studentId)
-    if (!student || student.classCode !== normalizedCode) {
+    const student = await getAuthorizedStudent(String(studentId), normalizedCode, sessionToken)
+    if (!student) {
       return NextResponse.json({ error: "Student not found" }, { status: 404 })
     }
 
-    const nextStudent: StudentRecord = {
+    const nextStudent = {
       ...student,
       currentModule: 1,
       currentLesson: 1,
@@ -24,8 +25,8 @@ export async function POST(request: Request) {
       completedStages: [],
     }
 
-    const savedStudent = await setDocument<StudentRecord>("students", student.id, nextStudent)
-    return NextResponse.json(savedStudent)
+    const savedStudent = await saveStoredStudent(nextStudent)
+    return NextResponse.json(toPublicStudentRecord(savedStudent))
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to reset student progress"
     return NextResponse.json({ error: message }, { status: 500 })

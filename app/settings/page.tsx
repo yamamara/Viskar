@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { useTheme } from "next-themes"
 import { Moon, Sun, Home, GraduationCap } from "lucide-react"
 import type { StudentRecord } from "@/lib/app-types"
-import { fetchJson } from "@/lib/client-api"
+import { fetchStudentJson } from "@/lib/client-api"
 import { loadStudentSession, persistStudentSession } from "@/lib/student-session"
 import { useTeacherAuth } from "@/components/teacher-auth-provider"
 
@@ -42,13 +42,13 @@ function SettingsContent() {
       return
     }
 
-    const studentId = loadStudentSession(classCode)
-    if (!studentId) {
+    const studentSession = loadStudentSession(classCode)
+    if (!studentSession?.studentId || !studentSession.sessionToken) {
       router.push("/")
       return
     }
 
-    fetchJson<StudentRecord>(`/api/students/session?classCode=${classCode}&studentId=${studentId}`)
+    fetchStudentJson<StudentRecord>(classCode, `/api/students/session?classCode=${classCode}`)
       .then(setStudent)
       .catch(() => {
         persistStudentSession(classCode, null)
@@ -62,13 +62,12 @@ function SettingsContent() {
     const confirmed = confirm("Are you sure you want to reset your progress? This cannot be undone.")
 
     if (confirmed) {
-      const updatedStudent = await fetchJson<StudentRecord>("/api/students/reset", {
+      const updatedStudent = await fetchStudentJson<StudentRecord>(student.classCode, "/api/students/reset", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          studentId: student.id,
           classCode: student.classCode,
         }),
       })

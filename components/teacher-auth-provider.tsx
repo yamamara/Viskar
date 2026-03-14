@@ -7,6 +7,7 @@ import {
   loadStoredTeacherSession,
   logoutTeacher,
   persistTeacherSession,
+  setCurrentTeacherSession,
   signInTeacher,
   signUpTeacher,
 } from "@/lib/firebase-auth"
@@ -75,8 +76,9 @@ export function TeacherAuthProvider({ children }: { children: React.ReactNode })
         setSession(null)
       },
       refresh: async () => {
-        const stored = loadStoredTeacherSession()
+        const stored = session ?? loadStoredTeacherSession()
         if (!stored) {
+          setCurrentTeacherSession(null)
           setSession(null)
           return null
         }
