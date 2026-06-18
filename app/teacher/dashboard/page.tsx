@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -11,8 +12,10 @@ import type { StudentRecord, TeacherDashboardData } from "@/lib/app-types"
 import { fetchTeacherJson } from "@/lib/client-api"
 import { useTeacherAuth } from "@/components/teacher-auth-provider"
 import { TeacherAuthGuard } from "@/components/teacher-auth-guard"
+import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
 
 function TeacherDashboardContent() {
+  const router = useRouter()
   const [modules, setModules] = useState<Module[]>([])
   const [dashboard, setDashboard] = useState<TeacherDashboardData | null>(null)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
@@ -87,7 +90,15 @@ function TeacherDashboardContent() {
       <header className="border-b border-border/50 glass-effect sticky top-0 z-50 shadow-elegant">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all duration-300 group">
+            <Link
+              href="/"
+              onClick={(event) => {
+                event.preventDefault()
+                markSkipAutoResumeOnce()
+                router.push("/")
+              }}
+              className="flex items-center gap-3 hover:opacity-80 transition-all duration-300 group"
+            >
               <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-elegant group-hover:scale-105 transition-transform">
                 <GraduationCap className="h-6 w-6 text-primary-foreground" />
               </div>

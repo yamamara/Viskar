@@ -4,6 +4,7 @@ import type { StudentClientSession } from "@/lib/app-types"
 
 const keyForClass = (classCode: string) => `viskar_student_session_${classCode.toUpperCase()}`
 const currentStudentSessions = new Map<string, StudentClientSession>()
+const SESSION_KEY_PREFIX = "viskar_student_session_"
 
 export function getCurrentStudentSession(classCode: string) {
   return currentStudentSessions.get(classCode.toUpperCase()) ?? null
@@ -58,4 +59,18 @@ export function persistStudentSession(classCode: string, session: StudentClientS
 
   setCurrentStudentSession(classCode, session)
   window.localStorage.setItem(keyForClass(classCode), JSON.stringify(session))
+}
+
+export function getStoredStudentSessionClassCodes() {
+  if (typeof window === "undefined") return []
+
+  const classCodes: string[] = []
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index)
+    if (key?.startsWith(SESSION_KEY_PREFIX)) {
+      classCodes.push(key.slice(SESSION_KEY_PREFIX.length).toUpperCase())
+    }
+  }
+
+  return classCodes.sort()
 }

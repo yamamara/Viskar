@@ -10,6 +10,7 @@ import { useTheme } from "next-themes"
 import { Moon, Sun, Home, GraduationCap } from "lucide-react"
 import type { StudentRecord } from "@/lib/app-types"
 import { fetchStudentJson } from "@/lib/client-api"
+import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
 import { loadStudentSession, persistStudentSession } from "@/lib/student-session"
 import { useTeacherAuth } from "@/components/teacher-auth-provider"
 
@@ -89,7 +90,15 @@ function SettingsContent() {
       <header className="border-b bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Link
+              href="/"
+              onClick={(event) => {
+                event.preventDefault()
+                markSkipAutoResumeOnce()
+                router.push("/")
+              }}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
               {isTeacher ? (
                 <>
                   <GraduationCap className="h-6 w-6 text-primary" />

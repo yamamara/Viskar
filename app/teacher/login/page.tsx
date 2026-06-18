@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AlertCircle, GraduationCap } from "lucide-react"
 import { useTeacherAuth } from "@/components/teacher-auth-provider"
 import { sendTeacherPasswordReset } from "@/lib/firebase-auth"
+import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
 
 export default function TeacherLoginPage() {
   const [loginEmail, setLoginEmail] = useState("")
@@ -118,7 +119,15 @@ export default function TeacherLoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
+          <Link
+            href="/"
+            onClick={(event) => {
+              event.preventDefault()
+              markSkipAutoResumeOnce()
+              router.push("/")
+            }}
+            className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity"
+          >
             <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center">
               <GraduationCap className="h-7 w-7 text-primary" />
             </div>
@@ -254,7 +263,15 @@ export default function TeacherLoginPage() {
         </Card>
 
         <div className="text-center mt-6">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/"
+            onClick={(event) => {
+              event.preventDefault()
+              markSkipAutoResumeOnce()
+              router.push("/")
+            }}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             Back to Home
           </Link>
         </div>

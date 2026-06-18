@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress"
 import { PythonIDE } from "@/components/python-ide"
 import { type Module } from "@/lib/lessons-data"
 import { fetchJson, fetchStudentJson } from "@/lib/client-api"
+import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
 import { loadStudentSession, persistStudentSession } from "@/lib/student-session"
 import type { StudentRecord } from "@/lib/app-types"
 import { cn } from "@/lib/utils"
@@ -317,7 +318,15 @@ function LearnPageContent() {
         <p className="text-muted-foreground max-w-xs">
           Your progress is being matched with the latest curriculum. One moment please.
         </p>
-        <Button variant="outline" size="sm" onClick={() => router.push("/")} className="mt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            markSkipAutoResumeOnce()
+            router.push("/")
+          }}
+          className="mt-4"
+        >
           Return to Login
         </Button>
       </div>
@@ -461,7 +470,15 @@ function LearnPageContent() {
                 {showSidebar ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
 
-              <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-all duration-300 group">
+              <Link
+                href="/"
+                onClick={(event) => {
+                  event.preventDefault()
+                  markSkipAutoResumeOnce()
+                  router.push("/")
+                }}
+                className="flex items-center gap-2.5 hover:opacity-80 transition-all duration-300 group"
+              >
                 <Home className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
                 <span className="font-semibold text-foreground tracking-tight">Viskar</span>
               </Link>

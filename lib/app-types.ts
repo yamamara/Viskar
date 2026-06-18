@@ -19,6 +19,16 @@ export interface StudentJoinResponse {
   sessionToken: string
 }
 
+export interface StudentContinueResponse {
+  student: StudentRecord
+  sessionToken: string
+}
+
+export interface ClassRosterResponse {
+  classCode: string
+  students: StudentRosterEntry[]
+}
+
 export interface StudentRosterEntry {
   id: string
   name: string

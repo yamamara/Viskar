@@ -1,12 +1,14 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { AutoStudentRedirect } from "@/components/auto-student-redirect"
 import { Code2, BookOpen, Users, Sparkles } from "lucide-react"
 import { ClassCodeForm } from "@/components/class-code-form"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 relative">
+      <AutoStudentRedirect />
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
 
       <div className="container mx-auto px-4 py-8 md:py-16 relative z-10">
