@@ -629,9 +629,9 @@ function LearnPageContent() {
 
       <div className="relative z-10">
         {isDesktop ? (
-          <ResizablePanelGroup direction="horizontal" autoSaveId="learn-sidebar" className="min-h-[calc(100vh-64px)]">
+          <ResizablePanelGroup direction="horizontal" autoSaveId="learn-sidebar" className="h-[calc(100vh-64px)]">
             <ResizablePanel defaultSize={22} minSize={16} maxSize={40}>
-              <div className="custom-scrollbar sticky h-[calc(100vh-64px)] overflow-y-auto border-r border-outline-variant/10 bg-surface-container-low">
+              <div className="custom-scrollbar h-full overflow-y-auto border-r border-outline-variant/10 bg-surface-container-low">
                 <SidebarHeading />
                 <ModuleNav
                   modules={modulesArray}
@@ -647,13 +647,8 @@ function LearnPageContent() {
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel>
-              <div className="flex min-h-[calc(100vh-64px)] flex-col bg-background">
-                <div
-                  className={cn(
-                    "custom-scrollbar px-6 py-10 md:px-12",
-                    currentStage.type === "lesson" && "flex-1 overflow-y-auto",
-                  )}
-                >
+              <div className="flex h-full flex-col bg-background">
+                <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-10 md:px-12">
                   <div className="mx-auto w-full max-w-content">
                     <nav className="mb-8 flex items-center gap-2 text-label-md uppercase text-on-surface-variant/70">
                       <span>Module {currentModule.id}</span>
@@ -712,7 +707,7 @@ function LearnPageContent() {
                   </div>
                 </div>
 
-                <div className="sticky bottom-0 z-10 mt-auto w-full border-t border-outline-variant/10 bg-surface-dim/80 px-6 py-4 backdrop-blur-md md:px-12">
+                <div className="z-10 w-full shrink-0 border-t border-outline-variant/10 bg-surface-dim/80 px-6 py-4 backdrop-blur-md md:px-12">
                   <div className="mx-auto flex w-full max-w-content items-center justify-between gap-4">
                     <Button
                       variant="outline"

@@ -1,0 +1,484 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Obsidian Midnight — ported verbatim from the Stitch design system's
+ * DESIGN.md. Every token below is the design system's own name and value;
+ * shadcn's semantic roles are aliased onto them further down.
+ *
+ * The system is dark-only, so :root and .dark carry identical values.
+ */
+:root,
+.dark {
+  /* Surfaces */
+  --surface: #0f131c;
+  --surface-dim: #0f131c;
+  --surface-bright: #353942;
+  --surface-container-lowest: #0a0e16;
+  --surface-container-low: #181c24;
+  --surface-container: #1c2028;
+  --surface-container-high: #262a33;
+  --surface-container-highest: #31353e;
+  --surface-variant: #31353e;
+  --surface-tint: #d0bcff;
+  --background: #0f131c;
+
+  /* Content */
+  --on-surface: #dfe2ee;
+  --on-surface-variant: #cbc3d7;
+  --on-background: #dfe2ee;
+  --inverse-surface: #dfe2ee;
+  --inverse-on-surface: #2c3039;
+  --outline: #958ea0;
+  --outline-variant: #494454;
+
+  /* Primary — violet */
+  --primary: #d0bcff;
+  --on-primary: #3c0091;
+  --primary-container: #a078ff;
+  --on-primary-container: #340080;
+  --inverse-primary: #6d3bd7;
+  --primary-fixed: #e9ddff;
+  --primary-fixed-dim: #d0bcff;
+  --on-primary-fixed: #23005c;
+  --on-primary-fixed-variant: #5516be;
+
+  /* Secondary — sky */
+  --secondary: #89ceff;
+  --on-secondary: #00344d;
+  --secondary-container: #00a2e6;
+  --on-secondary-container: #00344e;
+  --secondary-fixed: #c9e6ff;
+  --secondary-fixed-dim: #89ceff;
+  --on-secondary-fixed: #001e2f;
+  --on-secondary-fixed-variant: #004c6e;
+
+  /* Tertiary — amber */
+  --tertiary: #ffb869;
+  --on-tertiary: #482900;
+  --tertiary-container: #ca801e;
+  --on-tertiary-container: #3f2300;
+  --tertiary-fixed: #ffdcbb;
+  --tertiary-fixed-dim: #ffb869;
+  --on-tertiary-fixed: #2c1700;
+  --on-tertiary-fixed-variant: #673d00;
+
+  /* Error */
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+
+  /*
+   * shadcn semantic roles, aliased onto the tokens above.
+   * `success` has no counterpart in the design system — it is an app-level
+   * addition for exercise test results, tuned to sit in the same pastel-on-
+   * obsidian register as primary/secondary/tertiary.
+   */
+  --foreground: var(--on-background);
+  --card: var(--surface-container);
+  --card-foreground: var(--on-surface);
+  --popover: var(--surface-container-high);
+  --popover-foreground: var(--on-surface);
+  --primary-foreground: var(--on-primary);
+  --secondary-foreground: var(--on-secondary);
+  --muted: var(--surface-container-high);
+  --muted-foreground: var(--on-surface-variant);
+  --accent: var(--surface-variant);
+  --accent-foreground: var(--on-surface);
+  --destructive: var(--error);
+  --destructive-foreground: var(--on-error);
+  --border: var(--outline-variant);
+  --input: var(--surface-container-lowest);
+  --ring: var(--primary);
+  --success: #7ee2b8;
+  --success-foreground: #00382a;
+  --warning: var(--tertiary);
+  --warning-foreground: var(--on-tertiary);
+
+  --chart-1: var(--primary);
+  --chart-2: var(--secondary);
+  --chart-3: var(--tertiary);
+  --chart-4: var(--primary-container);
+  --chart-5: var(--secondary-container);
+
+  --sidebar: var(--surface-container-low);
+  --sidebar-foreground: var(--on-surface);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--on-primary);
+  --sidebar-accent: var(--surface-variant);
+  --sidebar-accent-foreground: var(--on-surface);
+  --sidebar-border: var(--outline-variant);
+  --sidebar-ring: var(--primary);
+}
+
+@theme inline {
+  /* Geist for chrome and headings, Literata for reading, JetBrains Mono for code */
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-literata), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", monospace;
+
+  /* Type scale */
+  --text-headline-xl: 48px;
+  --text-headline-xl--line-height: 56px;
+  --text-headline-xl--letter-spacing: -0.02em;
+  --text-headline-xl--font-weight: 700;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--letter-spacing: -0.01em;
+  --text-headline-lg--font-weight: 600;
+  --text-headline-lg-mobile: 28px;
+  --text-headline-lg-mobile--line-height: 36px;
+  --text-headline-lg-mobile--font-weight: 600;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 32px;
+  --text-body-lg--font-weight: 400;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 28px;
+  --text-body-md--font-weight: 400;
+  --text-label-md: 14px;
+  --text-label-md--line-height: 20px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 500;
+  --text-code-sm: 13px;
+  --text-code-sm--line-height: 20px;
+  --text-code-sm--font-weight: 400;
+
+  /* Shape — 4px standard, 8px for cards and code blocks */
+  --radius-sm: 0.125rem;
+  --radius: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  /* Layout — 8px base unit, 1200px fixed content grid */
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 16px;
+  --spacing-margin-desktop: 40px;
+  --container-content: 1200px;
+
+  /* --- Design system colors, under their own names --- */
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-variant: var(--surface-variant);
+  --color-surface-tint: var(--surface-tint);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-on-background: var(--on-background);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-inverse-primary: var(--inverse-primary);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  --color-on-primary-fixed: var(--on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--on-primary-fixed-variant);
+
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-secondary-fixed: var(--secondary-fixed);
+  --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+  --color-on-secondary-fixed: var(--on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
+
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-tertiary-fixed: var(--tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+  --color-on-tertiary-fixed: var(--on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
+
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+
+  /* --- shadcn semantic aliases --- */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-on-background antialiased;
+  }
+
+  html {
+    @apply scroll-smooth;
+    color-scheme: dark;
+  }
+
+  /* Headlines and labels take Geist; long-form prose switches to Literata */
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-sans tracking-tight;
+  }
+
+  /* Inputs sit darker than the surface, with a violet focus edge and glow */
+  input,
+  textarea,
+  select {
+    @apply bg-surface-container-lowest;
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+/*
+ * Long-form lesson copy. The typography plugin's palette is repointed at the
+ * Obsidian tokens so prose sits on the same surfaces as the chrome.
+ *
+ * These rules are deliberately UNLAYERED. @tailwindcss/typography emits `.prose`
+ * into the `utilities` layer, and layer order outranks selector specificity — so
+ * anything placed in `@layer components` here loses to the plugin's light-theme
+ * defaults no matter how specific it is. Unlayered rules outrank every layer.
+ */
+.prose.prose-obsidian {
+  --tw-prose-body: var(--on-surface);
+  --tw-prose-headings: var(--on-surface);
+  --tw-prose-lead: var(--on-surface-variant);
+  --tw-prose-links: var(--secondary);
+  --tw-prose-bold: var(--on-surface);
+  --tw-prose-counters: var(--on-surface-variant);
+  --tw-prose-bullets: var(--primary);
+  --tw-prose-hr: var(--outline-variant);
+  --tw-prose-quotes: var(--on-surface-variant);
+  --tw-prose-quote-borders: var(--primary);
+  --tw-prose-captions: var(--on-surface-variant);
+  --tw-prose-code: var(--secondary-fixed);
+  --tw-prose-pre-code: var(--on-surface);
+  --tw-prose-pre-bg: var(--surface-container-lowest);
+  --tw-prose-th-borders: var(--outline-variant);
+  --tw-prose-td-borders: var(--outline-variant);
+  color: var(--tw-prose-body);
+  font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* The stage subtitle sits one step down the hierarchy */
+.prose.prose-obsidian.prose-obsidian-lead {
+  --tw-prose-body: var(--on-surface-variant);
+}
+
+.prose.prose-obsidian :where(h1, h2, h3, h4) {
+  color: var(--tw-prose-headings);
+  font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.prose.prose-obsidian :where(code):not(:where(pre code)) {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--secondary-fixed);
+  background-color: var(--surface-container-high);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+}
+
+.prose.prose-obsidian :where(code):not(:where(pre code))::before,
+.prose.prose-obsidian :where(code):not(:where(pre code))::after {
+  content: "";
+}
+
+/* Fenced blocks are replaced by LessonCodeBlock; this covers any bare <pre> */
+.prose.prose-obsidian :where(pre) {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--on-surface);
+  background-color: var(--surface-container-lowest);
+  border: 1px solid color-mix(in oklab, var(--outline-variant) 20%, transparent);
+  border-radius: 0.5rem;
+}
+
+/* Bullets become small violet squares, per the design's technical grid */
+.prose.prose-obsidian :where(ul) {
+  list-style: none;
+  padding-left: 1.5rem;
+}
+
+.prose.prose-obsidian :where(ul > li) {
+  position: relative;
+  padding-left: 0;
+}
+
+.prose.prose-obsidian :where(ul > li)::marker {
+  content: "";
+}
+
+.prose.prose-obsidian :where(ul > li)::before {
+  content: "";
+  position: absolute;
+  left: -1.25rem;
+  top: 0.65em;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 1px;
+  background-color: var(--primary);
+}
+
+/* Callout body: a leading `**Title**` becomes the callout's heading line */
+.callout-body > p {
+  margin: 0;
+}
+
+.callout-body > p:first-child > strong:first-child {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.callout-body code {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--secondary-fixed);
+  background-color: var(--surface-container-high);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+}
+
+@layer utilities {
+  /* Faint technical grid, used behind full-page backgrounds */
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, var(--on-surface) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--on-surface) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--outline-variant);
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--outline);
+  }
+
+  /* Syntax highlighting draws on the secondary and primary tokens */
+  .token-keyword {
+    color: var(--secondary);
+  }
+
+  .token-string {
+    color: var(--tertiary-container);
+  }
+
+  .token-function {
+    color: var(--primary-container);
+  }
+
+  .token-number {
+    color: var(--tertiary);
+  }
+
+  .token-comment {
+    color: var(--outline);
+    font-style: italic;
+  }
+
+  .animate-in {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /*
+   * Glassmorphism: 20px backdrop blur with a 10% white top highlight, as
+   * specified for top-level navigation and floating panels.
+   */
+  .glass-effect {
+    @apply bg-surface-dim/80 border-t border-white/10;
+    backdrop-filter: blur(20px);
+  }
+
+  /* Contained energy: a low-opacity violet interior stroke on active surfaces */
+  .inner-glow {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 25%, transparent);
+  }
+
+  /* Depth comes from tonal layers, so "shadows" stay near-invisible */
+  .shadow-elegant {
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+  }
+
+  .shadow-elegant-lg {
+    box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.5), 0 8px 32px -8px rgba(0, 0, 0, 0.4);
+  }
+}
