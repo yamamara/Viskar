@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,8 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { storage } from "@/lib/storage"
 import { AlertCircle, GraduationCap } from "lucide-react"
+import { useTeacherAuth } from "@/components/teacher-auth-provider"
+import { sendTeacherPasswordReset } from "@/lib/firebase-auth"
+import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
 
 export default function TeacherLoginPage() {
   const [loginEmail, setLoginEmail] = useState("")
@@ -19,40 +21,47 @@ export default function TeacherLoginPage() {
   const [signupPassword, setSignupPassword] = useState("")
   const [signupConfirm, setSignupConfirm] = useState("")
   const [error, setError] = useState("")
+  const [notice, setNotice] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const { login, signup, session, loading } = useTeacherAuth()
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!loading && session) {
+      router.replace("/teacher/dashboard")
+    }
+  }, [loading, router, session])
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setNotice("")
 
     if (!loginEmail || !loginPassword) {
       setError("Please fill in all fields")
       return
     }
 
-    const teacher = storage.getTeacher(loginEmail)
-
-    if (!teacher) {
-      setError("No account found with this email")
-      return
+    setIsSubmitting(true)
+    try {
+      await login(loginEmail, loginPassword)
+      router.push("/teacher/dashboard")
+    } catch (authError) {
+      const message = authError instanceof Error ? authError.message : "Failed to sign in"
+      if (message === "INVALID_LOGIN_CREDENTIALS") {
+        setError("Incorrect email or password")
+      } else {
+        setError(message)
+      }
+    } finally {
+      setIsSubmitting(false)
     }
-
-    if (teacher.password !== loginPassword) {
-      setError("Incorrect password")
-      return
-    }
-
-    // Store current teacher session
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("teacherEmail", loginEmail)
-    }
-
-    router.push("/teacher/dashboard")
   }
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setNotice("")
 
     if (!signupEmail || !signupPassword || !signupConfirm) {
       setError("Please fill in all fields")
@@ -69,41 +78,60 @@ export default function TeacherLoginPage() {
       return
     }
 
-    // Check if teacher already exists
-    const existingTeacher = storage.getTeacher(signupEmail)
-    if (existingTeacher) {
-      setError("An account with this email already exists")
+    setIsSubmitting(true)
+    try {
+      await signup(signupEmail, signupPassword)
+      router.push("/teacher/dashboard")
+    } catch (authError) {
+      const message = authError instanceof Error ? authError.message : "Failed to create account"
+      if (message === "EMAIL_EXISTS") {
+        setError("An account with this email already exists")
+      } else {
+        setError(message)
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handlePasswordReset = async () => {
+    setError("")
+    setNotice("")
+
+    if (!loginEmail) {
+      setError("Enter your email first to reset your password")
       return
     }
 
-    // Create new teacher account
-    const newTeacher = {
-      id: `teacher_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      email: signupEmail,
-      password: signupPassword,
-      classCodes: [],
-      createdAt: new Date().toISOString(),
+    setIsSubmitting(true)
+    try {
+      await sendTeacherPasswordReset(loginEmail)
+      setNotice("Password reset email sent. Check your inbox.")
+    } catch (resetError) {
+      const message = resetError instanceof Error ? resetError.message : "Failed to send password reset email"
+      setError(message)
+    } finally {
+      setIsSubmitting(false)
     }
-
-    storage.setTeacher(newTeacher)
-
-    // Store current teacher session
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("teacherEmail", signupEmail)
-    }
-
-    router.push("/teacher/dashboard")
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
+          <Link
+            href="/"
+            onClick={(event) => {
+              event.preventDefault()
+              markSkipAutoResumeOnce()
+              router.push("/")
+            }}
+            className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity"
+          >
             <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center">
               <GraduationCap className="h-7 w-7 text-primary" />
             </div>
-            <span className="text-2xl font-bold text-foreground">PyLearn</span>
+            <span className="text-2xl font-bold text-foreground">Viskar</span>
           </Link>
           <h1 className="text-3xl font-bold text-foreground mb-2">Teacher Portal</h1>
           <p className="text-muted-foreground">Manage your classes and track student progress</p>
@@ -158,8 +186,18 @@ export default function TeacherLoginPage() {
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full">
+                  {notice && (
+                    <div className="text-sm text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                      <p>{notice}</p>
+                    </div>
+                  )}
+
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
                     Sign In
+                  </Button>
+
+                  <Button type="button" variant="link" className="w-full" onClick={handlePasswordReset} disabled={isSubmitting}>
+                    Forgot Password?
                   </Button>
                 </form>
               </TabsContent>
@@ -215,7 +253,7 @@ export default function TeacherLoginPage() {
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
                     Create Account
                   </Button>
                 </form>
@@ -225,7 +263,15 @@ export default function TeacherLoginPage() {
         </Card>
 
         <div className="text-center mt-6">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/"
+            onClick={(event) => {
+              event.preventDefault()
+              markSkipAutoResumeOnce()
+              router.push("/")
+            }}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             Back to Home
           </Link>
         </div>

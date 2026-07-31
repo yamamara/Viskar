@@ -1,70 +1,57 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { storage } from "@/lib/storage"
-import type { Teacher, Student, ClassCode } from "@/lib/storage"
-import { modules } from "@/lib/lessons-data"
-import { Plus, Copy, LogOut, GraduationCap, Users, Settings, Check } from "lucide-react"
+import { type Module } from "@/lib/lessons-data"
+import { Plus, Copy, LogOut, GraduationCap, Users, Settings, Check, BookOpen } from "lucide-react"
+import type { StudentRecord, TeacherDashboardData } from "@/lib/app-types"
+import { fetchTeacherJson } from "@/lib/client-api"
+import { useTeacherAuth } from "@/components/teacher-auth-provider"
+import { TeacherAuthGuard } from "@/components/teacher-auth-guard"
+import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
 
-export default function TeacherDashboardPage() {
+function TeacherDashboardContent() {
   const router = useRouter()
-  const [teacher, setTeacher] = useState<Teacher | null>(null)
-  const [classData, setClassData] = useState<Map<string, { code: ClassCode; students: Student[] }>>(new Map())
+  const [modules, setModules] = useState<Module[]>([])
+  const [dashboard, setDashboard] = useState<TeacherDashboardData | null>(null)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
+  const [isCreatingClass, setIsCreatingClass] = useState(false)
+  const { session, logout } = useTeacherAuth()
 
   useEffect(() => {
-    const teacherEmail = sessionStorage.getItem("teacherEmail")
+    fetch("/api/lessons")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.error) {
+          setModules(data)
+        }
+      })
+      .catch((err) => console.error("Failed to load lessons:", err))
+  }, [])
 
-    if (!teacherEmail) {
-      router.push("/teacher/login")
-      return
+  useEffect(() => {
+    if (!session) return
+
+    fetchTeacherJson<TeacherDashboardData>("/api/teacher/dashboard")
+      .then(setDashboard)
+      .catch((err) => console.error("Failed to load teacher dashboard:", err))
+  }, [session])
+
+  const handleGenerateClassCode = async () => {
+    setIsCreatingClass(true)
+    try {
+      await fetchTeacherJson("/api/classes", {
+        method: "POST",
+      })
+      const nextDashboard = await fetchTeacherJson<TeacherDashboardData>("/api/teacher/dashboard")
+      setDashboard(nextDashboard)
+    } finally {
+      setIsCreatingClass(false)
     }
-
-    const teacherData = storage.getTeacher(teacherEmail)
-
-    if (!teacherData) {
-      router.push("/teacher/login")
-      return
-    }
-
-    setTeacher(teacherData)
-
-    // Load all class data
-    const classMap = new Map<string, { code: ClassCode; students: Student[] }>()
-    teacherData.classCodes.forEach((code) => {
-      const codeData = storage.getClassCode(code)
-      if (codeData) {
-        const students = storage.getAllStudentsForClass(code)
-        classMap.set(code, { code: codeData, students })
-      }
-    })
-    setClassData(classMap)
-  }, [router])
-
-  const handleGenerateClassCode = () => {
-    if (!teacher) return
-
-    const newCode = storage.generateClassCode()
-
-    const newClassCode: ClassCode = {
-      code: newCode,
-      teacherId: teacher.id,
-      createdAt: new Date().toISOString(),
-      students: [],
-    }
-
-    storage.setClassCode(newClassCode)
-
-    teacher.classCodes.push(newCode)
-    storage.setTeacher(teacher)
-
-    setTeacher({ ...teacher })
-    setClassData(new Map(classData.set(newCode, { code: newClassCode, students: [] })))
   }
 
   const handleCopyCode = (code: string) => {
@@ -73,13 +60,14 @@ export default function TeacherDashboardPage() {
     setTimeout(() => setCopiedCode(null), 2000)
   }
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("teacherEmail")
-    router.push("/teacher/login")
+  const handleLogout = async () => {
+    await logout()
+    window.location.href = "/teacher/login"
   }
 
-  const getStudentProgress = (student: Student) => {
-    const currentModule = modules.find((m) => m.id === student.currentModule)
+  const getStudentProgress = (student: StudentRecord) => {
+    const modulesArray = Array.isArray(modules) ? modules : []
+    const currentModule = modulesArray.find((m) => m.id === student.currentModule)
     const currentLesson = currentModule?.lessons.find((l) => l.id === student.currentLesson)
 
     if (!currentModule || !currentLesson) return "Module 1, Lesson 1"
@@ -87,7 +75,7 @@ export default function TeacherDashboardPage() {
     return `Module ${currentModule.id}: ${currentModule.title}, Lesson ${currentLesson.id}: ${currentLesson.title}`
   }
 
-  if (!teacher) {
+  if (!dashboard) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
@@ -102,17 +90,31 @@ export default function TeacherDashboardPage() {
       <header className="border-b border-border/50 glass-effect sticky top-0 z-50 shadow-elegant">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all duration-300 group">
+            <Link
+              href="/"
+              onClick={(event) => {
+                event.preventDefault()
+                markSkipAutoResumeOnce()
+                router.push("/")
+              }}
+              className="flex items-center gap-3 hover:opacity-80 transition-all duration-300 group"
+            >
               <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-elegant group-hover:scale-105 transition-transform">
                 <GraduationCap className="h-6 w-6 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground tracking-tight">PyLearn Teacher</span>
+              <span className="text-xl font-bold text-foreground tracking-tight">Viskar Teacher</span>
             </Link>
 
             <div className="flex items-center gap-3">
               <div className="hidden md:block text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{teacher.email}</span>
+                <span className="font-medium text-foreground">{dashboard.teacher.email}</span>
               </div>
+              <Link href="/teacher/lessons">
+                <Button variant="outline" size="sm" className="hover:bg-accent/10 transition-all duration-300">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Manage Lessons
+                </Button>
+              </Link>
               <Link href={`/settings?teacher=true`}>
                 <Button variant="ghost" size="sm" className="hover:bg-accent/10 transition-all duration-300">
                   <Settings className="h-4 w-4" />
@@ -142,7 +144,7 @@ export default function TeacherDashboardPage() {
           <Card className="border border-border/50 shadow-elegant hover:shadow-elegant-lg transition-all duration-300">
             <CardHeader className="pb-3 space-y-2">
               <CardDescription className="text-sm font-medium">Total Classes</CardDescription>
-              <CardTitle className="text-4xl font-bold">{teacher.classCodes.length}</CardTitle>
+              <CardTitle className="text-4xl font-bold">{dashboard.classes.length}</CardTitle>
             </CardHeader>
           </Card>
 
@@ -150,7 +152,7 @@ export default function TeacherDashboardPage() {
             <CardHeader className="pb-3 space-y-2">
               <CardDescription className="text-sm font-medium">Total Students</CardDescription>
               <CardTitle className="text-4xl font-bold">
-                {Array.from(classData.values()).reduce((sum, data) => sum + data.students.length, 0)}
+                {dashboard.classes.reduce((sum, data) => sum + data.students.length, 0)}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -172,6 +174,7 @@ export default function TeacherDashboardPage() {
             <Button
               onClick={handleGenerateClassCode}
               className="shadow-elegant hover:shadow-elegant-lg transition-all duration-300"
+              disabled={isCreatingClass}
             >
               <Plus className="h-4 w-4 mr-2" />
               Generate Class Code
@@ -180,7 +183,7 @@ export default function TeacherDashboardPage() {
         </Card>
 
         <div className="space-y-8">
-          {teacher.classCodes.length === 0 ? (
+          {dashboard.classes.length === 0 ? (
             <Card className="border border-border/50 shadow-elegant">
               <CardContent className="py-16 text-center">
                 <Users className="h-16 w-16 text-muted-foreground/50 mx-auto mb-5" />
@@ -189,6 +192,7 @@ export default function TeacherDashboardPage() {
                 <Button
                   onClick={handleGenerateClassCode}
                   className="shadow-elegant hover:shadow-elegant-lg transition-all duration-300"
+                  disabled={isCreatingClass}
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Generate Class Code
@@ -196,19 +200,16 @@ export default function TeacherDashboardPage() {
               </CardContent>
             </Card>
           ) : (
-            teacher.classCodes.map((code) => {
-              const data = classData.get(code)
-              if (!data) return null
-
+            dashboard.classes.map((data) => {
               return (
                 <Card
-                  key={code}
+                  key={data.code}
                   className="border border-border/50 shadow-elegant hover:shadow-elegant-lg transition-all duration-300"
                 >
                   <CardHeader>
                     <div className="flex items-center justify-between gap-4">
                       <div className="space-y-2">
-                        <CardTitle className="text-2xl tracking-tight">Class {code}</CardTitle>
+                        <CardTitle className="text-2xl tracking-tight">Class {data.code}</CardTitle>
                         <CardDescription className="text-base">
                           {data.students.length} students enrolled
                         </CardDescription>
@@ -216,10 +217,10 @@ export default function TeacherDashboardPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleCopyCode(code)}
+                        onClick={() => handleCopyCode(data.code)}
                         className="flex-shrink-0 hover:bg-accent/10 transition-all duration-300"
                       >
-                        {copiedCode === code ? (
+                        {copiedCode === data.code ? (
                           <>
                             <Check className="h-4 w-4 mr-2 text-success" />
                             Copied!
@@ -238,7 +239,7 @@ export default function TeacherDashboardPage() {
                       <div className="text-center py-12 text-muted-foreground">
                         <p className="text-base">No students have joined this class yet</p>
                         <p className="text-sm mt-3">
-                          Share the class code: <span className="font-mono font-semibold text-foreground">{code}</span>
+                          Share the class code: <span className="font-mono font-semibold text-foreground">{data.code}</span>
                         </p>
                       </div>
                     ) : (
@@ -275,5 +276,13 @@ export default function TeacherDashboardPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function TeacherDashboardPage() {
+  return (
+    <TeacherAuthGuard>
+      <TeacherDashboardContent />
+    </TeacherAuthGuard>
   )
 }
