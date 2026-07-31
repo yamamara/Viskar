@@ -28,22 +28,10 @@ jobs:
         with:
           node-version: "22"
 
-      # The Firebase CLI reads this file for non-interactive auth, which is what
-      # replaces `firebase login` here.
-      - name: Write service account credentials
+      # Talks to firebaserules.googleapis.com directly. firebase-tools would
+      # also demand Service Usage permissions for its API-enablement preflight,
+      # which has nothing to do with publishing rules.
+      - name: Deploy rules
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
-            echo "::error::FIREBASE_SERVICE_ACCOUNT secret is not set. See DEPLOYMENT.md."
-            exit 1
-          fi
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-key.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-key.json" >> "$GITHUB_ENV"
-
-      - name: Deploy rules
-        run: npx --yes firebase-tools@latest deploy --only firestore:rules --non-interactive
-
-      - name: Remove credentials
-        if: always()
-        run: rm -f "$RUNNER_TEMP/firebase-key.json"
+        run: node scripts/deploy-firestore-rules.mjs

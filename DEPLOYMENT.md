@@ -27,15 +27,25 @@ custom apex domain the site is the root, and a basePath makes every asset URL
    secret:
 
    - `FIREBASE_SERVICE_ACCOUNT` — the full JSON key for a service account with
-     the **Firebase Rules Admin** role (`roles/firebaserules.admin`).
+     the **Firebase Rules Admin** role (`roles/firebaserules.admin`). That one
+     role is enough.
 
-   To mint it: Google Cloud console → IAM & Admin → Service Accounts → create
-   (or reuse the existing `firebase-adminsdk-*` account) → grant Firebase Rules
-   Admin under IAM → Keys → Add key → JSON. Paste the whole file into the
-   secret.
+   To mint it: Firebase console → Project settings → Service accounts →
+   Generate new private key, then grant the role to that account in the Google
+   Cloud IAM console and paste the whole JSON file into the secret.
 
-   To deploy from a laptop instead, `npx firebase-tools login` followed by
-   `npx firebase-tools deploy --only firestore:rules` does the same thing.
+   The workflow runs `scripts/deploy-firestore-rules.mjs`, which calls the
+   Firebase Rules API directly rather than going through `firebase-tools`. The
+   CLI insists on checking that `firestore.googleapis.com` is enabled before it
+   will deploy anything, and that check needs Service Usage permissions that
+   have nothing to do with rules — an easy source of 403s that look like rules
+   problems but are not.
+
+   The same script runs locally:
+
+   ```
+   GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json node scripts/deploy-firestore-rules.mjs
+   ```
 
 3. **Add the build variables.** GitHub → Settings → Secrets and variables →
    Actions → Variables:
