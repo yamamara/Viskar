@@ -68,9 +68,6 @@ jobs:
       # firestore.rules, not by keeping these secret.
       - name: Build with Next.js
         run: pnpm exec next build
-        env:
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
