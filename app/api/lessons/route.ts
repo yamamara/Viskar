@@ -6,12 +6,23 @@ import { requireTeacherAuth } from "@/lib/server-auth"
 
 const LESSONS_COLLECTION = "content"
 const LESSONS_DOCUMENT_ID = "lessons"
+const USE_REMOTE_LESSON_CONTENT = process.env.USE_REMOTE_LESSON_CONTENT === "true"
 
 export async function GET() {
   try {
-    const document = await getDocument<LessonsContentDocument>(LESSONS_COLLECTION, LESSONS_DOCUMENT_ID)
-    const modules = document?.modules ? parseModules(document.modules) : getDefaultModules()
-    return NextResponse.json(modules)
+    if (USE_REMOTE_LESSON_CONTENT) {
+      try {
+        const document = await getDocument<LessonsContentDocument>(LESSONS_COLLECTION, LESSONS_DOCUMENT_ID)
+
+        if (document?.modules) {
+          return NextResponse.json(parseModules(document.modules))
+        }
+      } catch (error) {
+        console.warn("Falling back to bundled lesson content:", error)
+      }
+    }
+
+    return NextResponse.json(getDefaultModules())
   } catch (error) {
     console.error("Failed to load lessons:", error)
     return NextResponse.json({ error: "Failed to load lessons" }, { status: 500 })
