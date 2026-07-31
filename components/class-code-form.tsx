@@ -5,9 +5,9 @@ import type React from "react"
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AlertCircle } from "lucide-react"
-import { fetchJson } from "@/lib/client-api"
+import { continueAsStudent, fetchClassRoster, joinClass } from "@/lib/client-api"
 import { loadStudentSession, persistStudentSession } from "@/lib/student-session"
-import type { ClassRosterResponse, StudentContinueResponse, StudentJoinResponse, StudentRosterEntry } from "@/lib/app-types"
+import type { StudentRosterEntry } from "@/lib/app-types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,7 +26,7 @@ export function ClassCodeForm() {
 
   const hasLoadedRoster = loadedClassCode.length > 0 && loadedClassCode === classCode.trim().toUpperCase()
   const rememberedSession = useMemo(() => loadStudentSession(classCode.trim().toUpperCase()), [classCode])
-  const canResumeExistingSession = Boolean(rememberedSession?.studentId && rememberedSession?.sessionToken)
+  const canResumeExistingSession = Boolean(rememberedSession?.studentId)
   const hasStudents = students.length > 0
 
   const resetRosterState = () => {
@@ -47,7 +47,7 @@ export function ClassCodeForm() {
     setIsSubmitting(true)
     setError("")
     try {
-      const roster = await fetchJson<ClassRosterResponse>(`/api/classes/${upperCode}/students`)
+      const roster = await fetchClassRoster(upperCode)
       setLoadedClassCode(roster.classCode)
       setStudents(roster.students)
       setIsNewStudent(roster.students.length === 0)
@@ -62,7 +62,7 @@ export function ClassCodeForm() {
   }
 
   const continueExistingStudent = () => {
-    if (!rememberedSession?.studentId || !rememberedSession.sessionToken) {
+    if (!rememberedSession?.studentId) {
       setError("No saved student session was found for this device.")
       return
     }
@@ -80,21 +80,9 @@ export function ClassCodeForm() {
     setIsSubmitting(true)
     setError("")
     try {
-      const response = await fetchJson<StudentJoinResponse>("/api/students/join", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          classCode: loadedClassCode,
-          name: studentName.trim(),
-        }),
-      })
+      const student = await joinClass(loadedClassCode, studentName.trim())
 
-      persistStudentSession(loadedClassCode, {
-        studentId: response.student.id,
-        sessionToken: response.sessionToken,
-      })
+      persistStudentSession(loadedClassCode, { studentId: student.id })
       router.push(`/learn?code=${loadedClassCode}`)
     } catch (joinError) {
       const message = joinError instanceof Error ? joinError.message : "Failed to join class"
@@ -113,21 +101,9 @@ export function ClassCodeForm() {
     setIsSubmitting(true)
     setError("")
     try {
-      const response = await fetchJson<StudentContinueResponse>("/api/students/continue", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          classCode: loadedClassCode,
-          studentId: selectedStudentId,
-        }),
-      })
+      const student = await continueAsStudent(loadedClassCode, selectedStudentId)
 
-      persistStudentSession(loadedClassCode, {
-        studentId: response.student.id,
-        sessionToken: response.sessionToken,
-      })
+      persistStudentSession(loadedClassCode, { studentId: student.id })
       router.push(`/learn?code=${loadedClassCode}`)
     } catch (continueError) {
       const message = continueError instanceof Error ? continueError.message : "Failed to continue class progress"

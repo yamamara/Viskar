@@ -1,0 +1,78 @@
+rules_version = '2';
+
+// The app is a static site: there is no server and no service account, so
+// these rules are the only thing standing between a browser and the database.
+//
+// Two kinds of caller:
+//   - teachers, signed in with email and password
+//   - students, signed in anonymously; their uid is recorded on the student
+//     document's authUids, which is what lets them write their own progress
+//
+// Knowing a class code is what grants access to a class's roster, because the
+// code is part of the document path. Codes are therefore secrets in the same
+// weak sense they were before: anyone holding one can see that class's roster
+// and continue as any student in it.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isTeacher() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+
+    function classTeacher(classCode) {
+      return isTeacher()
+        && exists(/databases/$(database)/documents/classes/$(classCode))
+        && get(/databases/$(database)/documents/classes/$(classCode)).data.teacherId == request.auth.uid;
+    }
+
+    // The curriculum. Everyone signed in reads it; only teachers publish it.
+    match /content/{document} {
+      allow read: if signedIn();
+      allow write: if isTeacher();
+    }
+
+    match /teachers/{teacherId} {
+      allow read, write: if isTeacher() && request.auth.uid == teacherId;
+    }
+
+    match /classes/{classCode} {
+      // A student must be able to look up the class they are joining, but
+      // nobody may enumerate classes — the dashboard reads the teacher's own
+      // classCodes list instead.
+      allow get: if signedIn();
+      allow list: if false;
+
+      allow create: if isTeacher() && request.resource.data.teacherId == request.auth.uid;
+      allow update, delete: if isTeacher() && resource.data.teacherId == request.auth.uid;
+
+      match /students/{studentId} {
+        function ownsRecord() {
+          return signedIn() && request.auth.uid in resource.data.authUids;
+        }
+
+        // A browser adopting an existing student may add itself to authUids and
+        // nothing else — progress cannot change in the same write.
+        function claimsRecord() {
+          return signedIn()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['authUids'])
+            && request.auth.uid in request.resource.data.authUids;
+        }
+
+        allow read: if signedIn();
+
+        allow create: if signedIn()
+          && request.resource.data.classCode == classCode
+          && request.resource.data.authUids.size() == 1
+          && request.auth.uid in request.resource.data.authUids;
+
+        allow update: if ownsRecord() || claimsRecord() || classTeacher(classCode);
+        allow delete: if classTeacher(classCode);
+      }
+    }
+  }
+}

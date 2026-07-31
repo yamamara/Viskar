@@ -9,19 +9,18 @@ export interface StudentRecord {
   createdAt: string
 }
 
+/**
+ * The stored shape of a student. `authUids` holds the anonymous Firebase uids
+ * allowed to write this record — one per device, capped so a shared classroom
+ * machine does not grow the list forever. It is stripped before the record
+ * reaches the UI.
+ */
+export interface StoredStudentRecord extends StudentRecord {
+  authUids?: string[]
+}
+
 export interface StudentClientSession {
   studentId: string
-  sessionToken: string
-}
-
-export interface StudentJoinResponse {
-  student: StudentRecord
-  sessionToken: string
-}
-
-export interface StudentContinueResponse {
-  student: StudentRecord
-  sessionToken: string
 }
 
 export interface ClassRosterResponse {

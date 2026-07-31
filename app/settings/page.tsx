@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { useTheme } from "next-themes"
 import { Moon, Sun, Home, GraduationCap } from "lucide-react"
 import type { StudentRecord } from "@/lib/app-types"
-import { fetchStudentJson } from "@/lib/client-api"
+import { loadStudentRecord, resetStudentProgress } from "@/lib/client-api"
 import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
 import { loadStudentSession, persistStudentSession } from "@/lib/student-session"
 import { useTeacherAuth } from "@/components/teacher-auth-provider"
@@ -44,12 +44,12 @@ function SettingsContent() {
     }
 
     const studentSession = loadStudentSession(classCode)
-    if (!studentSession?.studentId || !studentSession.sessionToken) {
+    if (!studentSession?.studentId) {
       router.push("/")
       return
     }
 
-    fetchStudentJson<StudentRecord>(classCode, `/api/students/session?classCode=${classCode}`)
+    loadStudentRecord(classCode)
       .then(setStudent)
       .catch(() => {
         persistStudentSession(classCode, null)
@@ -63,15 +63,7 @@ function SettingsContent() {
     const confirmed = confirm("Are you sure you want to reset your progress? This cannot be undone.")
 
     if (confirmed) {
-      const updatedStudent = await fetchStudentJson<StudentRecord>(student.classCode, "/api/students/reset", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          classCode: student.classCode,
-        }),
-      })
+      const updatedStudent = await resetStudentProgress(student.classCode)
       setStudent(updatedStudent)
       alert("Progress has been reset!")
       router.push(`/learn?code=${student.classCode}`)

@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { type Module } from "@/lib/lessons-data"
 import { Plus, Copy, LogOut, GraduationCap, Users, Settings, Check, BookOpen } from "lucide-react"
 import type { StudentRecord, TeacherDashboardData } from "@/lib/app-types"
-import { fetchTeacherJson } from "@/lib/client-api"
+import { createClass, loadLessons, loadTeacherDashboard } from "@/lib/client-api"
 import { useTeacherAuth } from "@/components/teacher-auth-provider"
 import { TeacherAuthGuard } from "@/components/teacher-auth-guard"
 import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
@@ -23,20 +23,15 @@ function TeacherDashboardContent() {
   const { session, logout } = useTeacherAuth()
 
   useEffect(() => {
-    fetch("/api/lessons")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.error) {
-          setModules(data)
-        }
-      })
+    loadLessons()
+      .then(setModules)
       .catch((err) => console.error("Failed to load lessons:", err))
   }, [])
 
   useEffect(() => {
     if (!session) return
 
-    fetchTeacherJson<TeacherDashboardData>("/api/teacher/dashboard")
+    loadTeacherDashboard()
       .then(setDashboard)
       .catch((err) => console.error("Failed to load teacher dashboard:", err))
   }, [session])
@@ -44,11 +39,8 @@ function TeacherDashboardContent() {
   const handleGenerateClassCode = async () => {
     setIsCreatingClass(true)
     try {
-      await fetchTeacherJson("/api/classes", {
-        method: "POST",
-      })
-      const nextDashboard = await fetchTeacherJson<TeacherDashboardData>("/api/teacher/dashboard")
-      setDashboard(nextDashboard)
+      await createClass()
+      setDashboard(await loadTeacherDashboard())
     } finally {
       setIsCreatingClass(false)
     }

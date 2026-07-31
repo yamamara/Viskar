@@ -10,7 +10,7 @@ import { PythonIDE } from "@/components/python-ide"
 import { LessonCodeBlock } from "@/components/lesson-code-block"
 import { LessonCallout } from "@/components/lesson-callout"
 import { type Module } from "@/lib/lessons-data"
-import { fetchJson, fetchStudentJson } from "@/lib/client-api"
+import { loadLessons, loadStudentRecord, saveStudentProgress } from "@/lib/client-api"
 import { markSkipAutoResumeOnce } from "@/lib/home-navigation"
 import { loadStudentSession, persistStudentSession } from "@/lib/student-session"
 import type { StudentRecord } from "@/lib/app-types"
@@ -216,13 +216,13 @@ function LearnPageContent() {
     }
 
     const studentSession = loadStudentSession(classCode)
-    if (!studentSession?.studentId || !studentSession.sessionToken) {
+    if (!studentSession?.studentId) {
       router.push("/")
       return null
     }
 
     try {
-      const studentRecord = await fetchStudentJson<StudentRecord>(classCode, `/api/students/session?classCode=${classCode}`)
+      const studentRecord = await loadStudentRecord(classCode)
       setStudent(studentRecord)
       return studentRecord
     } catch {
@@ -248,18 +248,11 @@ function LearnPageContent() {
 
       setIsSavingProgress(true)
       try {
-        const updatedStudent = await fetchStudentJson<StudentRecord>(student.classCode, "/api/students/progress", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            classCode: student.classCode,
-            currentModule,
-            currentLesson,
-            currentStage,
-            completedStageKey,
-          }),
+        const updatedStudent = await saveStudentProgress(student.classCode, {
+          currentModule,
+          currentLesson,
+          currentStage,
+          completedStageKey,
         })
         setStudent(updatedStudent)
         return updatedStudent
@@ -271,13 +264,8 @@ function LearnPageContent() {
   )
 
   useEffect(() => {
-    fetch("/api/lessons")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.error) {
-          setModules(data)
-        }
-      })
+    loadLessons()
+      .then(setModules)
       .catch((err) => console.error("Failed to load lessons:", err))
   }, [])
 

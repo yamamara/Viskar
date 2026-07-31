@@ -1,46 +1,48 @@
 "use client"
 
-import type { TeacherSession } from "@/lib/app-types"
+import type { TeacherProfile, TeacherSession } from "@/lib/app-types"
+import { getDocument, setDocument } from "@/lib/firestore-client"
+import {
+  exchangeRefreshToken,
+  sendPasswordResetEmail,
+  signInWithPassword,
+  signUpWithPassword,
+  type FirebaseIdentity,
+} from "@/lib/firebase-identity"
 
 const STORAGE_KEY = "viskar_teacher_session"
 const REFRESH_WINDOW_MS = 60_000
 let currentTeacherSession: TeacherSession | null = null
 
-interface AuthResponse {
-  idToken: string
-  refreshToken: string
-  expiresIn: string
-  localId: string
-  email: string
-}
-
-function getApiKey() {
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY
-  if (!apiKey) {
-    throw new Error("NEXT_PUBLIC_FIREBASE_API_KEY is not configured")
-  }
-  return apiKey
-}
-
-async function parseResponse<T>(response: Response): Promise<T> {
-  const payload = await response.json().catch(() => ({}))
-
-  if (!response.ok) {
-    const message = payload?.error?.message || payload?.error || "Request failed"
-    throw new Error(message)
-  }
-
-  return payload as T
-}
-
-function toSession(data: AuthResponse): TeacherSession {
+function toSession(identity: FirebaseIdentity): TeacherSession {
   return {
-    uid: data.localId,
-    email: data.email,
-    idToken: data.idToken,
-    refreshToken: data.refreshToken,
-    expiresAt: Date.now() + Number(data.expiresIn) * 1000,
+    uid: identity.uid,
+    email: identity.email,
+    idToken: identity.idToken,
+    refreshToken: identity.refreshToken,
+    expiresAt: identity.expiresAt,
   }
+}
+
+/**
+ * The teacher profile used to be created by the login route. With no server,
+ * the client writes it on first sign-in; rules only let a teacher touch their
+ * own document.
+ */
+async function ensureTeacherProfile(session: TeacherSession) {
+  const existing = await getDocument<TeacherProfile>(`teachers/${session.uid}`, session.idToken)
+  if (existing) return existing
+
+  return setDocument<TeacherProfile>(
+    `teachers/${session.uid}`,
+    {
+      id: session.uid,
+      email: session.email,
+      classCodes: [],
+      createdAt: new Date().toISOString(),
+    },
+    session.idToken,
+  )
 }
 
 export function getCurrentTeacherSession() {
@@ -82,32 +84,14 @@ export function persistTeacherSession(session: TeacherSession | null) {
 }
 
 export async function refreshTeacherSession(session: TeacherSession): Promise<TeacherSession> {
-  const body = new URLSearchParams({
-    grant_type: "refresh_token",
-    refresh_token: session.refreshToken,
-  })
-
-  const response = await fetch(`https://securetoken.googleapis.com/v1/token?key=${getApiKey()}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body,
-  })
-
-  const payload = await parseResponse<{
-    id_token: string
-    refresh_token: string
-    expires_in: string
-    user_id: string
-  }>(response)
+  const refreshed = await exchangeRefreshToken(session.refreshToken)
 
   return {
-    uid: payload.user_id,
-    email: session.email,
-    idToken: payload.id_token,
-    refreshToken: payload.refresh_token,
-    expiresAt: Date.now() + Number(payload.expires_in) * 1000,
+    ...session,
+    uid: refreshed.uid,
+    idToken: refreshed.idToken,
+    refreshToken: refreshed.refreshToken,
+    expiresAt: refreshed.expiresAt,
   }
 }
 
@@ -134,43 +118,19 @@ export async function logoutTeacher() {
 }
 
 export async function sendTeacherPasswordReset(email: string) {
-  const response = await fetch("/api/auth/reset-password", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email }),
-  })
-
-  return parseResponse<{ success: boolean }>(response)
+  return sendPasswordResetEmail(email)
 }
 
 export async function signInTeacher(email: string, password: string) {
-  const response = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  })
-
-  const payload = await parseResponse<AuthResponse>(response)
-  const session = toSession(payload)
+  const session = toSession(await signInWithPassword(email, password))
   persistTeacherSession(session)
+  await ensureTeacherProfile(session)
   return session
 }
 
 export async function signUpTeacher(email: string, password: string) {
-  const response = await fetch("/api/auth/signup", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  })
-
-  const payload = await parseResponse<AuthResponse>(response)
-  const session = toSession(payload)
+  const session = toSession(await signUpWithPassword(email, password))
   persistTeacherSession(session)
+  await ensureTeacherProfile(session)
   return session
 }

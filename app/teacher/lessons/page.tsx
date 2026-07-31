@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { type Module, type Lesson, type Stage, type TestCase, type MatchMode } from "@/lib/lessons-data"
-import { fetchTeacherJson } from "@/lib/client-api"
+import { loadLessons, saveLessons } from "@/lib/client-api"
 import { Plus, Trash2, ArrowLeft, Save, GraduationCap, ChevronRight, ChevronDown, PlusCircle } from "lucide-react"
 import { TeacherAuthGuard } from "@/components/teacher-auth-guard"
 
@@ -17,26 +17,15 @@ function LessonManagerContent() {
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
-    fetch('/api/lessons')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.error) {
-          setModules(data)
-        }
-      })
+    loadLessons()
+      .then(setModules)
       .catch(err => console.error('Failed to load lessons:', err))
   }, [])
 
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      await fetchTeacherJson<{ success: boolean; updatedAt: string }>('/api/lessons', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(modules),
-      })
+      await saveLessons(modules)
 
       alert("Lessons saved successfully.")
     } catch (error) {
