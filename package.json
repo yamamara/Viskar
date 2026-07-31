@@ -6,7 +6,9 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "curriculum:build": "node scripts/build-curriculum.ts",
+    "curriculum:validate": "node scripts/validate-curriculum.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

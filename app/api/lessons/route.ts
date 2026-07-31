@@ -1,28 +1,19 @@
 import { NextResponse } from "next/server"
 import { ZodError } from "zod"
 import { getDocument, setDocument } from "@/lib/firestore-rest"
-import { getDefaultModules, parseModules, type LessonsContentDocument } from "@/lib/lesson-content"
+import { parseModules, resolveModules, type LessonsContentDocument } from "@/lib/lesson-content"
+import { CURRICULUM_VERSION } from "@/lib/curriculum-version"
 import { requireTeacherAuth } from "@/lib/server-auth"
 
 const LESSONS_COLLECTION = "content"
 const LESSONS_DOCUMENT_ID = "lessons"
-const USE_REMOTE_LESSON_CONTENT = process.env.USE_REMOTE_LESSON_CONTENT === "true"
 
 export async function GET() {
   try {
-    if (USE_REMOTE_LESSON_CONTENT) {
-      try {
-        const document = await getDocument<LessonsContentDocument>(LESSONS_COLLECTION, LESSONS_DOCUMENT_ID)
-
-        if (document?.modules) {
-          return NextResponse.json(parseModules(document.modules))
-        }
-      } catch (error) {
-        console.warn("Falling back to bundled lesson content:", error)
-      }
-    }
-
-    return NextResponse.json(getDefaultModules())
+    const document = await getDocument<LessonsContentDocument>(LESSONS_COLLECTION, LESSONS_DOCUMENT_ID)
+    // A stored curriculum is only trusted when it matches the bundled version.
+    const { modules } = resolveModules(document)
+    return NextResponse.json(modules)
   } catch (error) {
     console.error("Failed to load lessons:", error)
     return NextResponse.json({ error: "Failed to load lessons" }, { status: 500 })
@@ -36,6 +27,7 @@ export async function POST(request: Request) {
 
     const document: LessonsContentDocument = {
       id: LESSONS_DOCUMENT_ID,
+      version: CURRICULUM_VERSION,
       modules,
       updatedAt: new Date().toISOString(),
       updatedBy: teacher.id,

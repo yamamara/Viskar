@@ -187,7 +187,7 @@ export default function TeacherLoginPage() {
                   )}
 
                   {notice && (
-                    <div className="text-sm text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                    <div className="text-sm text-success bg-success/10 p-3 rounded-lg border border-success/20">
                       <p>{notice}</p>
                     </div>
                   )}

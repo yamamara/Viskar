@@ -3,10 +3,11 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Play, RotateCcw, Loader2, CheckCircle2, XCircle } from "lucide-react"
+import { Play, RotateCcw, Loader2, CheckCircle2, XCircle, Terminal, FlaskConical } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { TestCase } from "@/lib/lessons-data"
 import { getPyodide } from "@/lib/pyodide"
+import { runProgram, runTestCases, normalizeOutput, type TestOutcome } from "@/lib/python-runner"
 
 interface PythonIDEProps {
   starterCode: string
@@ -29,17 +30,34 @@ const PYTHON_BUILTINS = [
   "open", "read", "write", "append",
 ]
 
+function DiffRow({ label, value, tone }: { label: string; value: string; tone?: "error" }) {
+  return (
+    <div>
+      <div className="mb-1 text-label-md uppercase text-on-surface-variant/70">{label}</div>
+      <pre
+        className={cn(
+          "m-0 overflow-x-auto whitespace-pre-wrap break-words rounded bg-surface-container-lowest p-2.5",
+          tone === "error" ? "text-error" : "text-on-surface",
+        )}
+      >
+        {value}
+      </pre>
+    </div>
+  )
+}
+
 export function PythonIDE({ starterCode, testCases, onSuccess, className }: PythonIDEProps) {
   const [code, setCode] = useState(starterCode)
   const [output, setOutput] = useState("")
   const [isRunning, setIsRunning] = useState(false)
-  const [testResults, setTestResults] = useState<Array<{ passed: boolean; description: string }>>([])
+  const [isTesting, setIsTesting] = useState(false)
+  const [testResults, setTestResults] = useState<TestOutcome[]>([])
   const [allTestsPassed, setAllTestsPassed] = useState(false)
-  const pyodideRef = useRef<any>(null)
   const [pyodideLoading, setPyodideLoading] = useState(true)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const mirrorRef = useRef<HTMLDivElement>(null)
   const editorWrapperRef = useRef<HTMLDivElement>(null)
+  const gutterRef = useRef<HTMLDivElement>(null)
 
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -47,17 +65,18 @@ export function PythonIDE({ starterCode, testCases, onSuccess, className }: Pyth
   const [cursorPosition, setCursorPosition] = useState({ top: 0, left: 0 })
 
   useEffect(() => {
-    let mounted = true;
-    getPyodide().then(pyodide => {
-      if (mounted) {
-        pyodideRef.current = pyodide
-        setPyodideLoading(false)
-      }
-    }).catch(err => {
-      console.error("Failed to load Pyodide:", err)
-      if (mounted) setPyodideLoading(false)
-    })
-    return () => { mounted = false }
+    let mounted = true
+    getPyodide()
+      .then(() => {
+        if (mounted) setPyodideLoading(false)
+      })
+      .catch((err) => {
+        console.error("Failed to load Pyodide:", err)
+        if (mounted) setPyodideLoading(false)
+      })
+    return () => {
+      mounted = false
+    }
   }, [])
 
   useEffect(() => {
@@ -81,8 +100,13 @@ export function PythonIDE({ starterCode, testCases, onSuccess, className }: Pyth
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  /**
+   * Runs the program once so the student can see its output. When the exercise
+   * has test cases, the first case's input is supplied, otherwise `input()`
+   * would immediately hit end-of-file.
+   */
   const runCode = async () => {
-    if (!pyodideRef.current) {
+    if (pyodideLoading) {
       setOutput("Python interpreter is still loading. Please wait...")
       return
     }
@@ -92,54 +116,48 @@ export function PythonIDE({ starterCode, testCases, onSuccess, className }: Pyth
     setTestResults([])
 
     try {
-      // Capture stdout
-      const result = await pyodideRef.current.runPythonAsync(`
-import sys
-from io import StringIO
-
-# Redirect stdout
-sys.stdout = StringIO()
-
-try:
-${code
-  .split("\n")
-  .map((line: string) => `    ${line}`)
-  .join("\n")}
-except Exception as e:
-    print(f"Error: {e}")
-
-# Get the output
-output = sys.stdout.getvalue()
-output
-      `)
-
-      setOutput(result || "(No output)")
-
-      // Run test cases
-      if (testCases.length > 0) {
-        const results = testCases.map((testCase) => {
-          const regex = new RegExp(testCase.expectedOutput)
-          const passed = regex.test(result)
-          return {
-            passed,
-            description: testCase.description,
-          }
-        })
-
-        setTestResults(results)
-        const allPassed = results.every((r) => r.passed)
-        setAllTestsPassed(allPassed)
-
-        if (allPassed && onSuccess) {
-          setTimeout(() => {
-            onSuccess()
-          }, 1000)
-        }
-      }
+      const sampleInput = testCases[0]?.input ?? ""
+      const result = await runProgram(code, sampleInput)
+      setOutput(result.ok ? result.stdout || "(No output)" : result.error)
     } catch (error: any) {
       setOutput(`Error: ${error.message}`)
     } finally {
       setIsRunning(false)
+    }
+  }
+
+  /**
+   * Grades the exercise. Every test case runs the program from scratch with its
+   * own input, so the cases genuinely exercise different paths.
+   */
+  const runTests = async () => {
+    if (pyodideLoading || testCases.length === 0) return
+
+    setIsTesting(true)
+    setOutput("")
+    setTestResults([])
+
+    try {
+      const outcomes = await runTestCases(code, testCases)
+      setTestResults(outcomes)
+
+      const allPassed = outcomes.every((outcome) => outcome.passed)
+      setAllTestsPassed(allPassed)
+
+      const firstFailure = outcomes.find((outcome) => !outcome.passed)
+      if (firstFailure?.error) {
+        setOutput(firstFailure.error)
+      }
+
+      if (allPassed && onSuccess) {
+        setTimeout(() => {
+          onSuccess()
+        }, 800)
+      }
+    } catch (error: any) {
+      setOutput(`Error: ${error.message}`)
+    } finally {
+      setIsTesting(false)
     }
   }
 
@@ -277,98 +295,147 @@ output
     updateSuggestions(newCode, position)
   }
 
+  const lineCount = code.split("\n").length
+  const busy = isRunning || isTesting || pyodideLoading
+
   return (
-    <div className={cn("flex flex-col h-full", className)}>
-      <div className="bg-card border-b border-border/50">
-        <div className="flex items-center justify-between p-4 border-b border-border/50">
-          <span className="text-sm font-semibold text-muted-foreground tracking-wide">Code Editor</span>
-          <div className="flex gap-2.5">
+    <div className={cn("flex flex-col gap-6", className)}>
+      {/* Editor — a Level 1 container sitting above the page surface */}
+      <div className="overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-container-low">
+        <div className="flex items-center justify-between border-b border-outline-variant/10 bg-surface-container-highest px-4 py-2">
+          <span className="flex items-center gap-2 text-label-md uppercase text-on-surface-variant">
+            <Terminal className="h-4 w-4" />
+            Editor
+          </span>
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={resetCode}
-              disabled={isRunning || pyodideLoading}
-              className="hover:bg-accent/10 transition-all duration-300"
+              disabled={busy}
+              className="h-7 rounded-md px-3 text-label-md uppercase text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
             >
-              <RotateCcw className="h-4 w-4 mr-2" />
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
               Reset
             </Button>
             <Button
+              variant="ghost"
               onClick={runCode}
-              disabled={isRunning || pyodideLoading}
+              disabled={busy}
               size="sm"
-              className="shadow-elegant hover:shadow-elegant-lg transition-all duration-300"
+              className="h-7 rounded-md px-3 text-label-md uppercase text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
             >
               {isRunning ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Running...
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Running
                 </>
               ) : pyodideLoading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Loading...
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Loading
                 </>
               ) : (
                 <>
-                  <Play className="h-4 w-4 mr-2" />
-                  Run Code
+                  <Play className="mr-1.5 h-3.5 w-3.5" />
+                  Run
                 </>
               )}
             </Button>
+            {testCases.length > 0 && (
+              <Button
+                variant="ghost"
+                onClick={runTests}
+                disabled={busy}
+                size="sm"
+                className="h-7 rounded-md bg-primary/10 px-3 text-label-md uppercase text-primary hover:bg-primary/20 hover:text-primary"
+              >
+                {isTesting ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Checking
+                  </>
+                ) : (
+                  <>
+                    <FlaskConical className="mr-1.5 h-3.5 w-3.5" />
+                    Check
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </div>
-        <div ref={editorWrapperRef} className="relative">
-          <textarea
-            ref={textareaRef}
-            value={code}
-            onChange={handleCodeChange}
-            onKeyDown={handleKeyDown}
-            onClick={() => setShowSuggestions(false)}
-            className="flex-1 w-full min-h-[250px] md:min-h-[300px] p-4 font-mono text-sm bg-muted/4 border border-input focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none transition-all duration-200"
-            spellCheck={false}
-            disabled={isRunning || pyodideLoading}
-          />
+
+        <div ref={editorWrapperRef} className="flex">
+          {/* Line-number gutter, kept in sync with the textarea's scroll */}
           <div
-              ref={mirrorRef}
-              className="absolute top-0 left-0 invisible pointer-events-none whitespace-pre-wrap break-words"
-              aria-hidden
-          />
+            ref={gutterRef}
+            aria-hidden
+            className="select-none overflow-hidden bg-surface-container-lowest/50 py-4 pl-4 pr-3 text-right font-mono text-code-sm text-outline-variant/60"
+          >
+            {Array.from({ length: lineCount }, (_, index) => (
+              <div key={index}>{index + 1}</div>
+            ))}
+          </div>
 
-          {showSuggestions && (
-            <div
-              className="absolute z-50 bg-popover border border-border rounded-lg shadow-elegant-lg overflow-hidden"
-              style={{
-                top: cursorPosition.top + 25, // below caret
-                left: cursorPosition.left - 10
+          <div className="relative flex-1">
+            <textarea
+              ref={textareaRef}
+              value={code}
+              onChange={handleCodeChange}
+              onKeyDown={handleKeyDown}
+              onClick={() => setShowSuggestions(false)}
+              onScroll={(event) => {
+                if (gutterRef.current) {
+                  gutterRef.current.scrollTop = event.currentTarget.scrollTop
+                }
               }}
-            >
-              {suggestions.map((suggestion, index) => (
-                <button
-                  key={suggestion}
-                  className={cn(
-                    "w-full px-3 py-2 text-left text-sm font-mono hover:bg-accent transition-colors",
-                    index === selectedSuggestion && "bg-accent",
-                  )}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onClick={() => applySuggestion(suggestion)}
-                  onMouseEnter={() => setSelectedSuggestion(index)}
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+              className="block min-h-[250px] w-full resize-none border-0 bg-transparent px-4 py-4 font-mono text-code-sm text-on-surface caret-primary focus:outline-none focus:ring-0 md:min-h-[300px]"
+              spellCheck={false}
+              disabled={busy}
+            />
+            <div
+              ref={mirrorRef}
+              className="invisible pointer-events-none absolute left-0 top-0 whitespace-pre-wrap break-words"
+              aria-hidden
+            />
 
-      <div className="bg-card border-b border-border/50">
-        <div className="p-4 border-b border-border/50">
-          <span className="text-sm font-semibold text-muted-foreground tracking-wide">Output</span>
+            {showSuggestions && (
+              <div
+                className="absolute z-50 overflow-hidden rounded-lg border border-outline-variant/30 bg-popover shadow-elegant-lg"
+                style={{
+                  top: cursorPosition.top + 25, // below caret
+                  left: cursorPosition.left - 10,
+                }}
+              >
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={suggestion}
+                    className={cn(
+                      "w-full px-3 py-2 text-left font-mono text-code-sm transition-colors hover:bg-surface-variant",
+                      index === selectedSuggestion && "bg-surface-variant text-primary",
+                    )}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={() => applySuggestion(suggestion)}
+                    onMouseEnter={() => setSelectedSuggestion(index)}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="p-4">
-          <div className="min-h-[120px] p-4 font-mono text-sm bg-muted/40 rounded-xl border border-input whitespace-pre-wrap break-words leading-relaxed">
-            {output || (pyodideLoading ? "Loading Python interpreter..." : "Click 'Run Code' to see output")}
+
+        {/* Console */}
+        <div className="border-t border-outline-variant/10 bg-surface-container-lowest p-4 font-mono text-code-sm">
+          <div className="mb-2 select-none text-label-md uppercase text-outline-variant/70">Console Output</div>
+          <div className="whitespace-pre-wrap break-words text-on-surface/90">
+            {output || (
+              <span className="text-outline">
+                {pyodideLoading ? "Loading Python interpreter…" : "Run your code to see output here."}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -376,14 +443,14 @@ output
       {testResults.length > 0 && (
         <div
           className={cn(
-            "p-4 border-b border-border/50 transition-all duration-300",
-            allTestsPassed ? "bg-success/5" : "bg-card",
+            "rounded-xl border p-4 transition-colors duration-300",
+            allTestsPassed ? "border-success/30 bg-success/5" : "border-outline-variant/20 bg-surface-container-low",
           )}
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold tracking-wide">Test Results</span>
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-label-md uppercase text-on-surface-variant">Test Results</span>
             {allTestsPassed && (
-              <div className="flex items-center gap-2.5 text-success font-semibold animate-in">
+              <div className="flex animate-in items-center gap-2 font-semibold text-success">
                 <CheckCircle2 className="h-5 w-5" />
                 <span className="text-sm">All tests passed!</span>
               </div>
@@ -394,23 +461,44 @@ output
               <div
                 key={index}
                 className={cn(
-                  "flex items-start gap-3 p-3.5 rounded-xl transition-all duration-300 animate-in",
+                  "flex animate-in items-start gap-3 rounded-lg p-3.5",
                   result.passed
-                    ? "bg-success/10 border border-success/20"
-                    : "bg-destructive/10 border border-destructive/20",
+                    ? "border border-success/20 bg-success/10"
+                    : "border border-destructive/20 bg-destructive/10",
                 )}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {result.passed ? (
-                  <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-success" />
                 ) : (
-                  <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                  <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive" />
                 )}
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <p className={cn("text-sm font-semibold", result.passed ? "text-success" : "text-destructive")}>
                     Test {index + 1}: {result.passed ? "Passed" : "Failed"}
                   </p>
-                  <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{result.description}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-on-surface-variant">{result.description}</p>
+
+                  {/* On failure, show exactly what was compared */}
+                  {!result.passed && (
+                    <div className="mt-3 space-y-2 font-mono text-code-sm">
+                      {result.input.trim() !== "" && (
+                        <DiffRow label="Input" value={result.input} />
+                      )}
+                      {result.error ? (
+                        <DiffRow label="Error" value={result.error} tone="error" />
+                      ) : (
+                        <>
+                          <DiffRow label="Expected" value={normalizeOutput(result.expected)} />
+                          <DiffRow
+                            label="Your output"
+                            value={normalizeOutput(result.actual) || "(nothing was printed)"}
+                            tone="error"
+                          />
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
