@@ -17,13 +17,25 @@ custom apex domain the site is the root, and a basePath makes every asset URL
    anonymous account whose uid is recorded on their student document.
    Email/Password must stay enabled for teachers.
 
-2. **Deploy the security rules.**
+2. **Deploy the security rules.** Nothing else guards the database — the
+   privileged service account the API routes used is gone, so until the rules
+   are published Firestore denies every read and write with
+   `PERMISSION_DENIED`.
 
-   ```
-   npx firebase-tools deploy --only firestore:rules
-   ```
+   The `Deploy Firestore rules` workflow does this on any push that touches
+   `firestore.rules`, and can be run by hand from the Actions tab. It needs one
+   secret:
 
-   Nothing else guards the database — the service account is gone.
+   - `FIREBASE_SERVICE_ACCOUNT` — the full JSON key for a service account with
+     the **Firebase Rules Admin** role (`roles/firebaserules.admin`).
+
+   To mint it: Google Cloud console → IAM & Admin → Service Accounts → create
+   (or reuse the existing `firebase-adminsdk-*` account) → grant Firebase Rules
+   Admin under IAM → Keys → Add key → JSON. Paste the whole file into the
+   secret.
+
+   To deploy from a laptop instead, `npx firebase-tools login` followed by
+   `npx firebase-tools deploy --only firestore:rules` does the same thing.
 
 3. **Add the build variables.** GitHub → Settings → Secrets and variables →
    Actions → Variables:

@@ -1,0 +1,49 @@
+# Publishes firestore.rules to Firebase.
+#
+# Kept separate from the Pages build: the site and the database rules are
+# different artifacts with different failure modes, and a rules change should
+# not require a full site rebuild to take effect.
+name: Deploy Firestore rules
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "firestore.rules"
+      - "firebase.json"
+      - ".firebaserc"
+      - ".github/workflows/firestore-rules.yml"
+  # Lets you deploy the current rules on demand from the Actions tab.
+  workflow_dispatch:
+
+jobs:
+  deploy-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # The Firebase CLI reads this file for non-interactive auth, which is what
+      # replaces `firebase login` here.
+      - name: Write service account credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT secret is not set. See DEPLOYMENT.md."
+            exit 1
+          fi
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-key.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-key.json" >> "$GITHUB_ENV"
+
+      - name: Deploy rules
+        run: npx --yes firebase-tools@latest deploy --only firestore:rules --non-interactive
+
+      - name: Remove credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/firebase-key.json"
