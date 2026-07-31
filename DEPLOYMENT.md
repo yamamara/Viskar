@@ -1,8 +1,14 @@
 # Deploying to GitHub Pages
 
 The app is a static export (`output: 'export'` in `next.config.mjs`) served from
-`https://<user>.github.io/Viskar`. There is no server: the browser talks to
-Firebase directly, and `firestore.rules` is what enforces access.
+the root of the custom domain `https://viskar.org`. There is no server: the
+browser talks to Firebase directly, and `firestore.rules` is what enforces
+access.
+
+`next.config.mjs` deliberately sets **no `basePath`**. A basePath is only right
+when the site lives under a project path such as `user.github.io/Viskar`; on a
+custom apex domain the site is the root, and a basePath makes every asset URL
+404 — which renders the page as unstyled HTML.
 
 ## One-time setup
 
