@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AutoStudentRedirect } from "@/components/auto-student-redirect"
-import { Code2, BookOpen, Users, Sparkles } from "lucide-react"
+import { Users } from "lucide-react"
 import { ClassCodeForm } from "@/components/class-code-form"
 
 export default function LandingPage() {
@@ -40,44 +40,6 @@ export default function LandingPage() {
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
               The world's best interactive python course, with lessons designed for <strong>beginners</strong>
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 md:mb-20">
-            <Card className="border border-border/50 hover:border-primary/40 hover:shadow-elegant-lg transition-all duration-300 group">
-              <CardHeader className="space-y-3">
-                <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-                  <BookOpen className="h-7 w-7 text-primary" />
-                </div>
-                <CardTitle className="text-xl">Structured Lessons</CardTitle>
-                <CardDescription className="text-base leading-relaxed">
-                  Progress through carefully designed modules from basics to advanced concepts
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border border-border/50 hover:border-secondary/40 hover:shadow-elegant-lg transition-all duration-300 group">
-              <CardHeader className="space-y-3">
-                <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-                  <Code2 className="h-7 w-7 text-secondary" />
-                </div>
-                <CardTitle className="text-xl">Live Code Editor</CardTitle>
-                <CardDescription className="text-base leading-relaxed">
-                  Write and run Python code directly in your browser with instant results
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border border-border/50 hover:border-accent/40 hover:shadow-elegant-lg transition-all duration-300 group">
-              <CardHeader className="space-y-3">
-                <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-                  <Sparkles className="h-7 w-7 text-accent" />
-                </div>
-                <CardTitle className="text-xl">Instant Feedback</CardTitle>
-                <CardDescription className="text-base leading-relaxed">
-                  Test your code automatically and get immediate feedback on your solutions
-                </CardDescription>
-              </CardHeader>
-            </Card>
           </div>
 
           <div className="max-w-md mx-auto animate-in" style={{ animationDelay: "0.1s" }}>
