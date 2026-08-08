@@ -2,7 +2,7 @@ import { module, lesson, type ModuleSource } from "../types.ts"
 
 const moduleTen: ModuleSource = module(
   "Files, CSV, and JSON",
-  "Making data outlive the program that created it: reading and writing text files, and working with the two most common structured formats.",
+  "Making data outlive the program that made it: reading and writing text files, and working with the two most common structured formats.",
   [
     lesson(
       "Reading and Writing Files",
@@ -14,17 +14,17 @@ const moduleTen: ModuleSource = module(
           description: "The open function, the with statement, and what a file path means.",
           instructions: `## Data that outlives the program
 
-Everything your programs have produced so far vanished when they finished. Variables exist only while a program runs.
+Everything your programs have produced so far disappeared when they finished. Variables exist only while a program runs.
 
-**Persistence** is the ability to store data so it survives. The simplest form is a file.
+**Persistence** means keeping data so that it survives. The simplest form is a file.
 
 ## Paths
 
-A **path** identifies a file. \`notes.txt\` is a *relative* path: it names a file in the program's current directory. \`/home/ada/notes.txt\` is an *absolute* path, naming a file from the root of the file system.
+A **path** names a file. \`notes.txt\` is a *relative* path: it names a file in the folder where the program is running. \`/home/ada/notes.txt\` is an *absolute* path, naming a file from the very top of the file system.
 
-Relative paths are usually right, because they let a program work wherever it is installed. Absolute paths hard-code assumptions about one particular machine.
+Relative paths are usually the right choice, because they let a program work wherever it is installed. An absolute path builds in an assumption about one particular machine.
 
-In this course, each program runs in its own private directory, so relative filenames are all you need — and files created by one exercise are invisible to the next. Every exercise creates the data it needs.
+In this course, every program runs in its own private folder, so relative filenames are all you need. Files made by one exercise cannot be seen by the next. Every exercise creates the data it needs.
 
 ## Writing a file
 
@@ -40,13 +40,13 @@ print("written")
 written
 \`\`\`
 
-\`open\` takes a path and a **mode**. \`"w"\` means write. It returns a **file object**, often called a handle, through which the file is read or written.
+\`open\` takes a path and a **mode**. \`"w"\` means write. It gives back a **file object**, often called a handle, and you read or write the file through it.
 
-Note \`\\n\` at the end of each write. Unlike \`print\`, \`write\` adds nothing of its own. Without them, everything ends up on one line.
+Note the \`\\n\` at the end of each write. Unlike \`print\`, \`write\` adds nothing of its own. Without them, everything ends up on one line.
 
 ## The with statement
 
-The \`with\` above is important. An open file consumes a resource that must be released; data written may sit in a buffer and only reach the disk when the file is closed.
+The \`with\` above matters. An open file uses a resource that must be given back, and data you write may sit in a buffer and only reach the disk when the file is closed.
 
 Without \`with\`, you must close it yourself:
 
@@ -62,9 +62,9 @@ print("written and closed")
 written and closed
 \`\`\`
 
-That works until something goes wrong between opening and closing. If an exception is raised in the middle, \`close()\` never runs, and the file may be left incomplete.
+That works until something goes wrong between the opening and the closing. If an exception is raised in the middle, \`close()\` never runs, and the file may be left half finished.
 
-\`with\` closes the file automatically when the block ends — normally or by exception:
+\`with\` closes the file for you when the block ends, whether it ends normally or through an exception:
 
 \`\`\`python
 with open("notes.txt", "w") as handle:
@@ -77,10 +77,10 @@ print("closed automatically")
 closed automatically
 \`\`\`
 
-This is the \`finally\` idea from Module 7, packaged. Always use \`with\`. There is no situation in ordinary code where opening a file without it is better.
+This is the \`finally\` idea from Module 7, packed into one statement. Always use \`with\`. In ordinary code there is no situation where opening a file without it is better.
 
 > **Key idea**
-> \`with open(...) as handle:\` guarantees the file is closed when the block ends, even if an exception occurs. Use it every time.
+> \`with open(...) as handle:\` promises that the file is closed when the block ends, even if an exception happens. Use it every time.
 
 ## Reading a whole file
 
@@ -98,9 +98,9 @@ print(repr(content))
 'first\\nsecond\\n'
 \`\`\`
 
-\`read()\` returns the entire contents as one string. The mode was omitted because \`"r"\` for reading is the default.
+\`read()\` gives back the whole contents as one string. The mode was left out because \`"r"\` for reading is the default.
 
-\`repr\` is used here deliberately, to make the newline characters visible. Printing \`content\` directly would show two lines and hide the structure.
+\`repr\` is used here on purpose, to make the newline characters visible. Printing \`content\` directly would show two lines and hide the structure.
 
 ## Reading line by line
 
@@ -119,9 +119,9 @@ with open("notes.txt") as handle:
 'third\\n'
 \`\`\`
 
-Iterating a file object yields one line at a time. **Each line keeps its trailing newline**, which is the single most common surprise when working with files.
+Going through a file object gives you one line at a time. **Each line keeps its newline at the end**, and that is the single most common surprise when working with files.
 
-That matters immediately:
+It matters straight away:
 
 \`\`\`python
 with open("data.txt", "w") as handle:
@@ -136,9 +136,9 @@ with open("data.txt") as handle:
 84
 \`\`\`
 
-\`int("42\\n")\` happens to work, since \`int\` tolerates surrounding whitespace. But \`line == "42"\` would be \`False\`, and \`len(line)\` is 3, not 2. Strip each line as you read it and the problem disappears.
+\`int("42\\n")\` happens to work, because \`int\` allows spaces and newlines around the number. But \`line == "42"\` would be \`False\`, and \`len(line)\` is 3, not 2. Strip each line as you read it, and the problem disappears.
 
-Iterating is also memory-efficient: it reads one line at a time rather than loading the whole file, which matters for large files.
+Going line by line also uses little memory. It reads one line at a time instead of loading the whole file, and that matters for large files.
 
 ## readlines and splitlines
 
@@ -156,31 +156,31 @@ print(lines)
 ['a', 'b', 'c']
 \`\`\`
 
-\`read().splitlines()\` gives a list of lines with the newlines already removed, which is often exactly what you want. \`readlines()\` also gives a list, but keeps the newlines.
+\`read().splitlines()\` gives a list of lines with the newlines already removed, and that is often exactly what you want. \`readlines()\` also gives a list, but it keeps the newlines.
 
 ## Summary
 
-A path identifies a file; relative paths are usually right. \`open(path, mode)\` returns a handle, and \`with\` guarantees it is closed. \`write\` adds no newline of its own. Iterating a file gives lines that keep their trailing newline, so strip them.`,
+A path names a file, and relative paths are usually right. \`open(path, mode)\` gives a handle, and \`with\` promises it is closed. \`write\` adds no newline of its own. Going through a file gives lines that keep their newline, so strip them.`,
         },
         {
           type: "lesson",
           title: "Modes, Appending, and Failures",
-          description: "Choosing a mode without destroying data, and handling files that are not there.",
+          description: "Choosing a mode without destroying data, and dealing with files that are not there.",
           instructions: `## The modes
 
-The mode decides what \`open\` does and what is permitted.
+The mode decides what \`open\` does and what you are allowed to do.
 
-\`"r"\` — read. The file must exist; otherwise \`FileNotFoundError\`. The default.
+\`"r"\` — read. The file must exist, or you get \`FileNotFoundError\`. This is the default.
 
-\`"w"\` — write. Creates the file, or **empties it completely** if it exists.
+\`"w"\` — write. It creates the file, or **empties it completely** if it already exists.
 
-\`"a"\` — append. Creates the file if needed, and adds to the end of an existing one.
+\`"a"\` — append. It creates the file if needed, and adds to the end of a file that exists.
 
-\`"x"\` — exclusive create. Creates the file, but raises \`FileExistsError\` if it already exists.
+\`"x"\` — create only. It creates the file, but raises \`FileExistsError\` if the file is already there.
 
 ## The danger of "w"
 
-\`"w"\` destroys existing content immediately, before you write anything:
+\`"w"\` destroys the existing content at once, before you write anything:
 
 \`\`\`python
 with open("log.txt", "w") as handle:
@@ -197,11 +197,11 @@ with open("log.txt") as handle:
 replacement
 \`\`\`
 
-The original is gone. There is no warning and no undo.
+The original is gone. There is no warning, and there is no undo.
 
-This is a genuinely common way to lose data. The habit worth forming is to pause whenever you type \`"w"\` and ask whether the file might already contain something you want.
+This is a genuinely common way to lose data. The habit worth building is to stop whenever you type \`"w"\` and ask whether the file might already hold something you want to keep.
 
-When adding to a record, use \`"a"\`:
+When you are adding to a record, use \`"a"\`:
 
 \`\`\`python
 with open("log.txt", "w") as handle:
@@ -219,9 +219,9 @@ first entry
 second entry
 \`\`\`
 
-When a file must not be overwritten at all, \`"x"\` makes that a rule the operating system enforces rather than one you have to remember.
+When a file must never be overwritten, \`"x"\` turns that into a rule the operating system enforces, instead of one you have to remember.
 
-## Handling missing files
+## Dealing with missing files
 
 Reading a file that does not exist raises \`FileNotFoundError\`:
 
@@ -259,28 +259,28 @@ print(f"read {len(content)} characters")
 read 0 characters
 \`\`\`
 
-**Or try and handle the failure**, as in the first example.
+**Or try it and handle the failure**, as in the first example.
 
-The second is generally preferred for files, because checking first contains a subtle flaw: the file may be deleted between the check and the open. The gap is tiny but real, and on a busy system it eventually happens. Attempting the operation and handling failure has no gap.
+For files, the second is usually better, because checking first has a quiet flaw. The file may be deleted between the check and the open. The gap is tiny but real, and on a busy machine it eventually happens. Trying the operation and handling the failure leaves no gap at all.
 
-This is a case where exception handling beats validation, and it is worth understanding why rather than treating it as arbitrary. Validation wins when the check is reliable; here it is not.
+This is a case where exception handling beats checking first, and it is worth understanding why, rather than taking it as a rule with no reason behind it. Checking wins when the check is dependable. Here it is not.
 
 > **Key idea**
-> \`"w"\` empties an existing file before writing. Use \`"a"\` to add and \`"x"\` to refuse to overwrite. Prefer \`try\`/\`except FileNotFoundError\` over checking existence first, because the file can change between the check and the open.
+> \`"w"\` empties an existing file before writing. Use \`"a"\` to add, and \`"x"\` to refuse to overwrite. Prefer \`try\`/\`except FileNotFoundError\` over checking that the file exists, because the file can change between the check and the open.
 
 ## Other file exceptions
 
-\`PermissionError\` — the file exists but you may not read or write it.
+\`PermissionError\` — the file exists, but you are not allowed to read or write it.
 
-\`IsADirectoryError\` — the path names a directory.
+\`IsADirectoryError\` — the path names a folder, not a file.
 
 \`UnicodeDecodeError\` — the bytes are not valid text in the expected encoding, usually because the file is not a text file at all.
 
-Catch the specific one you can handle. Catching all of them and reporting "file error" tells a user nothing about what to do.
+Catch the exact one you can deal with. Catching all of them and reporting "file error" tells a user nothing about what to do next.
 
 ## Text and binary
 
-Text mode decodes bytes into characters using an **encoding**. Almost always this should be UTF-8, which can represent every character in every language:
+Text mode turns bytes into characters using an **encoding**. Almost always this should be UTF-8, which can hold every character in every language:
 
 \`\`\`python
 with open("notes.txt", "w", encoding="utf-8") as handle:
@@ -294,40 +294,40 @@ with open("notes.txt", encoding="utf-8") as handle:
 café — naïve
 \`\`\`
 
-The default encoding depends on the system, so a program that omits it can work on one machine and produce \`UnicodeDecodeError\` on another. Stating \`encoding="utf-8"\` explicitly avoids a class of bug that is tedious to diagnose.
+The default encoding depends on the machine, so a program that leaves it out can work on one computer and raise \`UnicodeDecodeError\` on another. Writing \`encoding="utf-8"\` yourself avoids a kind of bug that is very tiring to track down.
 
-Adding \`"b"\` to a mode opens the file in **binary**, giving raw bytes rather than text. That is what you need for images, audio, and compressed files, none of which are text at all.
+Adding \`"b"\` to a mode opens the file in **binary**, which gives you raw bytes instead of text. That is what you need for images, sound, and compressed files, none of which are text at all.
 
 ## Writing safely
 
-Two habits worth adopting:
+Two habits are worth taking up.
 
-Write to a temporary file and rename it when complete. A crash partway through then leaves the original intact rather than a half-written file.
+Write to a temporary file and rename it when you have finished. Then a crash partway through leaves the original file whole, instead of leaving a half-written file.
 
-Never open a file for writing while reading it. Read everything, close it, transform the data in memory, then write.
+Never open a file for writing while you are reading it. Read everything, close it, change the data in memory, and then write.
 
 ## Summary
 
-\`"r"\` reads and requires existence, \`"w"\` empties, \`"a"\` appends, \`"x"\` refuses to overwrite. Prefer catching \`FileNotFoundError\` to checking existence first. Always specify \`encoding="utf-8"\` for text.`,
+\`"r"\` reads and needs the file to exist. \`"w"\` empties it. \`"a"\` adds to the end. \`"x"\` refuses to overwrite. Prefer catching \`FileNotFoundError\` to checking that the file exists. Always give \`encoding="utf-8"\` for text.`,
         },
         {
           type: "exercise",
           title: "Write, Append, and Read Back",
-          description: "Create a file, add to it, and report on its contents.",
+          description: "Create a file, add to it, and then report on what it holds.",
           instructions: `## The problem
 
 Build a small log file and then summarise it.
 
 ## Input
 
-A series of lines ending with \`end\`. Each other line is an entry to record.
+A series of lines ending with \`end\`. Every other line is an entry to record.
 
 ## Requirements
 
-1. Write the **first** entry to a file named \`log.txt\` using write mode, creating the file.
-2. Append every subsequent entry to the same file.
-3. Each entry occupies its own line in the file.
-4. After \`end\`, read the file back and display exactly:
+1. Write the **first** entry to a file named \`log.txt\` using write mode, which creates the file.
+2. Append every later entry to the same file.
+3. Each entry has its own line in the file.
+4. After \`end\`, read the file back and show exactly:
 
 \`\`\`text
 Entries: 3
@@ -335,7 +335,7 @@ First: alpha
 Last: gamma
 \`\`\`
 
-If there were no entries at all, do not create the file, and display:
+If there were no entries at all, do not create the file, and show:
 
 \`\`\`text
 Entries: 0
@@ -349,20 +349,20 @@ Given \`alpha\`, \`beta\`, \`gamma\`, \`end\`, the output is the three lines abo
 
 ## Guidance
 
-Write mode empties the file, so it must be used only once — for the first entry. Everything after that appends.
+Write mode empties the file, so use it only once, for the first entry. Everything after that appends.
 
-Remember that \`write\` adds no newline. You must include \`\\n\` yourself, or all the entries will end up on one line.
+Remember that \`write\` adds no newline. You must put \`\\n\` in yourself, or all the entries will end up on one line.
 
-When reading back, \`read().splitlines()\` gives a list with the newlines already removed, which makes counting and indexing straightforward.
+When you read the file back, \`read().splitlines()\` gives a list with the newlines already removed, and that makes counting and indexing simple.
 
 ## Constraints
 
-Use \`with\` for every file operation. The file is created fresh for each run, so you need not worry about content left by a previous run.`,
+Use \`with\` for every file operation. The file is made fresh on each run, so you need not worry about anything left over from a previous run.`,
           starterCode: `entries = []
 
 line = input()
 `,
-          hint: "Collect the entries into a list first, then decide: if the list is empty just print Entries: 0. Otherwise write the first with mode \"w\" and append the rest with mode \"a\", each followed by a newline.",
+          hint: "Collect the entries into a list first, then decide. If the list is empty, just print Entries: 0. Otherwise write the first entry with mode \"w\" and append the rest with mode \"a\", each followed by a newline.",
           tests: [
             {
               input: "alpha\nbeta\ngamma\nend\n",
@@ -377,12 +377,12 @@ line = input()
             {
               input: "end\n",
               expectedOutput: "Entries: 0",
-              description: "No entries produces only the count line and no file",
+              description: "No entries gives only the count line, and no file",
             },
             {
               input: "a\nb\nend\n",
               expectedOutput: "Entries: 2\nFirst: a\nLast: b",
-              description: "Two entries confirm the append preserves order",
+              description: "Two entries show that appending keeps the order",
             },
           ],
           solution: `entries = []
@@ -416,22 +416,22 @@ else:
           description: "Read a file that may not exist, without letting the program crash.",
           instructions: `## The problem
 
-Write a function that reads a file's lines, returning an empty list when the file does not exist.
+Write a function that reads the lines of a file, and gives back an empty list when the file does not exist.
 
 ## Requirements
 
-1. Define \`read_lines(path: str) -> list[str]\` which:
-   - Returns a list of the file's lines with trailing newlines removed.
-   - Returns an empty list if the file does not exist, rather than raising.
-2. Define \`summarise(lines: list[str]) -> str\` which returns:
+1. Define \`read_lines(path: str) -> list[str]\`, which:
+   - Returns a list of the file's lines, with the newlines removed.
+   - Returns an empty list if the file does not exist, instead of raising an error.
+2. Define \`summarise(lines: list[str]) -> str\`, which returns:
    - \`No data\` for an empty list.
-   - Otherwise \`3 lines, longest: gamma\` — the count, and the longest line. Ties are broken by whichever comes first in the file.
+   - Otherwise \`3 lines, longest: gamma\` — the count, and the longest line. When two lines tie, the one that comes first in the file wins.
 
 ## Then
 
-Read one line of input, the filename to read. Before reading it, create a file named \`present.txt\` containing three lines: \`alpha\`, \`beta\`, and \`gamma\`.
+Read one line of input: the name of the file to read. Before reading it, create a file named \`present.txt\` holding three lines: \`alpha\`, \`beta\`, and \`gamma\`.
 
-Then call the two functions with the supplied filename and print the summary.
+Then call the two functions with the filename you were given, and print the summary.
 
 ## Examples
 
@@ -449,17 +449,17 @@ No data
 
 ## Details
 
-Note the first example carefully. \`alpha\`, \`beta\`, and \`gamma\` have lengths 5, 4, and 5. \`alpha\` and \`gamma\` tie at 5, and \`alpha\` comes first, so it wins.
+Look at the first example carefully. \`alpha\`, \`beta\`, and \`gamma\` have lengths 5, 4, and 5. \`alpha\` and \`gamma\` tie at 5, and \`alpha\` comes first, so it wins.
 
 ## Guidance
 
-Wrap only the \`open\` call in \`try\`, and catch \`FileNotFoundError\` specifically. Catching everything would also hide mistakes in your own code.
+Wrap only the \`open\` call in \`try\`, and catch \`FileNotFoundError\` exactly. Catching everything would also hide mistakes in your own code.
 
-For the longest line, iterating and keeping the best so far naturally gives the first-wins behaviour, because you only replace when something is strictly longer.
+For the longest line, looping and keeping the best so far gives the first-wins behaviour naturally, because you replace it only when a line is strictly longer.
 
 ## Constraints
 
-Do not use \`os.path.exists\`. The point of the exercise is to attempt the operation and handle its failure.`,
+Do not use \`os.path.exists\`. The point of this exercise is to try the operation and handle its failure.`,
           starterCode: `def read_lines(path: str) -> list[str]:
     return []
 
@@ -474,17 +474,17 @@ with open("present.txt", "w", encoding="utf-8") as handle:
 filename = input()
 print(summarise(read_lines(filename)))
 `,
-          hint: "In read_lines: try opening and return handle.read().splitlines(), and except FileNotFoundError: return []. In summarise, guard the empty list then loop keeping the longest, replacing only when strictly longer.",
+          hint: "In read_lines: try opening the file and return handle.read().splitlines(), and use except FileNotFoundError: return []. In summarise, guard the empty list, then loop keeping the longest line, replacing it only when a line is strictly longer.",
           tests: [
             {
               input: "present.txt\n",
               expectedOutput: "3 lines, longest: alpha",
-              description: "An existing file is read and the first of the tied longest lines wins",
+              description: "An existing file is read, and the first of the two longest lines wins",
             },
             {
               input: "absent.txt\n",
               expectedOutput: "No data",
-              description: "A missing file returns an empty list instead of raising",
+              description: "A missing file gives an empty list instead of raising an error",
             },
           ],
           solution: `def read_lines(path: str) -> list[str]:
@@ -519,15 +519,15 @@ print(summarise(read_lines(filename)))
 
     lesson(
       "Comma-Separated Values",
-      "The most common format for tabular data, and the module that handles its awkward cases.",
+      "The most common format for table data, and the module that deals with its awkward cases.",
       [
         {
           type: "lesson",
           title: "Rows, Headers, and the csv Module",
           description: "Why splitting on commas is not enough, and what to use instead.",
-          instructions: `## Tabular data as text
+          instructions: `## Table data written as text
 
-**CSV** — comma-separated values — stores a table as text. Each line is a row; commas separate the columns:
+**CSV** stands for comma-separated values. It stores a table as text. Each line is a row, and commas separate the columns:
 
 \`\`\`text
 title,pages,status
@@ -535,13 +535,13 @@ Tidal Systems,320,done
 Coastal Birds,180,reading
 \`\`\`
 
-The first row is usually a **header**, naming the columns. It looks like data but describes it, and must be handled separately.
+The first row is usually a **header** that names the columns. It looks like data but describes it, so it must be handled separately.
 
-CSV is ubiquitous because every spreadsheet and database can read and write it, and because it is plain text a person can inspect.
+CSV is used everywhere, because every spreadsheet and every database can read and write it, and because it is plain text that a person can look at.
 
-## Why not just split on commas
+## Why you cannot just split on commas
 
-The obvious approach:
+Here is the obvious approach:
 
 \`\`\`python
 line = "Tidal Systems,320,done"
@@ -552,14 +552,14 @@ print(line.split(","))
 ['Tidal Systems', '320', 'done']
 \`\`\`
 
-That works until a value contains a comma. CSV handles this by quoting:
+That works until a value itself holds a comma. CSV deals with this by putting quotes around the value:
 
 \`\`\`text
 title,pages,status
 "Birds, Coastal",180,reading
 \`\`\`
 
-Now splitting on commas gives four pieces instead of three, and every column after the first is wrong:
+Now splitting on commas gives four pieces instead of three, and every column after the first one is wrong:
 
 \`\`\`python
 line = '"Birds, Coastal",180,reading'
@@ -570,10 +570,10 @@ print(line.split(","))
 ['"Birds', ' Coastal"', '180', 'reading']
 \`\`\`
 
-There are further complications: a quoted value may contain newlines, and a quote inside a quoted value is doubled. Handling all of it correctly is more work than it appears, and getting it subtly wrong corrupts data silently.
+There are more complications. A quoted value may hold newlines, and a quote inside a quoted value is written twice. Handling all of that correctly is more work than it looks, and getting it slightly wrong spoils your data in silence.
 
 > **Key idea**
-> Never parse CSV by splitting on commas. Quoted fields containing commas will silently produce wrong data. Use the \`csv\` module, which handles the rules correctly.
+> Never read CSV by splitting on commas. Quoted fields that hold commas will quietly give you wrong data. Use the \`csv\` module, which follows the rules correctly.
 
 ## Reading with the csv module
 
@@ -597,17 +597,17 @@ with open("books.csv", encoding="utf-8", newline="") as handle:
 ['Tidal Systems', '320', 'done']
 \`\`\`
 
-The quoted field came through as one value with its comma intact.
+The quoted field arrived as one value, with its comma still inside it.
 
 \`csv.reader\` gives each row as a list of strings. Two details matter.
 
-**Every value is a string.** \`'180'\` is text, not a number. Convert what you need, exactly as with \`input()\`.
+**Every value is a string.** \`'180'\` is text, not a number. Convert what you need, exactly as you do with \`input()\`.
 
-**\`newline=""\` is required.** The csv module handles line endings itself, and omitting this causes problems on some systems. Include it whenever opening a file for csv.
+**\`newline=""\` is required.** The csv module deals with line endings itself, and leaving this out causes trouble on some systems. Include it whenever you open a file for csv.
 
 ## Handling the header
 
-The header arrives as the first row, so skip it deliberately:
+The header arrives as the first row, so skip it on purpose:
 
 \`\`\`python
 import csv
@@ -631,7 +631,7 @@ print(f"Total pages: {total}")
 Total pages: 500
 \`\`\`
 
-\`next(reader)\` reads one row and advances, so the loop starts at the first data row. Forgetting this gives \`ValueError: invalid literal for int()\` when the header text hits a conversion — a distinctive symptom worth recognising.
+\`next(reader)\` reads one row and moves on, so the loop starts at the first row of real data. If you forget this, you get \`ValueError: invalid literal for int()\` when the header text meets a conversion. That is a distinctive sign worth recognising.
 
 ## Writing CSV
 
@@ -658,13 +658,13 @@ title,pages
 Tidal Systems,320
 \`\`\`
 
-The writer quoted the value containing a comma automatically and left the others alone. Doing that correctly by hand requires knowing every rule; the module already does.
+The writer put quotes around the value with a comma in it, and left the others alone. Doing that correctly by hand means knowing every rule. The module already knows them.
 
-\`writerow\` writes one row; \`writerows\` writes many.
+\`writerow\` writes one row. \`writerows\` writes many.
 
 ## Summary
 
-CSV stores tabular data with one row per line and an optional header. Splitting on commas breaks on quoted fields, so use the \`csv\` module. Values arrive as strings and must be converted. Open csv files with \`newline=""\`, and skip the header with \`next(reader)\`.`,
+CSV stores table data with one row for each line, and usually a header. Splitting on commas breaks on quoted fields, so use the \`csv\` module. Values arrive as strings and must be converted. Open csv files with \`newline=""\`, and skip the header with \`next(reader)\`.`,
         },
         {
           type: "lesson",
@@ -672,7 +672,7 @@ CSV stores tabular data with one row per line and an optional header. Splitting 
           description: "Working with columns by name instead of by position.",
           instructions: `## The problem with positions
 
-Reading rows as lists means referring to columns by index:
+Reading rows as lists means naming columns by their index:
 
 \`\`\`python
 row = ["Tidal Systems", "320", "done"]
@@ -683,13 +683,13 @@ print(row[1])
 320
 \`\`\`
 
-\`row[1]\` says nothing about what it holds. Worse, if a column is inserted into the file, every index shifts and the program silently reads the wrong data.
+\`row[1]\` says nothing about what it holds. Worse, if someone adds a column to the file, every index moves, and your program quietly reads the wrong data.
 
-This is the same argument that motivated dictionaries in Module 5: position is the wrong handle when the thing has a name.
+This is the same argument that led to dictionaries in Module 5. Position is the wrong handle when the thing has a name.
 
 ## DictReader
 
-\`csv.DictReader\` reads each row as a dictionary keyed by the header:
+\`csv.DictReader\` reads each row as a dictionary, using the header for the keys:
 
 \`\`\`python
 import csv
@@ -710,13 +710,13 @@ Tidal Systems: 320 pages, done
 Coastal Birds: 180 pages, reading
 \`\`\`
 
-Three improvements. The header is consumed automatically, so no \`next\` call is needed. Columns are reached by name, so the code says what it means. And inserting a column into the file changes nothing, because nothing depends on position.
+Three things improved. The header is used up for you, so you need no \`next\` call. Columns are reached by name, so the code says what it means. And adding a column to the file changes nothing, because nothing depends on position.
 
-Note the quoting inside the f-string: \`row['title']\` uses single quotes because the f-string is delimited by double quotes.
+Note the quotes inside the f-string. \`row['title']\` uses single quotes, because the f-string itself is inside double quotes.
 
 ## Converting as you read
 
-Values are still strings. Convert them once, as you build your data:
+The values are still strings. Convert them once, as you build your data:
 
 \`\`\`python
 import csv
@@ -738,9 +738,9 @@ print(sum(book["pages"] for book in books))
 500
 \`\`\`
 
-Converting at the boundary means the rest of the program works with proper types and never has to remember that pages arrived as text.
+Converting at the boundary means the rest of the program works with proper types, and never has to remember that the pages arrived as text.
 
-That list of dictionaries is exactly the "list of records" shape from Module 5. It is the natural in-memory form for tabular data, and everything you learned about iterating, sorting, and grouping applies unchanged.
+That list of dictionaries is exactly the "list of records" shape from Module 5. It is the natural way to hold table data in memory, and everything you learned about going through, sorting, and grouping applies without change.
 
 ## DictWriter
 
@@ -767,13 +767,13 @@ Tidal Systems,320
 Coastal Birds,180
 \`\`\`
 
-\`fieldnames\` states the column order, since dictionaries carry no inherent notion of which column comes first. \`writeheader()\` writes that row.
+\`fieldnames\` gives the order of the columns, because a dictionary has no idea which column should come first. \`writeheader()\` writes that first row.
 
-A dictionary missing one of the named fields raises \`ValueError\` unless a default is supplied — which is helpful, since a silently blank column is worse than a loud failure.
+A dictionary that is missing one of the named fields raises \`ValueError\`, unless you supply a default. That is helpful, because a quietly blank column is worse than a loud failure.
 
-## Cleaning imported data
+## Cleaning data that comes in
 
-Data from outside your program is rarely clean. Values arrive with stray spaces, inconsistent case, missing entries, and occasional nonsense. Handle it at the boundary:
+Data from outside your program is rarely tidy. Values arrive with extra spaces, capital letters in odd places, missing entries, and occasional nonsense. Deal with it at the boundary:
 
 \`\`\`python
 import csv
@@ -805,28 +805,28 @@ print(f"Skipped: {skipped}")
 Skipped: 1
 \`\`\`
 
-Three techniques combine here: stripping whitespace, attempting conversion inside \`try\`, and \`continue\` to skip a bad row without abandoning the rest.
+Three techniques come together here: stripping spaces, trying the conversion inside \`try\`, and using \`continue\` to skip a bad row without giving up on the rest.
 
-Deciding what to do with bad rows is a real design choice. Skipping silently loses information; stopping entirely may be too strict. Counting them and reporting, as above, is usually the right balance.
+Deciding what to do with bad rows is a real design choice. Skipping them in silence loses information. Stopping completely may be too strict. Counting them and reporting the count, as above, is usually the right balance.
 
 > **Key idea**
-> Convert and clean data at the point it enters your program. Everything past that boundary can then assume the data is correct, which removes defensive checks from the rest of the code.
+> Convert and clean data at the point where it enters your program. Everything past that boundary can then assume the data is correct, which removes defensive checks from the rest of the code.
 
 ## Summary
 
-\`DictReader\` reads rows as dictionaries keyed by the header, so columns are reached by name and are unaffected by reordering. \`DictWriter\` needs \`fieldnames\` and \`writeheader()\`. Convert types and clean values at the boundary, and decide deliberately what to do with rows that fail.`,
+\`DictReader\` reads rows as dictionaries keyed by the header, so columns are reached by name and are not affected by reordering. \`DictWriter\` needs \`fieldnames\` and \`writeheader()\`. Convert types and clean values at the boundary, and decide on purpose what to do with rows that fail.`,
         },
         {
           type: "exercise",
           title: "Summarise a CSV File",
-          description: "Read tabular data with DictReader, convert it, and report on it.",
+          description: "Read table data with DictReader, convert it, and report on it.",
           instructions: `## The problem
 
-Read a CSV file of study sessions and report totals per subject.
+Read a CSV file of study sessions and report the totals for each subject.
 
 ## Setup
 
-Your program must first create a file named \`sessions.csv\` containing exactly this content:
+Your program must first create a file named \`sessions.csv\` holding exactly this:
 
 \`\`\`text
 subject,minutes,mode
@@ -841,8 +841,8 @@ The starter code does this for you.
 ## Requirements
 
 1. Read the file with \`csv.DictReader\`.
-2. Total the minutes for each subject.
-3. Display one line per subject, sorted by total minutes descending, then by subject name:
+2. Add up the minutes for each subject.
+3. Show one line for each subject, sorted by total minutes with the highest first, then by subject name:
 
 \`\`\`text
 statistics: 60
@@ -850,25 +850,25 @@ history: 55
 biology: 25
 \`\`\`
 
-4. Then display one final line with the overall total:
+4. Then show one last line with the overall total:
 
 \`\`\`text
 Total: 140
 \`\`\`
 
-Note the ordering: \`statistics\` comes first with 60 minutes, then \`history\` with 55 from two sessions, then \`biology\` with 25.
+Note the order. \`statistics\` comes first with 60 minutes, then \`history\` with 55 from two sessions, then \`biology\` with 25.
 
 ## Guidance
 
-Use \`DictReader\` and reach columns by name. The header is consumed automatically, so there is no row to skip.
+Use \`DictReader\` and reach the columns by name. The header is used up for you, so there is no row to skip.
 
 Convert \`minutes\` to an integer as you read each row.
 
-Group into a dictionary of subject to total, then sort the keys with a key returning the negative total and the name.
+Group the data into a dictionary from subject to total, then sort the keys with a key that returns the negative total and the name.
 
 ## Constraints
 
-Open the file with \`newline=""\`. Do not split lines on commas yourself.`,
+Open the file with \`newline=""\`. Do not split the lines on commas yourself.`,
           starterCode: `import csv
 
 with open("sessions.csv", "w", encoding="utf-8", newline="") as handle:
@@ -884,7 +884,7 @@ totals = {}
           tests: [
             {
               expectedOutput: "statistics: 60\nhistory: 55\nbiology: 25\nTotal: 140",
-              description: "Subjects are grouped, totalled, and ordered by minutes descending",
+              description: "Subjects are grouped, added up, and ordered by minutes with the highest first",
             },
           ],
           solution: `import csv
@@ -913,7 +913,7 @@ print(f"Total: {sum(totals.values())}")
 
     lesson(
       "JSON",
-      "A structured format that maps directly onto Python's own collections.",
+      "A structured format that matches Python's own collections almost exactly.",
       [
         {
           type: "lesson",
@@ -921,9 +921,9 @@ print(f"Total: {sum(totals.values())}")
           description: "Converting between Python data and text, in both directions.",
           instructions: `## Beyond flat tables
 
-CSV represents a table: rows and columns, all values text. It cannot naturally represent a book with a list of tags, or a record containing another record.
+CSV holds a table: rows and columns, with every value as text. It cannot naturally hold a book with a list of tags, or a record that holds another record inside it.
 
-**JSON** — JavaScript Object Notation — is a text format for structured data with nesting and types. It is the standard format for web APIs and configuration files.
+**JSON** stands for JavaScript Object Notation. It is a text format for structured data, with nesting and with types. It is the standard format for web APIs and for configuration files.
 
 \`\`\`text
 {
@@ -934,23 +934,23 @@ CSV represents a table: rows and columns, all values text. It cannot naturally r
 }
 \`\`\`
 
-## JSON maps onto Python
+## JSON matches Python
 
-The correspondence is close, which is why working with JSON in Python is comfortable:
+The two match closely, and that is why working with JSON in Python is comfortable.
 
-An object becomes a dictionary. An array becomes a list. A string becomes a string. A number becomes an \`int\` or \`float\`. \`true\` and \`false\` become \`True\` and \`False\`. \`null\` becomes \`None\`.
+An object becomes a dictionary. An array becomes a list. A string stays a string. A number becomes an \`int\` or a \`float\`. \`true\` and \`false\` become \`True\` and \`False\`. \`null\` becomes \`None\`.
 
-Note the capitalisation difference: JSON writes \`true\`, \`false\`, and \`null\` in lowercase, while Python writes \`True\`, \`False\`, and \`None\`. The module handles the translation; the difference matters only when reading raw JSON by eye.
+Note the difference in capital letters. JSON writes \`true\`, \`false\`, and \`null\` in small letters, while Python writes \`True\`, \`False\`, and \`None\`. The module translates for you. The difference only matters when you read raw JSON with your own eyes.
 
 ## The four functions
 
-The \`json\` module provides four functions, and the naming is worth learning deliberately because it is easy to reach for the wrong one.
+The \`json\` module gives you four functions. The names are worth learning carefully, because it is easy to reach for the wrong one.
 
-\`json.dumps\` converts Python data **to** a JSON string. \`json.loads\` converts a JSON string **to** Python data. The \`s\` means "string".
+\`json.dumps\` turns Python data **into** a JSON string. \`json.loads\` turns a JSON string **into** Python data. The \`s\` means "string".
 
 \`json.dump\` writes Python data to a **file**. \`json.load\` reads from a file. No \`s\`.
 
-So: \`dump\` writes, \`load\` reads, and the \`s\` suffix means a string rather than a file.
+So: \`dump\` writes, \`load\` reads, and the \`s\` at the end means a string rather than a file.
 
 \`\`\`python
 import json
@@ -971,11 +971,11 @@ str
 321
 \`\`\`
 
-\`dumps\` produced a string. \`loads\` turned it back into a dictionary whose values have their proper types — \`320\` is an integer, so arithmetic works immediately.
+\`dumps\` produced a string. \`loads\` turned it back into a dictionary whose values have their proper types. \`320\` is an integer, so arithmetic works at once.
 
-That is a significant advantage over CSV, where everything arrives as text and must be converted.
+That is a real advantage over CSV, where everything arrives as text and must be converted.
 
-## Readable output
+## Output a person can read
 
 \`\`\`python
 import json
@@ -991,9 +991,9 @@ print(json.dumps(book, indent=2))
 }
 \`\`\`
 
-\`indent=2\` produces output a person can read, which matters for configuration files kept in version control. Without it, everything is on one line — more compact, and appropriate for data sent over a network.
+\`indent=2\` gives output that a person can read, and that matters for configuration files kept under version control. Without it, everything sits on one line. That is smaller, and it suits data sent over a network.
 
-\`sort_keys=True\` orders the keys alphabetically, which makes output stable regardless of insertion order:
+\`sort_keys=True\` puts the keys in alphabetical order, which makes the output the same whatever order the keys were added in:
 
 \`\`\`python
 import json
@@ -1006,7 +1006,7 @@ print(json.dumps(book, sort_keys=True))
 {"pages": 320, "title": "Tidal Systems"}
 \`\`\`
 
-That is worth using whenever output is compared or stored, because it removes an irrelevant source of difference.
+That is worth using whenever the output is compared or stored, because it removes a difference that means nothing.
 
 ## Files
 
@@ -1035,11 +1035,11 @@ Tidal Systems
 500
 \`\`\`
 
-The whole structure — a list of dictionaries — survived the round trip with its types intact.
+The whole structure, a list of dictionaries, survived the journey out and back with its types unchanged.
 
-## What JSON cannot store
+## What JSON cannot hold
 
-JSON has no tuples, sets, or dates. A tuple becomes a list on the way out and stays a list on the way back:
+JSON has no tuples, no sets, and no dates. A tuple becomes a list on the way out, and it stays a list on the way back:
 
 \`\`\`python
 import json
@@ -1055,11 +1055,11 @@ print(type(restored["point"]).__name__)
 list
 \`\`\`
 
-A set raises \`TypeError\`. Convert to a list before saving.
+A set raises \`TypeError\`. Change it to a list before saving.
 
-Dates must be stored as strings, conventionally in ISO format such as \`"2024-07-15"\`, and parsed back when loaded.
+Dates must be stored as strings, usually in the form \`"2024-07-15"\`, and read back into dates when they are loaded.
 
-Dictionary keys must be strings. An integer key becomes a string key on the round trip, which is a genuine trap:
+Dictionary keys must be strings. An integer key becomes a string key on the journey, and that is a real trap:
 
 \`\`\`python
 import json
@@ -1073,12 +1073,12 @@ print(restored)
 {'1': 'one', '2': 'two'}
 \`\`\`
 
-The keys are now strings. Any code looking up \`counts[1]\` will raise \`KeyError\`.
+The keys are now strings. Any code that looks up \`counts[1]\` will raise \`KeyError\`.
 
 > **Key idea**
-> A JSON round trip is not always lossless. Tuples become lists, sets are rejected, and dictionary keys become strings. Design your data with the format's limits in mind.
+> A journey out to JSON and back does not always return exactly what you sent. Tuples become lists, sets are refused, and dictionary keys become strings. Design your data with those limits in mind.
 
-## Malformed JSON
+## Broken JSON
 
 \`\`\`python
 import json
@@ -1093,21 +1093,21 @@ except json.JSONDecodeError as error:
 Could not parse: Expecting property name enclosed in double quotes
 \`\`\`
 
-\`JSONDecodeError\` is a subclass of \`ValueError\`, so catching either works. Any JSON from outside your program should be parsed inside a \`try\`.
+\`JSONDecodeError\` is a kind of \`ValueError\`, so catching either one works. Any JSON from outside your program should be read inside a \`try\`.
 
 ## Summary
 
-JSON stores nested, typed data and maps closely onto Python's collections. \`dumps\`/\`loads\` work with strings; \`dump\`/\`load\` work with files. Use \`indent\` for readability and \`sort_keys\` for stable output. Tuples become lists, sets are unsupported, and keys become strings.`,
+JSON holds nested data with types, and it matches Python's collections closely. \`dumps\` and \`loads\` work with strings. \`dump\` and \`load\` work with files. Use \`indent\` to make it readable and \`sort_keys\` for steady output. Tuples become lists, sets are not supported, and keys become strings.`,
         },
         {
           type: "lesson",
           title: "Validating Imported Data",
-          description: "Treating external data as untrusted, and failing usefully when it is wrong.",
-          instructions: `## Data from outside is not trustworthy
+          description: "Treating data from outside as untrusted, and failing in a useful way when it is wrong.",
+          instructions: `## Data from outside cannot be trusted
 
-Data your program creates is under your control. Data arriving from a file, a network, or a person is not. It may be missing fields, hold the wrong types, or be structured differently from what you expect.
+Data that your program made is under your control. Data that arrives from a file, from a network, or from a person is not. It may have missing fields, hold the wrong types, or be arranged differently from what you expect.
 
-The consequences of assuming it is correct show up far from the cause:
+If you assume it is correct, the trouble shows up a long way from its cause:
 
 \`\`\`python
 import json
@@ -1121,11 +1121,11 @@ print(book.get("pages", "no pages recorded"))
 no pages recorded
 \`\`\`
 
-Writing \`book["pages"]\` there would raise \`KeyError\` — perhaps in a report function three layers away, where the message tells you nothing about which record was malformed.
+Writing \`book["pages"]\` there would raise \`KeyError\`, perhaps inside a reporting function three layers away, where the message tells you nothing about which record was broken.
 
-## Validate at the boundary
+## Check at the boundary
 
-The remedy is to check the data once, where it enters, and reject or repair anything wrong. After that, the rest of the program can assume it is correct.
+The answer is to check the data once, where it comes in, and to refuse or repair anything wrong. After that, the rest of the program can assume that the data is correct.
 
 \`\`\`python
 import json
@@ -1160,13 +1160,13 @@ valid
 title must be non-empty text
 \`\`\`
 
-\`isinstance(value, type)\` reports whether a value is of a given type. It is the right tool here because JSON can supply anything: a number where text was expected, a list where an object was expected.
+\`isinstance(value, type)\` says whether a value is of a given type. It is the right tool here, because JSON can give you anything: a number where you expected text, or a list where you expected an object.
 
-\`validate_book(good) or "valid"\` uses truthiness — an empty string is false, so the \`or\` supplies the alternative. A neat idiom, though a plain \`if\` is clearer when the logic grows.
+\`validate_book(good) or "valid"\` uses the truth rules. An empty string counts as false, so \`or\` supplies the other value. It is a neat trick, although a plain \`if\` is clearer once the logic grows.
 
-## Reporting which record failed
+## Saying which record failed
 
-When processing many records, say which one was wrong:
+When you handle many records, say which one was wrong:
 
 \`\`\`python
 import json
@@ -1200,15 +1200,15 @@ Record 3 rejected: missing title
 Accepted 1 of 3
 \`\`\`
 
-\`enumerate(records, start=1)\` numbers from 1 rather than 0, which is what a person expects when told "record 2".
+\`enumerate(records, start=1)\` numbers from 1 instead of 0, and that is what a person expects when they are told "record 2".
 
-The program processed everything it could and reported precisely what it could not. That is usually better than stopping at the first problem, and much better than silently skipping.
+The program handled everything it could and reported exactly what it could not. That is usually better than stopping at the first problem, and far better than skipping in silence.
 
-## A caution about booleans
+## A warning about Booleans
 
-\`isinstance(True, int)\` is \`True\` in Python, because \`bool\` is a subclass of \`int\`. So a validator checking \`isinstance(value, int)\` accepts \`True\` as a page count.
+\`isinstance(True, int)\` is \`True\` in Python, because \`bool\` is built on top of \`int\`. So a check using \`isinstance(value, int)\` will accept \`True\` as a page count.
 
-If that matters, exclude it explicitly:
+If that matters, rule it out on purpose:
 
 \`\`\`python
 def is_whole_number(value):
@@ -1224,26 +1224,26 @@ True
 False
 \`\`\`
 
-This is the kind of detail that only surfaces when data is genuinely untrusted, which is exactly when it matters.
+This is the kind of detail that only appears when the data really is untrusted, and that is exactly when it matters.
 
-## Reject, repair, or default?
+## Refuse, repair, or fail?
 
-Three reasonable responses to a bad record, and the choice is a design decision:
+There are three fair answers to a bad record, and choosing between them is a design decision.
 
-**Reject it** and report. Right when the data must be correct.
+**Refuse it** and report. Right when the data must be correct.
 
-**Repair it** with a sensible default — an absent \`tags\` list becomes \`[]\`. Right when the field is genuinely optional.
+**Repair it** with a sensible default. A missing \`tags\` list becomes \`[]\`. Right when the field really is optional.
 
-**Fail entirely.** Right when partial data is worse than none, as in a financial import.
+**Fail completely.** Right when partial data is worse than none, as in a financial import.
 
-What is never right is ignoring the problem and hoping. A bad value that travels through a program surfaces later, far from its cause, as a confusing failure — which is the fail-fast argument from Module 7 applied to data.
+What is never right is ignoring the problem and hoping. A bad value that travels through a program appears later, far from its cause, as a confusing failure. That is the fail-fast argument from Module 7, applied to data.
 
 > **Key idea**
-> Validate external data once, at the boundary, and decide deliberately whether to reject, repair, or fail. Past that point the rest of your program can trust its inputs.
+> Check data from outside once, at the boundary, and decide on purpose whether to refuse, repair, or fail. Past that point, the rest of your program can trust its inputs.
 
 ## Summary
 
-Treat all external data as untrusted. Validate at the boundary with \`isinstance\` and explicit key checks, report which record failed and why, and choose deliberately between rejecting, repairing, and failing. Remember that \`bool\` counts as \`int\`.`,
+Treat all data from outside as untrusted. Check it at the boundary with \`isinstance\` and explicit key checks, report which record failed and why, and choose on purpose between refusing, repairing, and failing. Remember that \`bool\` counts as \`int\`.`,
         },
         {
           type: "exercise",
@@ -1259,10 +1259,10 @@ A series of lines in the form \`title|pages|tag\`, ending with \`end\`.
 
 ## Requirements
 
-1. Build a list of dictionaries, one per record, with keys \`title\`, \`pages\`, and \`tags\`. \`pages\` must be an integer. \`tags\` must be a **list** containing the single tag.
+1. Build a list of dictionaries, one for each record, with the keys \`title\`, \`pages\`, and \`tags\`. \`pages\` must be an integer. \`tags\` must be a **list** holding the single tag.
 2. Write the list to \`library.json\` using \`json.dump\` with \`indent=2\`.
 3. Read it back with \`json.load\`.
-4. Display exactly three lines from the **loaded** data:
+4. Show exactly three lines, worked out from the data you **loaded back**:
 
 \`\`\`text
 Records: 2
@@ -1270,7 +1270,7 @@ Total pages: 500
 Tags: marine, reference
 \`\`\`
 
-Where \`Tags\` lists every distinct tag, sorted alphabetically and joined by \`, \`.
+\`Tags\` lists every different tag, in alphabetical order, joined by \`, \`.
 
 ## Example
 
@@ -1288,9 +1288,9 @@ Note that the last line is \`Tags:\` with nothing after it.
 
 ## Guidance
 
-The summary must be computed from the data you loaded back, not from the list you built. That is what makes it a genuine round trip.
+The summary must be worked out from the data you loaded back, not from the list you built. That is what makes it a real journey out and back.
 
-Collect the distinct tags into a set, then sort it before joining. \`", ".join(items)\` combines a list of strings with that separator.
+Collect the different tags into a set, then sort it before joining. \`", ".join(items)\` joins a list of strings with that separator.
 
 ## Constraints
 
@@ -1301,27 +1301,27 @@ records = []
 
 line = input()
 `,
-          hint: "Split each line on \"|\" into three parts and append {\"title\": title, \"pages\": int(pages), \"tags\": [tag]}. After dumping and loading, use sum(r[\"pages\"] for r in loaded) and build a set from every tag in every record.",
+          hint: "Split each line on \"|\" into three parts and append {\"title\": title, \"pages\": int(pages), \"tags\": [tag]}. After dumping and loading, use sum(r[\"pages\"] for r in loaded), and build a set from every tag in every record.",
           tests: [
             {
               input: "Tidal Systems|320|marine\nCoastal Birds|180|reference\nend\n",
               expectedOutput: "Records: 2\nTotal pages: 500\nTags: marine, reference",
-              description: "Records survive the round trip with integer pages and list tags",
+              description: "Records survive the journey with integer pages and list tags",
             },
             {
               input: "end\n",
               expectedOutput: "Records: 0\nTotal pages: 0\nTags:",
-              description: "An empty set of records writes and reads back as an empty list",
+              description: "An empty set of records is written and read back as an empty list",
             },
             {
               input: "A|10|x\nB|20|x\nend\n",
               expectedOutput: "Records: 2\nTotal pages: 30\nTags: x",
-              description: "A repeated tag appears only once in the summary",
+              description: "A tag used twice appears only once in the summary",
             },
             {
               input: "Solo|5|zeta\nend\n",
               expectedOutput: "Records: 1\nTotal pages: 5\nTags: zeta",
-              description: "A single record round-trips correctly",
+              description: "A single record goes out and comes back correctly",
             },
           ],
           solution: `import json
@@ -1355,10 +1355,10 @@ print(f"Tags: {', '.join(sorted(tags))}")
         {
           type: "exercise",
           title: "Module 10 Checkpoint: Import, Validate, Report",
-          description: "Read a CSV file, validate every row, write valid records as JSON, and report.",
+          description: "Read a CSV file, check every row, write the good records as JSON, and report.",
           instructions: `## The problem
 
-Build a small import pipeline: read tabular data, reject anything invalid with a specific reason, save what survives, and report.
+Build a small import pipeline. Read table data, refuse anything invalid with an exact reason, save what survives, and report.
 
 ## Setup
 
@@ -1377,14 +1377,14 @@ Salt Marshes,150,reading
 ## Requirements
 
 1. Read the file with \`csv.DictReader\`.
-2. Validate each row in this order, rejecting with the first message that applies:
-   - Empty title (after stripping): \`missing title\`
+2. Check each row in this order, refusing it with the first message that applies:
+   - Empty title, after stripping: \`missing title\`
    - Pages not a whole number: \`bad pages\`
    - Pages negative: \`negative pages\`
    - Status not \`done\` or \`reading\`: \`bad status\`
-3. For each rejected row, display \`Row N rejected: MESSAGE\` where N counts data rows from 1.
-4. Write the accepted records to \`clean.json\` with \`json.dump\`, each a dictionary with keys \`title\`, \`pages\`, and \`status\`, with \`pages\` as an integer.
-5. Read that file back and display exactly two final lines:
+3. For each refused row, show \`Row N rejected: MESSAGE\`, where N counts the data rows from 1.
+4. Write the accepted records to \`clean.json\` with \`json.dump\`. Each one is a dictionary with the keys \`title\`, \`pages\`, and \`status\`, with \`pages\` as an integer.
+5. Read that file back and show exactly two last lines:
 
 \`\`\`text
 Accepted: 2
@@ -1402,19 +1402,19 @@ Accepted: 2
 Total pages: 470
 \`\`\`
 
-Two of the six data rows survive: \`Tidal Systems\` at 320 pages and \`Salt Marshes\` at 150, giving 470.
+Two of the six data rows survive: \`Tidal Systems\` with 320 pages and \`Salt Marshes\` with 150, giving 470.
 
 ## Guidance
 
-Number the data rows with \`enumerate(reader, start=1)\`, so the header does not count.
+Number the data rows with \`enumerate(reader, start=1)\`, so that the header is not counted.
 
-Attempt the page conversion inside \`try\` and catch \`ValueError\` to produce the \`bad pages\` message; the negative check happens only after a successful conversion.
+Try the page conversion inside \`try\` and catch \`ValueError\` to give the \`bad pages\` message. The check for a negative number happens only after the conversion has worked.
 
-The final totals must be computed from the data read back out of \`clean.json\`.
+The final totals must be worked out from the data read back out of \`clean.json\`.
 
 ## Constraints
 
-Use \`csv.DictReader\` for reading and \`json.dump\` / \`json.load\` for the JSON file.`,
+Use \`csv.DictReader\` for reading, and \`json.dump\` and \`json.load\` for the JSON file.`,
           starterCode: `import csv
 import json
 
@@ -1429,12 +1429,12 @@ with open("incoming.csv", "w", encoding="utf-8", newline="") as handle:
 
 accepted = []
 `,
-          hint: "Write a validate(row) helper returning an error message or \"\". Loop with enumerate(csv.DictReader(handle), start=1), print rejections, and append cleaned dictionaries to accepted. Then dump, load, and summarise the loaded list.",
+          hint: "Write a validate(row) helper that returns an error message or \"\". Loop with enumerate(csv.DictReader(handle), start=1), print the refusals, and append cleaned dictionaries to accepted. Then dump, load, and summarise the loaded list.",
           tests: [
             {
               expectedOutput:
                 "Row 2 rejected: missing title\nRow 3 rejected: bad pages\nRow 4 rejected: negative pages\nRow 5 rejected: bad status\nAccepted: 2\nTotal pages: 470",
-              description: "Each invalid row is rejected with its own reason and only valid records are saved",
+              description: "Every bad row is refused with its own reason, and only good records are saved",
             },
           ],
           solution: `import csv

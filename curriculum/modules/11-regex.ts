@@ -2,7 +2,7 @@ import { module, lesson, type ModuleSource } from "../types.ts"
 
 const moduleEleven: ModuleSource = module(
   "Regular Expressions and Text Processing",
-  "Describing patterns in text: matching, validating, extracting, and substituting, and knowing when an ordinary string method is the better answer.",
+  "Describing patterns in text: matching, checking, taking out, and replacing, and knowing when an ordinary string method is the better answer.",
   [
     lesson(
       "Why Regular Expressions Exist",
@@ -11,12 +11,12 @@ const moduleEleven: ModuleSource = module(
         {
           type: "lesson",
           title: "The Problem Patterns Solve",
-          description: "A concrete task that string methods handle badly.",
-          instructions: `## A task that gets out of hand
+          description: "A real task that string methods handle badly.",
+          instructions: `## A task that grows out of hand
 
-Suppose you must find every reference code in a piece of text. A code is three uppercase letters, a hyphen, and four digits: \`ABC-1234\`.
+Suppose you must find every reference code in a piece of text. A code is three capital letters, a hyphen, and four digits: \`ABC-1234\`.
 
-With the tools you have, you would split the text into words, then for each word check that it is eight characters long, that the first three are uppercase letters, that the fourth is a hyphen, and that the last four are digits:
+With the tools you have, you would split the text into words. Then, for each word, you would check that it is eight characters long, that the first three are capital letters, that the fourth is a hyphen, and that the last four are digits:
 
 \`\`\`python
 def looks_like_code(word):
@@ -38,13 +38,13 @@ print(found)
 ['ABC-1234', 'QRS-0001']
 \`\`\`
 
-It works. But it is twelve lines describing one simple shape, and it is fragile: it fails for a code followed by a full stop, because splitting on spaces leaves the punctuation attached.
+It works. But it is twelve lines to describe one simple shape, and it is fragile. It fails for a code followed by a full stop, because splitting on spaces leaves the punctuation attached to the word.
 
-Now imagine the rule changes to "three or four letters" and "two to six digits". Every check needs rewriting.
+Now imagine the rule changes to "three or four letters" and "two to six digits". Every check has to be rewritten.
 
 ## A notation for shapes of text
 
-A **regular expression**, usually shortened to *regex*, is a small language for describing patterns in text. The same rule above is written:
+A **regular expression**, usually shortened to *regex*, is a small language for describing patterns in text. The same rule above is written like this:
 
 \`\`\`python
 import re
@@ -57,24 +57,24 @@ print(re.findall(r"[A-Z]{3}-[0-9]{4}", text))
 ['ABC-1234', 'QRS-0001']
 \`\`\`
 
-One line. Read it in pieces: \`[A-Z]\` means one uppercase letter, \`{3}\` means exactly three of those, \`-\` is a literal hyphen, \`[0-9]\` is one digit, and \`{4}\` means exactly four.
+One line. Read it piece by piece. \`[A-Z]\` means one capital letter. \`{3}\` means exactly three of them. \`-\` is a real hyphen. \`[0-9]\` is one digit. \`{4}\` means exactly four.
 
-It is also more robust: it finds codes anywhere in the text, regardless of surrounding punctuation, because it never split on spaces in the first place.
+It is also sturdier. It finds codes anywhere in the text, whatever punctuation sits around them, because it never split on spaces in the first place.
 
 ## The trade
 
-Regex is dense. \`[A-Z]{3}-[0-9]{4}\` is unreadable until you know the notation, and complicated patterns are genuinely hard to read even then.
+Regex is dense. \`[A-Z]{3}-[0-9]{4}\` cannot be read at all until you know the notation, and complicated patterns are genuinely hard to read even then.
 
-What you gain is that patterns which would take dozens of lines of conditionals become one expression, and that expression can be changed in seconds when the rule changes.
+What you gain is that a pattern which would take dozens of lines of conditions becomes one expression, and that expression can be changed in seconds when the rule changes.
 
-The judgement to develop is *when* to use it. Regex is right for questions about the shape of text. It is wrong for questions an ordinary string method already answers, and the last lesson of this module examines that boundary.
+The judgement to build is *when* to use it. Regex is right for questions about the shape of text. It is wrong for questions that an ordinary string method already answers, and the last lesson of this module looks at that border.
 
 > **Key idea**
 > A regular expression describes the *shape* of a piece of text. Use one when the shape is the question, and a string method when it is not.
 
 ## Raw strings
 
-Regex patterns are written as **raw strings**, marked with \`r\` before the quotation mark:
+Regex patterns are written as **raw strings**, marked with an \`r\` before the quotation mark:
 
 \`\`\`python
 print("a\\tb")
@@ -86,11 +86,11 @@ a	b
 a\\tb
 \`\`\`
 
-In an ordinary string, a backslash starts an escape sequence: \`\\t\` becomes a tab, \`\\n\` a newline. In a raw string, the backslash is just a backslash.
+In an ordinary string, a backslash starts an escape: \`\\t\` becomes a tab and \`\\n\` becomes a newline. In a raw string, a backslash is only a backslash.
 
-This matters because regex uses backslashes heavily for its own purposes. Without a raw string, \`"\\d"\` would first be interpreted by Python and only then by the regex engine, which leads to confusing failures and, in some cases, patterns that quietly mean something different.
+This matters because regex uses backslashes heavily for its own purposes. Without a raw string, \`"\\d"\` would first be read by Python and only then by the regex engine. That leads to confusing failures and, sometimes, to patterns that quietly mean something else.
 
-The rule is simple: **always write regex patterns as raw strings.** There is no case where it hurts.
+The rule is simple: **always write regex patterns as raw strings.** There is no case where it does harm.
 
 ## The re module
 
@@ -112,23 +112,23 @@ else:
 Found: ABC-1234
 \`\`\`
 
-\`re.search\` looks for the pattern anywhere in the text. It returns a **match object** if found and \`None\` if not.
+\`re.search\` looks for the pattern anywhere in the text. It gives back a **match object** if it finds one, and \`None\` if it does not.
 
-That \`None\` is why the \`if\` is needed. Calling \`.group()\` on \`None\` raises \`AttributeError: 'NoneType' object has no attribute 'group'\` — one of the most common regex mistakes, and now recognisable from Module 7 as "something gave me nothing".
+That \`None\` is why the \`if\` is needed. Calling \`.group()\` on \`None\` raises \`AttributeError: 'NoneType' object has no attribute 'group'\`. It is one of the most common regex mistakes, and from Module 7 you will recognise it as "something gave me nothing".
 
-\`match.group()\` returns the matched text.
+\`match.group()\` gives back the text that matched.
 
 ## Summary
 
-A regular expression describes the shape of text in a compact notation, replacing long chains of conditionals. Patterns are written as raw strings so backslashes reach the regex engine intact. \`re.search\` finds a pattern anywhere and returns \`None\` when it does not match, which must be checked before using the result.`,
+A regular expression describes the shape of text in a short notation, and it replaces long chains of conditions. Patterns are written as raw strings, so that backslashes reach the regex engine untouched. \`re.search\` finds a pattern anywhere and gives \`None\` when there is no match, so you must check before using the result.`,
         },
         {
           type: "lesson",
           title: "Character Classes and Quantifiers",
           description: "Describing which characters are allowed, and how many of them.",
-          instructions: `## Literal characters
+          instructions: `## Plain characters
 
-The simplest pattern is literal text, matching exactly itself:
+The simplest pattern is plain text, which matches exactly itself:
 
 \`\`\`python
 import re
@@ -144,7 +144,7 @@ False
 True
 \`\`\`
 
-The third is worth noting: \`cat\` appears inside \`concatenate\`, and \`search\` finds patterns anywhere. Anchors, later in this lesson, control that.
+The third one is worth noticing. \`cat\` appears inside \`concatenate\`, and \`search\` finds patterns anywhere. Anchors, later in this lesson, control that.
 
 ## Character classes
 
@@ -162,9 +162,9 @@ print(re.findall(r"[0-9]", "a1b22c"))
 ['1', '2', '2']
 \`\`\`
 
-A hyphen inside brackets means a range. \`[a-z]\` is any lowercase letter, \`[A-Z]\` any uppercase, \`[0-9]\` any digit. Ranges combine: \`[a-zA-Z0-9]\` is any letter or digit.
+A hyphen inside the brackets means a range. \`[a-z]\` is any small letter, \`[A-Z]\` any capital letter, \`[0-9]\` any digit. Ranges can be combined: \`[a-zA-Z0-9]\` is any letter or digit.
 
-A caret at the start negates the set:
+A \`^\` at the start turns the set round:
 
 \`\`\`python
 import re
@@ -178,9 +178,9 @@ print(re.findall(r"[^0-9]", "a1b2"))
 
 \`[^0-9]\` means "any character that is not a digit".
 
-## Shorthand classes
+## Short forms
 
-Common sets have shorthands:
+Common sets have short forms:
 
 \`\`\`python
 import re
@@ -197,9 +197,9 @@ print(re.findall(r"\\s", text))
 [' ', ' ', ' ']
 \`\`\`
 
-\`\\d\` is a digit, equivalent to \`[0-9]\`. \`\\w\` is a "word character": a letter, digit, or underscore. \`\\s\` is whitespace: space, tab, or newline.
+\`\\d\` is a digit, the same as \`[0-9]\`. \`\\w\` is a "word character": a letter, a digit, or an underscore. \`\\s\` is whitespace: a space, a tab, or a newline.
 
-Their capitals negate them. \`\\D\` is any non-digit, \`\\W\` any non-word character, \`\\S\` any non-whitespace.
+Their capital versions mean the opposite. \`\\D\` is any non-digit, \`\\W\` any non-word character, \`\\S\` anything that is not whitespace.
 
 A dot matches **any character except a newline**:
 
@@ -213,13 +213,13 @@ print(re.findall(r"c.t", "cat cot c t cut"))
 ['cat', 'cot', 'c t', 'cut']
 \`\`\`
 
-The dot is the most over-used piece of regex notation. It matches far more than people expect, including punctuation and digits. Prefer a specific class when you know what you want.
+The dot is the most over-used piece of regex notation. It matches far more than people expect, including punctuation and digits. Prefer an exact class when you know what you want.
 
-To match a literal dot, escape it: \`\\.\` means a full stop rather than "any character".
+To match a real dot, escape it. \`\\.\` means a full stop, not "any character".
 
 ## Quantifiers
 
-Quantifiers say how many times the preceding element may repeat:
+A quantifier says how many times the thing before it may repeat:
 
 \`\`\`python
 import re
@@ -235,9 +235,9 @@ print(re.findall(r"colou?r", "color colour"))
 ['color', 'colour']
 \`\`\`
 
-\`+\` means one or more. \`*\` means zero or more. \`?\` means zero or one, making the preceding element optional.
+\`+\` means one or more. \`*\` means zero or more. \`?\` means zero or one, which makes the thing before it optional.
 
-Note the second result: \`\\d*\` matches an empty string, so it "finds" a match at every position. A pattern that can match nothing usually indicates a mistake — \`+\` is almost always what you meant.
+Look at the second result. \`\\d*\` matches an empty string, so it "finds" a match at every position. A pattern that can match nothing is usually a mistake. \`+\` is almost always what you meant.
 
 Braces give exact counts:
 
@@ -255,11 +255,11 @@ print(re.findall(r"\\d{2,3}", "1 22 333 4444"))
 
 \`{4}\` is exactly four. \`{2,3}\` is two to three. \`{2,}\` is two or more.
 
-Look closely at both results. \`78901\` yielded \`7890\` — four digits were found and the fifth left over. And \`4444\` yielded \`444\`, taking three and leaving one. Quantifiers take what they can and do not require the surrounding text to end. Anchors fix that.
+Look closely at both results. \`78901\` gave \`7890\`: four digits were taken and the fifth was left. And \`4444\` gave \`444\`, taking three and leaving one. A quantifier takes what it can, and it does not require the text around it to end. Anchors fix that.
 
 ## Greedy matching
 
-Quantifiers are **greedy**: they match as much as possible.
+Quantifiers are **greedy**. They match as much as they can.
 
 \`\`\`python
 import re
@@ -274,18 +274,18 @@ print(re.findall(r"\\[.+?\\]", text))
 ['[first]', '[second]']
 \`\`\`
 
-The first pattern matched from the opening bracket to the *last* closing bracket, swallowing the middle. Adding \`?\` after the quantifier makes it **lazy**, matching as little as possible.
+The first pattern matched from the opening bracket all the way to the *last* closing bracket, swallowing the middle. Adding \`?\` after the quantifier makes it **lazy**, so it matches as little as it can.
 
-This is one of the most common regex surprises. When a pattern matches far more than intended, greediness is usually why.
+This is one of the most common regex surprises. When a pattern matches far more than you wanted, greediness is usually the reason.
 
-Note also \`\\[\` and \`\\]\`: square brackets are regex syntax, so matching literal ones requires escaping.
+Note \`\\[\` and \`\\]\` as well. Square brackets are regex syntax, so matching real ones needs an escape.
 
 > **Key idea**
-> Quantifiers are greedy by default and take as much as they can. Add \`?\` after one to make it lazy. A pattern matching more than expected is usually a greediness problem.
+> Quantifiers are greedy by default and take as much as they can. Add \`?\` after one to make it lazy. A pattern that matches more than you expected is usually a greediness problem.
 
-## Characters needing escapes
+## Characters that need escaping
 
-These have special meaning and must be escaped with a backslash to match literally:
+These characters have a special meaning, so they must be escaped with a backslash to match themselves:
 
 \`\`\`text
 . ^ $ * + ? { } [ ] \\ | ( )
@@ -301,19 +301,19 @@ print(re.findall(r"\\d+\\.\\d+", "version 3.11 and 4"))
 ['3.11']
 \`\`\`
 
-Writing \`\\d+.\\d+\` without escaping the dot would also match \`3x11\`, because an unescaped dot matches any character. That kind of mistake produces a pattern that works on your examples and fails on real data.
+Writing \`\\d+.\\d+\` without escaping the dot would also match \`3x11\`, because an unescaped dot matches any character. That kind of mistake gives you a pattern that works on your examples and fails on real data.
 
 ## Summary
 
-Character classes describe which characters are allowed: \`[a-z]\`, \`[^0-9]\`, and the shorthands \`\\d\`, \`\\w\`, \`\\s\`. Quantifiers describe how many: \`+\`, \`*\`, \`?\`, and \`{n,m}\`. Quantifiers are greedy unless followed by \`?\`. Escape the special characters when you mean them literally.`,
+Character classes say which characters are allowed: \`[a-z]\`, \`[^0-9]\`, and the short forms \`\\d\`, \`\\w\`, \`\\s\`. Quantifiers say how many: \`+\`, \`*\`, \`?\`, and \`{n,m}\`. Quantifiers are greedy unless a \`?\` follows them. Escape the special characters when you mean them literally.`,
         },
         {
           type: "exercise",
           title: "Find Patterns in Text",
-          description: "Use character classes and quantifiers to extract several kinds of token.",
+          description: "Use character classes and quantifiers to take three kinds of token out of a line.",
           instructions: `## The problem
 
-Extract three different kinds of token from a line of text.
+Take three different kinds of token out of a line of text.
 
 ## Input
 
@@ -321,7 +321,7 @@ One line of text.
 
 ## Requirements
 
-Using \`re.findall\`, display exactly three lines:
+Using \`re.findall\`, show exactly three lines:
 
 \`\`\`text
 Numbers: ['12', '450', '7']
@@ -332,8 +332,8 @@ Codes: ['AB-12', 'XY-99']
 Where:
 
 1. \`Numbers\` are runs of one or more digits.
-2. \`Words\` are runs of one or more letters only — no digits, no underscores.
-3. \`Codes\` are exactly two uppercase letters, a hyphen, then exactly two digits.
+2. \`Words\` are runs of one or more letters only, with no digits and no underscores.
+3. \`Codes\` are exactly two capital letters, a hyphen, then exactly two digits.
 
 ## Example
 
@@ -345,43 +345,43 @@ Words: ['Order', 'items', 'ref', 'AB', 'and', 'more', 'XY', 'or']
 Codes: ['AB-12', 'XY-99']
 \`\`\`
 
-Note that digits inside codes are still found by the number pattern, and the letters inside codes are still found by the word pattern. The three searches are independent; none excludes the others.
+Note that the digits inside the codes are still found by the number pattern, and the letters inside the codes are still found by the word pattern. The three searches are separate, and none of them rules out the others.
 
 ## Guidance
 
-For words, \`\\w\` will not do, because it includes digits and underscores. Use an explicit letter class instead.
+For words, \`\\w\` will not do, because it also includes digits and underscores. Use a class of letters only.
 
 Write every pattern as a raw string.
 
 ## Constraints
 
-Use \`re.findall\` three times. Print each result list directly, which produces the bracketed format shown.`,
+Use \`re.findall\` three times. Print each result list directly, which gives the format with square brackets shown above.`,
           starterCode: `import re
 
 text = input()
 `,
-          hint: "Numbers use r\"\\d+\". Words need a letters-only class such as r\"[A-Za-z]+\". Codes are r\"[A-Z]{2}-\\d{2}\". Assign each result to a variable first: an f-string expression cannot contain a backslash.",
+          hint: "Numbers use r\"\\d+\". Words need a letters-only class such as r\"[A-Za-z]+\". Codes are r\"[A-Z]{2}-\\d{2}\". Assign each result to a variable first, because an expression inside an f-string cannot hold a backslash.",
           tests: [
             {
               input: "Order 12 items ref AB-12 and 450 more XY-99 or 7\n",
               expectedOutput:
                 "Numbers: ['12', '12', '450', '99', '7']\nWords: ['Order', 'items', 'ref', 'AB', 'and', 'more', 'XY', 'or']\nCodes: ['AB-12', 'XY-99']",
-              description: "All three token types are extracted independently of one another",
+              description: "All three kinds of token are found, and each search works on its own",
             },
             {
               input: "no tokens here\n",
               expectedOutput: "Numbers: []\nWords: ['no', 'tokens', 'here']\nCodes: []",
-              description: "Patterns that match nothing produce empty lists",
+              description: "Patterns that match nothing give empty lists",
             },
             {
               input: "ZZ-00\n",
               expectedOutput: "Numbers: ['00']\nWords: ['ZZ']\nCodes: ['ZZ-00']",
-              description: "A single code is also matched by the digit and letter patterns",
+              description: "A single code is also matched by the digit pattern and the letter pattern",
             },
             {
               input: "\n",
               expectedOutput: "Numbers: []\nWords: []\nCodes: []",
-              description: "An empty line produces three empty lists",
+              description: "An empty line gives three empty lists",
             },
           ],
           solution: `import re
@@ -402,12 +402,12 @@ print(f"Codes: {codes}")
 
     lesson(
       "Anchors, Groups, and Validation",
-      "Requiring a pattern to cover the whole string, and pulling out the parts you need.",
+      "Making a pattern cover the whole string, and pulling out the parts you need.",
       [
         {
           type: "lesson",
           title: "Anchors and Whole-String Matching",
-          description: "The difference between finding a pattern and requiring one.",
+          description: "The difference between finding a pattern and demanding one.",
           instructions: `## Searching finds patterns anywhere
 
 \`\`\`python
@@ -422,11 +422,11 @@ True
 True
 \`\`\`
 
-Both are true, because \`search\` looks anywhere in the string. For finding things that is exactly right. For **validation** it is disastrous: a program checking that input is a four-digit code would accept \`abc1234xyz\`.
+Both are true, because \`search\` looks anywhere in the string. For finding things, that is exactly right. For **checking** input it is a disaster. A program that checks whether the input is a four-digit code would accept \`abc1234xyz\`.
 
 ## Anchors
 
-An anchor ties a pattern to a position rather than matching a character.
+An anchor fixes a pattern to a position instead of matching a character.
 
 \`^\` means the start of the string. \`$\` means the end.
 
@@ -444,11 +444,11 @@ False
 False
 \`\`\`
 
-With both anchors, the pattern must account for the entire string. The last case fails because five digits cannot be exactly four with nothing left over.
+With both anchors, the pattern must account for the whole string. The last case fails because five digits cannot be exactly four with nothing left over.
 
 ## fullmatch
 
-Python provides a function that anchors for you:
+Python gives you a function that adds the anchors for you:
 
 \`\`\`python
 import re
@@ -462,16 +462,16 @@ True
 False
 \`\`\`
 
-\`re.fullmatch\` requires the pattern to match the whole string. It is equivalent to wrapping in \`^\` and \`$\` and is clearer, because the intention is stated by the function name rather than hidden in the pattern.
+\`re.fullmatch\` requires the pattern to match the whole string. It does the same job as wrapping the pattern in \`^\` and \`$\`, and it is clearer, because the name of the function states the intention instead of hiding it inside the pattern.
 
-There is also \`re.match\`, which anchors only at the start. It is a frequent source of bugs, because it accepts trailing rubbish — \`re.match(r"\\d{4}", "1234abc")\` succeeds. Prefer \`fullmatch\` for validation and \`search\` for finding.
+There is also \`re.match\`, which anchors only at the start. It causes bugs often, because it accepts rubbish at the end: \`re.match(r"\\d{4}", "1234abc")\` succeeds. Prefer \`fullmatch\` for checking and \`search\` for finding.
 
 > **Key idea**
-> Use \`search\` to find a pattern within text, and \`fullmatch\` to require that the whole string is the pattern. Using \`search\` for validation accepts anything with the pattern buried inside it.
+> Use \`search\` to find a pattern inside text, and \`fullmatch\` to demand that the whole string is the pattern. Using \`search\` for checking accepts anything with the pattern buried inside it.
 
 ## Word boundaries
 
-\`\\b\` matches the boundary between a word character and a non-word character:
+\`\\b\` matches the boundary between a word character and a character that is not part of a word:
 
 \`\`\`python
 import re
@@ -486,13 +486,13 @@ print(re.findall(r"\\bcat\\b", text))
 ['cat']
 \`\`\`
 
-The first found \`cat\` inside \`concatenate\` and \`cats\`. The second required a boundary on each side, so only the standalone word matched.
+The first found \`cat\` inside \`concatenate\` and inside \`cats\`. The second demanded a boundary on each side, so only the word on its own matched.
 
-\`\\b\` matches a position, not a character, so it consumes nothing.
+\`\\b\` matches a position, not a character, so it uses up nothing.
 
 ## Groups
 
-Parentheses group part of a pattern so a quantifier applies to the whole group:
+Round brackets group part of a pattern, so that a quantifier applies to the whole group:
 
 \`\`\`python
 import re
@@ -506,11 +506,11 @@ True
 False
 \`\`\`
 
-\`(ab)+\` means one or more repetitions of \`ab\`, not \`a\` followed by one or more \`b\`.
+\`(ab)+\` means one or more repeats of \`ab\`. It does not mean \`a\` followed by one or more \`b\`.
 
-## Capturing groups
+## Groups that capture
 
-Groups also **capture**: they remember what they matched, so you can retrieve the parts:
+Groups also **capture**. They remember what they matched, so you can fetch the parts:
 
 \`\`\`python
 import re
@@ -531,7 +531,7 @@ ABC
 ('ABC', '1234')
 \`\`\`
 
-\`group(0)\` is the whole match. \`group(1)\` is the first parenthesised group, numbered by the position of its opening parenthesis. \`groups()\` returns them all as a tuple, which unpacks neatly:
+\`group(0)\` is the whole match. \`group(1)\` is the first group in brackets, numbered by the position of its opening bracket. \`groups()\` gives them all back as a tuple, which unpacks neatly:
 
 \`\`\`python
 import re
@@ -545,11 +545,11 @@ print(f"prefix {prefix}, number {number}")
 prefix ABC, number 1234
 \`\`\`
 
-This is the answer to a task that would otherwise need careful slicing: validate the shape and pull out the parts in one operation.
+This answers a task that would otherwise need careful slicing. You check the shape and take out the parts in one operation.
 
 ## Named groups
 
-Numbered groups become unreadable once there are more than two, and inserting a group renumbers everything after it. Names fix both problems:
+Numbered groups become unreadable once there are more than two of them, and adding a group renumbers everything after it. Names fix both problems:
 
 \`\`\`python
 import re
@@ -569,13 +569,13 @@ if match:
 {'year': '2024', 'month': '07', 'day': '15'}
 \`\`\`
 
-\`(?P<name>...)\` names a group. The syntax is ugly, and it earns its place: \`match.group("year")\` says what it retrieves, while \`match.group(1)\` does not.
+\`(?P<name>...)\` gives a group a name. The notation is ugly, and it still earns its place. \`match.group("year")\` says what it fetches. \`match.group(1)\` does not.
 
-\`groupdict()\` returns every named group as a dictionary — often exactly the structure you want to keep.
+\`groupdict()\` gives back every named group as a dictionary, and that is often exactly the structure you want to keep.
 
-## Alternation
+## Choosing between alternatives
 
-\`|\` means "or", matching either alternative:
+\`|\` means "or". It matches either alternative:
 
 \`\`\`python
 import re
@@ -589,32 +589,32 @@ True
 ['cat', 'dogs']
 \`\`\`
 
-\`(?:...)\` is a **non-capturing group**: it groups for the alternation without capturing. Use it when you need grouping but not the captured value, which keeps the numbering of real groups clean.
+\`(?:...)\` is a **group that does not capture**. It groups the alternatives without remembering them. Use it when you need grouping but not the captured value, because it keeps the numbering of your real groups clean.
 
-Alternation has very low precedence, so \`^cat|dog$\` means "starts with cat, or ends with dog" — almost certainly not what was intended. Group the alternatives: \`^(?:cat|dog)$\`.
+\`|\` comes very late in the order of operations, so \`^cat|dog$\` means "starts with cat, or ends with dog". That is almost certainly not what anyone wanted. Group the alternatives: \`^(?:cat|dog)$\`.
 
 ## Summary
 
-\`^\` and \`$\` anchor to the start and end; \`fullmatch\` does both and states the intent. \`\\b\` matches a word boundary. Parentheses group for quantifiers and capture the matched text, retrievable by number or by name with \`(?P<name>...)\`. \`|\` alternates and needs grouping.`,
+\`^\` and \`$\` fix a pattern to the start and the end. \`fullmatch\` does both and says so in its name. \`\\b\` matches a word boundary. Round brackets group for quantifiers and capture the matched text, which you fetch by number, or by name with \`(?P<name>...)\`. \`|\` gives a choice and needs grouping.`,
         },
         {
           type: "exercise",
           title: "Validate an Identifier Format",
-          description: "Use fullmatch to accept only strings matching a precise specification.",
+          description: "Use fullmatch to accept only strings that match an exact specification.",
           instructions: `## The problem
 
-Write a validator for a booking reference.
+Write a checker for a booking reference.
 
 ## The format
 
 A valid reference is:
 
-1. Two or three uppercase letters.
+1. Two or three capital letters.
 2. A hyphen.
 3. Exactly four digits.
-4. Optionally, a hyphen followed by a single uppercase letter.
+4. Optionally, a hyphen followed by one capital letter.
 
-Nothing else may appear, before or after.
+Nothing else may appear, either before or after.
 
 ## Examples
 
@@ -625,7 +625,7 @@ AB-1234-C   valid
 A-1234      invalid  (only one letter)
 ABCD-1234   invalid  (four letters)
 AB-123      invalid  (three digits)
-AB-1234-c   invalid  (lowercase suffix)
+AB-1234-c   invalid  (small letter at the end)
 xAB-1234    invalid  (extra text before)
 AB-1234x    invalid  (extra text after)
 \`\`\`
@@ -637,11 +637,11 @@ AB-1234x    invalid  (extra text after)
 
 ## Guidance
 
-Use \`fullmatch\` rather than \`search\`. With \`search\`, \`xAB-1234\` would be accepted, because the pattern appears inside it.
+Use \`fullmatch\`, not \`search\`. With \`search\`, \`xAB-1234\` would be accepted, because the pattern appears inside it.
 
-The optional suffix is a group followed by \`?\`, making the whole group optional. Use a non-capturing group, since you do not need its value.
+The optional ending is a group followed by \`?\`, which makes the whole group optional. Use a group that does not capture, since you do not need its value.
 
-The letter count is a range, written with braces.
+The number of letters is a range, written with braces.
 
 ## Constraints
 
@@ -656,7 +656,7 @@ def is_valid(reference: str) -> bool:
 line = input()
 print("Valid" if is_valid(line) else "Invalid")
 `,
-          hint: "The pattern is r\"[A-Z]{2,3}-\\d{4}(?:-[A-Z])?\" passed to re.fullmatch. Wrap the result in bool() so the function returns a Boolean rather than a match object or None.",
+          hint: "The pattern is r\"[A-Z]{2,3}-\\d{4}(?:-[A-Z])?\" given to re.fullmatch. Wrap the result in bool(), so that the function returns a Boolean instead of a match object or None.",
           tests: [
             {
               input: "AB-1234\n",
@@ -666,42 +666,42 @@ print("Valid" if is_valid(line) else "Invalid")
             {
               input: "XYZ-0001\n",
               expectedOutput: "Valid",
-              description: "Three letters are also allowed",
+              description: "Three letters are allowed as well",
             },
             {
               input: "AB-1234-C\n",
               expectedOutput: "Valid",
-              description: "The optional uppercase suffix is accepted",
+              description: "The optional capital letter at the end is accepted",
             },
             {
               input: "A-1234\n",
               expectedOutput: "Invalid",
-              description: "A single letter is below the minimum",
+              description: "One letter is below the smallest allowed number",
             },
             {
               input: "ABCD-1234\n",
               expectedOutput: "Invalid",
-              description: "Four letters exceed the maximum",
+              description: "Four letters are more than the largest allowed number",
             },
             {
               input: "AB-123\n",
               expectedOutput: "Invalid",
-              description: "Three digits do not satisfy the exact count",
+              description: "Three digits do not meet the exact count",
             },
             {
               input: "AB-1234-c\n",
               expectedOutput: "Invalid",
-              description: "A lowercase suffix is rejected",
+              description: "A small letter at the end is refused",
             },
             {
               input: "xAB-1234\n",
               expectedOutput: "Invalid",
-              description: "Leading text is rejected because the whole string must match",
+              description: "Text at the front is refused, because the whole string must match",
             },
             {
               input: "AB-1234x\n",
               expectedOutput: "Invalid",
-              description: "Trailing text is rejected, which re.match would have allowed",
+              description: "Text at the end is refused, although re.match would have allowed it",
             },
           ],
           solution: `import re
@@ -719,32 +719,32 @@ print("Valid" if is_valid(line) else "Invalid")
         {
           type: "exercise",
           title: "Extract Parts With Named Groups",
-          description: "Capture the components of a structured line and reassemble them.",
+          description: "Capture the parts of a structured line and put them together again.",
           instructions: `## The problem
 
-Parse log lines and reformat them.
+Read log lines and write them out in a different shape.
 
 ## The format
 
-Each line looks like:
+Each line looks like this:
 
 \`\`\`text
 2024-07-15 14:30 ERROR Disk almost full
 \`\`\`
 
-That is: a date as four digits, hyphen, two digits, hyphen, two digits; a space; a time as two digits, colon, two digits; a space; a level of uppercase letters; a space; and a message which is the rest of the line.
+That is: a date as four digits, a hyphen, two digits, a hyphen, two digits; a space; a time as two digits, a colon, two digits; a space; a level made of capital letters; a space; and a message, which is the rest of the line.
 
 ## Requirements
 
-1. Define \`parse_line(line: str) -> str\` that uses **named groups** to capture the date, time, level, and message.
+1. Define \`parse_line(line: str) -> str\` that uses **named groups** to capture the date, the time, the level, and the message.
 2. If the line does not match the format exactly, return \`Malformed\`.
-3. Otherwise return the components rearranged as:
+3. Otherwise return the parts rearranged like this:
 
 \`\`\`text
 [ERROR] 15/07/2024 at 14:30 - Disk almost full
 \`\`\`
 
-Note the date is reordered to day, month, year with slashes.
+Note that the date is reordered to day, month, year, with slashes.
 
 4. Read one line and print the result.
 
@@ -756,11 +756,11 @@ Given \`not a log line\`, the output is \`Malformed\`.
 
 ## Guidance
 
-Name the groups \`year\`, \`month\`, \`day\`, \`hour\`, \`minute\`, \`level\`, and \`message\`. Then \`match.group("day")\` reads clearly where \`match.group(3)\` would not.
+Name the groups \`year\`, \`month\`, \`day\`, \`hour\`, \`minute\`, \`level\`, and \`message\`. Then \`match.group("day")\` reads clearly, where \`match.group(3)\` would not.
 
-For the message, match one or more of any character. Since it runs to the end of the line, a greedy quantifier is correct here.
+For the message, match one or more of any character. It runs to the end of the line, so a greedy quantifier is right here.
 
-Use \`fullmatch\`, and remember it returns \`None\` when the line does not match — check before calling \`.group\`.
+Use \`fullmatch\`, and remember that it gives \`None\` when the line does not match. Check for that before you call \`.group\`.
 
 ## Constraints
 
@@ -774,32 +774,32 @@ def parse_line(line: str) -> str:
 
 print(parse_line(input()))
 `,
-          hint: "Build the pattern as r\"(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2}) (?P<hour>\\d{2}):(?P<minute>\\d{2}) (?P<level>[A-Z]+) (?P<message>.+)\". Guard on match being None before formatting.",
+          hint: "Build the pattern as r\"(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2}) (?P<hour>\\d{2}):(?P<minute>\\d{2}) (?P<level>[A-Z]+) (?P<message>.+)\". Guard on match being None before you format anything.",
           tests: [
             {
               input: "2024-07-15 14:30 ERROR Disk almost full\n",
               expectedOutput: "[ERROR] 15/07/2024 at 14:30 - Disk almost full",
-              description: "A well-formed line is parsed and reordered",
+              description: "A well-formed line is read and reordered",
             },
             {
               input: "2023-01-02 09:05 INFO Started\n",
               expectedOutput: "[INFO] 02/01/2023 at 09:05 - Started",
-              description: "Leading zeros in the date and time are preserved",
+              description: "Zeros at the front of the date and time are kept",
             },
             {
               input: "not a log line\n",
               expectedOutput: "Malformed",
-              description: "A line that does not match the format is rejected",
+              description: "A line that does not match the format is refused",
             },
             {
               input: "2024-07-15 14:30 error lowercase level\n",
               expectedOutput: "Malformed",
-              description: "A lowercase level does not match the uppercase class",
+              description: "A level in small letters does not match the capital-letter class",
             },
             {
               input: "2024-7-15 14:30 WARN Short month\n",
               expectedOutput: "Malformed",
-              description: "A single-digit month does not satisfy the exact digit count",
+              description: "A one-digit month does not meet the exact digit count",
             },
           ],
           solution: `import re
@@ -831,15 +831,15 @@ print(parse_line(input()))
 
     lesson(
       "Extraction and Substitution",
-      "Finding every match, and rewriting text according to a pattern.",
+      "Finding every match, and rewriting text to follow a pattern.",
       [
         {
           type: "lesson",
           title: "findall, finditer, and sub",
-          description: "Collecting every match and replacing matched text.",
+          description: "Collecting every match, and replacing the text that matched.",
           instructions: `## Finding every match
 
-\`re.findall\` returns a list of every non-overlapping match:
+\`re.findall\` gives back a list of every match, and the matches never overlap:
 
 \`\`\`python
 import re
@@ -852,7 +852,7 @@ print(re.findall(r"\\d+", text))
 ['12', '450', '7']
 \`\`\`
 
-With no groups in the pattern, it returns the matched text. With **one** group, it returns what that group captured:
+With no groups in the pattern, it gives back the text that matched. With **one** group, it gives back what that group captured:
 
 \`\`\`python
 import re
@@ -865,7 +865,7 @@ print(re.findall(r"[A-Z]{3}-(\\d{4})", text))
 ['1234', '0001']
 \`\`\`
 
-The letters were matched but not returned, because a group was present and \`findall\` reports groups in preference to whole matches.
+The letters were matched but not returned, because a group was present, and \`findall\` reports groups instead of whole matches.
 
 With **several** groups, each result is a tuple:
 
@@ -880,11 +880,11 @@ print(re.findall(r"([A-Z]{3})-(\\d{4})", text))
 [('ABC', '1234'), ('QRS', '0001')]
 \`\`\`
 
-This behaviour surprises people regularly. Adding a group to a working \`findall\` pattern changes what comes back. When you want grouping without changing the result, use a non-capturing group \`(?:...)\`.
+This behaviour surprises people regularly. Adding a group to a \`findall\` pattern that already worked changes what comes back. When you need grouping without changing the result, use a group that does not capture: \`(?:...)\`.
 
 ## finditer
 
-\`re.finditer\` yields match objects rather than strings, so you get positions and named groups too:
+\`re.finditer\` gives back match objects instead of strings, so you also get positions and named groups:
 
 \`\`\`python
 import re
@@ -899,9 +899,9 @@ ABC-1234 at 0, prefix ABC
 QRS-0001 at 13, prefix QRS
 \`\`\`
 
-Use \`findall\` when you want the text and \`finditer\` when you need positions or several groups per match.
+Use \`findall\` when you want the text, and \`finditer\` when you need positions or several groups for each match.
 
-## Substitution
+## Replacing
 
 \`re.sub\` replaces every match:
 
@@ -916,7 +916,7 @@ print(re.sub(r"\\d{3}-\\d{4}", "[redacted]", text))
 Call [redacted] or [redacted]
 \`\`\`
 
-Like every string operation, it returns a new string; the original is unchanged.
+Like every string operation, it gives back a new string. The original does not change.
 
 A count limits how many are replaced:
 
@@ -946,9 +946,9 @@ print(re.sub(r"(\\d{4})-(\\d{2})-(\\d{2})", r"\\3/\\2/\\1", text))
 15/07/2024
 \`\`\`
 
-The replacement is also a raw string, because it contains backslashes.
+The replacement is a raw string as well, because it holds backslashes.
 
-Named groups are referenced with \`\\g<name>\`:
+Named groups are used with \`\\g<name>\`:
 
 \`\`\`python
 import re
@@ -961,11 +961,11 @@ print(re.sub(pattern, r"\\g<last>, \\g<first>", "Ada Lovelace"))
 Lovelace, Ada
 \`\`\`
 
-Reordering text like this with string methods would take several steps and careful index arithmetic. As one substitution it is a single line that states the transformation directly.
+Reordering text like this with string methods would take several steps and careful counting of positions. As one substitution it is a single line that states the change directly.
 
 ## A function as the replacement
 
-When the replacement depends on what was matched, pass a function. It receives the match object and returns the replacement text:
+When the replacement depends on what was matched, pass a function. It receives the match object and gives back the replacement text:
 
 \`\`\`python
 import re
@@ -982,11 +982,11 @@ print(re.sub(r"\\d+", double_number, "a 3 b 10"))
 a 6 b 20
 \`\`\`
 
-This is a powerful combination: regex finds the pieces, and ordinary Python decides what each becomes.
+This is a powerful combination. Regex finds the pieces, and ordinary Python decides what each piece becomes.
 
 ## Splitting
 
-\`re.split\` splits on a pattern rather than a fixed string:
+\`re.split\` splits on a pattern instead of a fixed string:
 
 \`\`\`python
 import re
@@ -999,22 +999,22 @@ print(re.split(r"\\d+", text))
 ['a', 'b', 'c', 'd']
 \`\`\`
 
-Useful when separators vary. Note that a separator at the start or end produces an empty string in the result, which usually needs filtering out.
+This is useful when the separators vary. Note that a separator at the start or the end gives an empty string in the result, and you usually need to filter that out.
 
 > **Key idea**
-> \`findall\` returns text but changes shape when the pattern has groups. \`sub\` returns a new string and can reference captured groups in its replacement, or delegate to a function.
+> \`findall\` gives back text, but its shape changes when the pattern has groups. \`sub\` gives back a new string, and it can use captured groups in its replacement, or hand the work to a function.
 
 ## Summary
 
-\`findall\` collects matches, returning groups instead of whole matches when the pattern has any. \`finditer\` yields match objects with positions. \`sub\` replaces matches and can use \`\\1\` or \`\\g<name>\` in the replacement, or take a function. \`re.split\` splits on a pattern.`,
+\`findall\` collects matches, and returns groups instead of whole matches when the pattern has any. \`finditer\` gives match objects with positions. \`sub\` replaces matches and can use \`\\1\` or \`\\g<name>\` in the replacement, or take a function. \`re.split\` splits on a pattern.`,
         },
         {
           type: "lesson",
           title: "Keeping Patterns Maintainable",
-          description: "When a regular expression is the wrong tool, and how to make the right ones readable.",
-          instructions: `## The temptation to over-use
+          description: "When a regular expression is the wrong tool, and how to keep the right ones readable.",
+          instructions: `## The temptation to use it everywhere
 
-Regex is satisfying, and that is a hazard. Once the notation is familiar, it is tempting to reach for it constantly — including for jobs an ordinary string method does better.
+Regex is satisfying, and that is a danger. Once the notation feels familiar, it is tempting to reach for it all the time, even for jobs that an ordinary string method does better.
 
 \`\`\`python
 import re
@@ -1030,7 +1030,7 @@ True
 True
 \`\`\`
 
-Both work. The second is shorter, obvious to any reader, and considerably faster.
+Both work. The second is shorter, obvious to any reader, and much faster.
 
 ## When a string method is better
 
@@ -1038,38 +1038,38 @@ Prefer the string method when the question is:
 
 **Does it start or end with this?** \`startswith\`, \`endswith\`.
 
-**Does it contain this exact text?** the \`in\` operator.
+**Does it hold this exact text?** the \`in\` operator.
 
 **Replace this exact text.** \`replace\`.
 
 **Split on a fixed separator.** \`split\`.
 
-**Change case, or trim whitespace.** \`lower\`, \`upper\`, \`strip\`.
+**Change the case, or remove spaces at the ends.** \`lower\`, \`upper\`, \`strip\`.
 
-Reach for regex when the question involves a *shape* rather than a fixed string: variable-length runs, optional parts, alternatives, or a structure whose pieces you need to extract.
+Reach for regex when the question is about a *shape* rather than a fixed string: runs of varying length, optional parts, choices between alternatives, or a structure whose pieces you need to take out.
 
 > **Key idea**
-> Regex answers questions about the shape of text. If you can express the question with a string method, that is the better answer — shorter, clearer, and faster.
+> Regex answers questions about the shape of text. If you can ask the question with a string method, that is the better answer: shorter, clearer, and faster.
 
-## When regex is the wrong tool entirely
+## When regex is completely the wrong tool
 
 Some formats look regular and are not.
 
-**HTML and XML** are nested, and nesting cannot be described by a regular expression. Patterns that appear to work fail on real documents in ways that are tedious to diagnose. Use a parser.
+**HTML and XML** are nested, and nesting cannot be described by a regular expression. Patterns that seem to work will fail on real documents, in ways that are very tiring to track down. Use a parser.
 
 **CSV** has quoting rules, as Module 10 showed. Use the \`csv\` module.
 
 **JSON** is nested. Use the \`json\` module.
 
-**Email addresses** are governed by a specification far more complex than anyone expects. The pragmatic approach is a loose check — something before an \`@\`, something after it, a dot in the domain — combined with actually sending a message if it matters.
+**Email addresses** follow a specification far more complicated than anyone expects. The practical approach is a loose check — something before an \`@\`, something after it, and a dot in the domain — together with actually sending a message if it matters.
 
-The pattern here is worth generalising: when a format has a specification, use the library written against that specification.
+The general lesson is worth keeping: when a format has a specification, use the library that was written against that specification.
 
 ## Making patterns readable
 
-A necessary pattern can still be readable.
+A pattern that you truly need can still be readable.
 
-**Name it.** A pattern assigned to a constant with a descriptive name explains itself at every use:
+**Give it a name.** A pattern stored in a constant with a clear name explains itself everywhere it is used:
 
 \`\`\`python
 import re
@@ -1085,7 +1085,7 @@ True
 False
 \`\`\`
 
-**Build it from pieces.** Adjacent string literals join automatically, so a long pattern can be assembled with a comment per part:
+**Build it from pieces.** String pieces written next to each other join automatically, so a long pattern can be built with one comment for each part:
 
 \`\`\`python
 import re
@@ -1104,7 +1104,7 @@ print(match.group("number"))
 1234
 \`\`\`
 
-**Use verbose mode** for genuinely complex patterns. \`re.VERBOSE\` makes the engine ignore whitespace and \`#\` comments inside the pattern:
+**Use verbose mode** for patterns that really are complicated. \`re.VERBOSE\` makes the engine ignore spaces and \`#\` comments inside the pattern:
 
 \`\`\`python
 import re
@@ -1123,11 +1123,11 @@ print(match.group("year"))
 2024
 \`\`\`
 
-Note that whitespace inside the pattern is now ignored, so a literal space must be written as \`\\ \` or \`[ ]\`.
+Note that spaces inside the pattern are now ignored, so a real space must be written as \`\\ \` or as \`[ ]\`.
 
 ## Compiling
 
-\`re.compile\` builds a pattern object once, which is worth doing when a pattern is used repeatedly:
+\`re.compile\` builds a pattern object once, and that is worth doing when a pattern is used many times:
 
 \`\`\`python
 import re
@@ -1144,11 +1144,11 @@ False
 True
 \`\`\`
 
-The methods on a compiled pattern take the text as their argument. Python caches recent patterns anyway, so the speed difference is small; the readability of naming the pattern is the better reason.
+The methods on a compiled pattern take the text as their argument. Python remembers recent patterns anyway, so the difference in speed is small. The better reason is that naming the pattern makes the code readable.
 
-## Test patterns against negative cases
+## Test patterns against the cases they must refuse
 
-A pattern that accepts what it should is only half tested. Check that it *rejects* what it should:
+A pattern that accepts what it should is only half tested. Check that it *refuses* what it should:
 
 \`\`\`python
 import re
@@ -1167,19 +1167,19 @@ print("pattern behaves as specified")
 pattern behaves as specified
 \`\`\`
 
-That last case is the one people forget, and it is precisely the one that catches a \`search\` where \`fullmatch\` was needed. A pattern too permissive is more dangerous than one too strict, because it fails silently.
+That last case is the one people forget, and it is exactly the one that catches a \`search\` where \`fullmatch\` was needed. A pattern that allows too much is more dangerous than one that allows too little, because it fails in silence.
 
 ## Summary
 
-Use string methods for fixed text and regex for shapes. Never parse HTML, CSV, or JSON with regex; use the proper library. Name patterns, build long ones from commented pieces, and use verbose mode when needed. Always test that a pattern rejects what it should.`,
+Use string methods for fixed text and regex for shapes. Never read HTML, CSV, or JSON with regex. Use the proper library. Name your patterns, build long ones from commented pieces, and use verbose mode when you need it. Always test that a pattern refuses what it should.`,
         },
         {
           type: "exercise",
           title: "Redact and Reformat Text",
-          description: "Use sub with captured groups to transform text in two ways.",
+          description: "Use sub with captured groups to change text in two ways.",
           instructions: `## The problem
 
-Clean a line of text by redacting reference codes and reformatting dates.
+Clean a line of text by hiding reference codes and reshaping dates.
 
 ## Input
 
@@ -1187,12 +1187,12 @@ One line of text.
 
 ## Requirements
 
-Apply two substitutions, in this order:
+Make two replacements, in this order:
 
-1. Replace every reference code — three uppercase letters, a hyphen, four digits — with \`[REDACTED]\`.
+1. Replace every reference code — three capital letters, a hyphen, four digits — with \`[REDACTED]\`.
 2. Replace every date in the form \`YYYY-MM-DD\` with \`DD/MM/YYYY\`, using captured groups.
 
-Then display exactly two lines:
+Then show exactly two lines:
 
 \`\`\`text
 Cleaned: Order [REDACTED] placed 15/07/2024
@@ -1214,25 +1214,25 @@ Codes removed: 0
 
 ## Guidance
 
-Count the codes **before** redacting them, with \`findall\`, or the count will be zero after the substitution has removed them.
+Count the codes **before** you hide them, with \`findall\`. Otherwise the count will be zero, because the substitution has already removed them.
 
-Do the code substitution before the date substitution. A code contains four digits and a hyphen, and doing the dates first would not affect it — but establishing a definite order is what makes the result predictable.
+Do the code replacement before the date replacement. A code holds four digits and a hyphen, and doing the dates first would not touch it. But fixing a definite order is what makes the result predictable.
 
-For the date, capture the three parts and reference them in the replacement with \`\\1\`, \`\\2\`, and \`\\3\`. The replacement string must also be raw.
+For the date, capture the three parts and use them in the replacement with \`\\1\`, \`\\2\`, and \`\\3\`. The replacement string must be raw as well.
 
 ## Constraints
 
-Use \`re.sub\` for both transformations. Do not use \`str.replace\`.`,
+Use \`re.sub\` for both changes. Do not use \`str.replace\`.`,
           starterCode: `import re
 
 text = input()
 `,
-          hint: "codes = re.findall(r\"[A-Z]{3}-\\d{4}\", text) for the count. Then text = re.sub(r\"[A-Z]{3}-\\d{4}\", \"[REDACTED]\", text) and text = re.sub(r\"(\\d{4})-(\\d{2})-(\\d{2})\", r\"\\3/\\2/\\1\", text).",
+          hint: "codes = re.findall(r\"[A-Z]{3}-\\d{4}\", text) for the count. Then text = re.sub(r\"[A-Z]{3}-\\d{4}\", \"[REDACTED]\", text), and text = re.sub(r\"(\\d{4})-(\\d{2})-(\\d{2})\", r\"\\3/\\2/\\1\", text).",
           tests: [
             {
               input: "Order ABC-1234 placed 2024-07-15\n",
               expectedOutput: "Cleaned: Order [REDACTED] placed 15/07/2024\nCodes removed: 1",
-              description: "A code is redacted and a date is reordered",
+              description: "A code is hidden and a date is reordered",
             },
             {
               input: "No codes or dates here\n",
@@ -1242,12 +1242,12 @@ text = input()
             {
               input: "ABC-1234 and QRS-0001 on 2023-01-02\n",
               expectedOutput: "Cleaned: [REDACTED] and [REDACTED] on 02/01/2023\nCodes removed: 2",
-              description: "Every code is redacted and counted",
+              description: "Every code is hidden and counted",
             },
             {
               input: "2024-12-25\n",
               expectedOutput: "Cleaned: 25/12/2024\nCodes removed: 0",
-              description: "A date alone is reformatted with no codes present",
+              description: "A date on its own is reshaped, with no codes present",
             },
           ],
           solution: `import re
@@ -1265,14 +1265,14 @@ print(f"Codes removed: {len(codes)}")
         {
           type: "exercise",
           title: "Module 11 Checkpoint: Log Analyser",
-          description: "Parse, filter, and summarise structured log text with regular expressions.",
+          description: "Read, filter, and summarise structured log text with regular expressions.",
           instructions: `## The problem
 
-Analyse a set of log lines, extracting structure and reporting on it.
+Study a set of log lines, take the structure out of them, and report on it.
 
 ## Input
 
-A series of lines ending with \`end\`. A well-formed line looks like:
+A series of lines ending with \`end\`. A well-formed line looks like this:
 
 \`\`\`text
 2024-07-15 14:30 ERROR disk full
@@ -1282,11 +1282,11 @@ A series of lines ending with \`end\`. A well-formed line looks like:
 
 1. Use a compiled pattern with **named groups** for the date, time, level, and message.
 2. Lines that do not match the format exactly are counted as malformed and otherwise ignored.
-3. Count how many lines occurred at each level.
-4. Report, after \`end\`, exactly these lines:
-   - One line per level, sorted by count descending then by level name, in the form \`ERROR: 2\`.
+3. Count how many lines came at each level.
+4. After \`end\`, report exactly these lines:
+   - One line for each level, sorted by count with the highest first, then by level name, in the form \`ERROR: 2\`.
    - Then \`Malformed: 1\`.
-   - Then \`First error: 15/07/2024 14:30\` — the date and time of the **first** \`ERROR\` line, reformatted to day/month/year. If there were no errors, this line reads \`First error: none\`.
+   - Then \`First error: 15/07/2024 14:30\`, which is the date and time of the **first** \`ERROR\` line, written as day/month/year. If there were no errors, this line reads \`First error: none\`.
 
 ## Example
 
@@ -1313,15 +1313,15 @@ First error: 15/07/2024 14:30
 
 Compile the pattern once, before the loop, and give it a name.
 
-Use \`fullmatch\` so a line with trailing rubbish is treated as malformed.
+Use \`fullmatch\`, so that a line with rubbish at the end counts as malformed.
 
-Record the first error as you go: only store it when you do not already have one.
+Record the first error as you go. Store it only when you do not already have one.
 
-For the level ordering, sort with a key returning the negative count and the level name.
+For the order of the levels, sort with a key that returns the negative count and the level name.
 
 ## Constraints
 
-Use one regular expression with named groups. Do not split lines on spaces.`,
+Use one regular expression with named groups. Do not split the lines on spaces.`,
           starterCode: `import re
 
 PATTERN = re.compile(
@@ -1335,34 +1335,34 @@ first_error = None
 
 line = input()
 `,
-          hint: "For each line, match = PATTERN.fullmatch(line). If None, increase malformed. Otherwise tally the level and, if first_error is None and the level is ERROR, store the date and time. Reformat the date by splitting it on hyphens.",
+          hint: "For each line, match = PATTERN.fullmatch(line). If it is None, add one to malformed. Otherwise count the level and, if first_error is None and the level is ERROR, store the date and time. Reshape the date by splitting it on hyphens.",
           tests: [
             {
               input:
                 "2024-07-15 14:30 ERROR disk full\n2024-07-15 14:31 INFO started\ngarbage line\n2024-07-16 09:00 ERROR retry failed\nend\n",
               expectedOutput: "ERROR: 2\nINFO: 1\nMalformed: 1\nFirst error: 15/07/2024 14:30",
-              description: "Levels are counted, malformed lines are separated, and the first error is reported",
+              description: "Levels are counted, malformed lines are kept apart, and the first error is reported",
             },
             {
               input: "end\n",
               expectedOutput: "Malformed: 0\nFirst error: none",
-              description: "No input produces no level lines and reports no error",
+              description: "No input gives no level lines and reports no error",
             },
             {
               input: "2024-01-01 00:00 INFO all good\nend\n",
               expectedOutput: "INFO: 1\nMalformed: 0\nFirst error: none",
-              description: "Logs without errors still report the absence explicitly",
+              description: "Logs with no errors still say so plainly",
             },
             {
               input: "bad\nalso bad\nend\n",
               expectedOutput: "Malformed: 2\nFirst error: none",
-              description: "Only malformed lines produces no level lines at all",
+              description: "When every line is malformed, there are no level lines at all",
             },
             {
               input:
                 "2024-03-04 08:00 WARN low space\n2024-03-04 08:01 WARN still low\n2024-03-04 08:02 ERROR out of space\nend\n",
               expectedOutput: "WARN: 2\nERROR: 1\nMalformed: 0\nFirst error: 04/03/2024 08:02",
-              description: "Counts are ordered by frequency and the first error is found late in the log",
+              description: "Counts are ordered by how often they occur, and the first error is found late in the log",
             },
           ],
           solution: `import re

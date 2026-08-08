@@ -20,14 +20,20 @@ and structured formats, and judge which language feature suits a problem.
 
 ## Intended audience
 
-Adults and older secondary students with no programming experience. The writing
-assumes intelligence and no prior knowledge: every technical term is defined
-before use, and nothing relies on familiarity with terminals, file systems, or
-mathematics beyond arithmetic.
+Secondary students and adults with no programming experience who read English as
+a second language. The course is written for a student who learned English in a
+Nepali secondary school: short sentences, common words, no idioms, and no
+cultural references a reader outside Britain or America would have to guess at.
+
+Technical vocabulary is not avoided, because a learner needs the real words. Every
+technical term is defined in plain language before it is used.
+
+The writing assumes intelligence and no prior knowledge. Nothing relies on
+familiarity with terminals, file systems, or mathematics beyond arithmetic.
 
 ## Prerequisites
 
-- Comfortable reading English prose.
+- Able to read simple English. Sentences are short and the vocabulary is common.
 - Basic arithmetic.
 - A web browser.
 
@@ -65,22 +71,22 @@ On completion, a learner can:
 
 | # | Module | Lessons | Stages | Exercises | Words |
 |---|--------|---------|--------|-----------|-------|
-| 1 | Computers, Code, and Your First Program | 4 | 17 | 9 | 6,452 |
-| 2 | Values, Variables, Input, and Functions | 5 | 22 | 11 | 8,237 |
-| 3 | Decisions and Boolean Logic | 5 | 16 | 9 | 6,290 |
-| 4 | Repetition and Loops | 3 | 12 | 6 | 5,183 |
-| 5 | Collections and Structured Data | 5 | 19 | 10 | 7,737 |
-| 6 | Functions and Program Design | 4 | 14 | 7 | 6,211 |
-| 7 | Debugging, Validation, and Exceptions | 3 | 10 | 4 | 5,350 |
-| 8 | Modules, Libraries, and Program Interfaces | 3 | 10 | 5 | 4,716 |
-| 9 | Testing and Code Quality | 3 | 10 | 5 | 4,680 |
-| 10 | Files, CSV, and JSON | 3 | 11 | 5 | 5,124 |
-| 11 | Regular Expressions and Text Processing | 3 | 10 | 5 | 4,361 |
-| 12 | Classes and Object-Oriented Design | 3 | 10 | 4 | 5,266 |
-| 13 | Practical Python Patterns and Capstone | 4 | 19 | 12 | 7,556 |
+| 1 | Computers, Code, and Your First Program | 4 | 17 | 9 | 6,640 |
+| 2 | Values, Variables, Input, and Functions | 5 | 22 | 11 | 8,662 |
+| 3 | Decisions and Boolean Logic | 5 | 16 | 9 | 6,576 |
+| 4 | Repetition and Loops | 3 | 12 | 6 | 5,458 |
+| 5 | Collections and Structured Data | 5 | 19 | 10 | 8,222 |
+| 6 | Functions and Program Design | 4 | 14 | 7 | 6,552 |
+| 7 | Debugging, Validation, and Exceptions | 3 | 10 | 4 | 5,631 |
+| 8 | Modules, Libraries, and Program Interfaces | 3 | 10 | 5 | 5,005 |
+| 9 | Testing and Code Quality | 3 | 10 | 5 | 4,942 |
+| 10 | Files, CSV, and JSON | 3 | 11 | 5 | 5,443 |
+| 11 | Regular Expressions and Text Processing | 3 | 10 | 5 | 4,630 |
+| 12 | Classes and Object-Oriented Design | 3 | 10 | 4 | 5,592 |
+| 13 | Practical Python Patterns and Capstone | 4 | 19 | 12 | 8,084 |
 
 Totals: 13 modules, 48 lessons, 180 stages, 92 graded exercises, 305 test
-cases, roughly 77,000 words of instructional content.
+cases, roughly 81,000 words of instructional content.
 
 ### What each module covers
 
@@ -146,6 +152,16 @@ dataclasses, and when not to use a class.
 milestones, responsible software, and a six-stage capstone.
 
 ## Pedagogical principles
+
+**Plain English throughout.** Sentences are short and carry one idea each.
+Vocabulary is common, and any word a reader might not know is either explained or
+replaced. Idioms, metaphors that depend on cultural knowledge, sarcasm, and jokes
+are avoided, because they are the first things to fail for a reader working in a
+second language. Spelling and punctuation follow British conventions, which is
+what Nepali schools teach, and money in worked examples is in rupees and paisa.
+None of this reduces the technical level: the terms, the rigour, and the exercises
+are unchanged, and the explanations are longer where a shorter sentence would have
+been harder to follow.
 
 **Nothing is used before it is defined.** Terms are introduced with a plain
 definition, then syntax, then a traced example.

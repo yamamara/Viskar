@@ -2,31 +2,31 @@ import { module, lesson, type ModuleSource } from "../types.ts"
 
 const moduleNine: ModuleSource = module(
   "Testing and Code Quality",
-  "Checking that code is correct and keeping it correct: test cases, assertions, regression tests, refactoring safely, and writing code others can read.",
+  "Checking that code is correct and keeping it correct: test cases, assertions, tests against old bugs, safe reworking, and writing code that others can read.",
   [
     lesson(
       "Why Tests Exist",
-      "The failure of manual checking, and how to choose cases that find real defects.",
+      "Why checking by hand stops working, and how to choose cases that find real faults.",
       [
         {
           type: "lesson",
           title: "The Limits of Checking by Hand",
-          description: "Why running a program and looking at the output stops working.",
+          description: "Why running a program and looking at the output stops being enough.",
           instructions: `## How you have been testing
 
-Until now, your method has been: run the program, look at the output, decide whether it seems right. This works, for a while.
+Until now your method has been: run the program, look at the output, and decide whether it seems right. This works for a while.
 
-It fails for three reasons, and each becomes more serious as programs grow.
+It fails for three reasons, and each one grows more serious as programs grow.
 
-**It does not scale.** Checking one function by hand takes thirty seconds. A program with forty functions takes twenty minutes, every time you change anything. In practice nobody does it, so most of the program goes unchecked after every change.
+**It does not grow with the program.** Checking one function by hand takes thirty seconds. A program with forty functions takes twenty minutes, every time you change anything. In practice nobody does that, so most of the program goes unchecked after every change.
 
-**It is not repeatable.** You checked the empty-list case last Tuesday. Did you check it after Thursday's change? You cannot remember, and neither can anyone else.
+**It cannot be repeated exactly.** You checked the empty-list case last Tuesday. Did you check it again after Thursday's change? You cannot remember, and nobody else can either.
 
-**It only covers what you happen to try.** People test the case they were thinking about while writing the code — which is precisely the case the code already handles.
+**It only covers what you happened to try.** People test the case they were thinking about while writing the code, and that is exactly the case the code already handles.
 
 ## What a test is
 
-A **test** is code that checks other code and reports whether the answer was right. Being code, it runs in a second and gives the same verdict every time.
+A **test** is code that checks other code and reports whether the answer was right. Because it is code, it runs in a second and gives the same verdict every time.
 
 The simplest form uses \`assert\`:
 
@@ -45,13 +45,13 @@ print("All tests passed")
 All tests passed
 \`\`\`
 
-Each \`assert\` states something that must be true. If it is, nothing happens and the program continues. If it is not, Python raises \`AssertionError\` immediately and the program stops.
+Each \`assert\` states something that must be true. If it is true, nothing happens and the program carries on. If it is not true, Python raises \`AssertionError\` at once and the program stops.
 
-Silence means success. That takes a moment to get used to: a test suite that prints nothing has found nothing wrong.
+Silence means success. That takes a little getting used to. A set of tests that prints nothing has found nothing wrong.
 
 ## Watching a test fail
 
-A test you have never seen fail is not yet trustworthy. Consider a deliberately broken function:
+A test you have never seen fail is not yet worth trusting. Look at a function that is broken on purpose:
 
 \`\`\`python
 def double(value):
@@ -69,46 +69,46 @@ except AssertionError:
 failed as expected
 \`\`\`
 
-\`double(3)\` returns \`5\`, so the assertion fails. Note that this happens to pass for \`double(2)\`, which returns \`4\` — a reminder that one lucky test case proves very little.
+\`double(3)\` returns \`5\`, so the assertion fails. Note that this same broken function passes for \`double(2)\`, which returns \`4\`. That is a reminder that one lucky test case proves very little.
 
-## What tests actually give you
+## What tests really give you
 
-The obvious benefit is catching mistakes. There are two larger ones.
+The obvious benefit is catching mistakes. There are two bigger ones.
 
-**Confidence to change code.** Without tests, every edit to working code risks breaking something silently, so people avoid improving code they do not fully understand. With tests, you make the change and run them. This is what makes the refactoring of Module 6 practical rather than theoretical.
+**Confidence to change code.** Without tests, every edit to working code risks breaking something in silence, so people avoid improving code they do not fully understand. With tests, you make the change and run them. This is what turns the refactoring of Module 6 from an idea into a practical habit.
 
-**A specification you can execute.** A test says what the function is supposed to do, in a form that cannot drift out of date. A comment claiming a function handles empty input may be years stale. A passing test proving it is true right now.
+**A specification you can run.** A test says what the function is supposed to do, in a form that cannot quietly go out of date. A comment claiming that a function handles empty input may be years out of date. A passing test proves it is true right now.
 
 > **Key idea**
-> Tests are not mainly about finding bugs today. They are about being able to change code tomorrow without fear, and about recording what the code is supposed to do in a form that cannot go stale.
+> Tests are not mainly about finding bugs today. They are about being able to change code tomorrow without fear, and about recording what the code should do in a form that cannot go stale.
 
 ## What to test
 
-Test the **logic**, not the plumbing. The functions worth testing are the ones that take input and return output — the pure functions of Module 2.
+Test the **logic**, not the plumbing. The functions worth testing are the ones that take input and return output: the pure functions of Module 2.
 
-This explains why the course has insisted on separating computation from printing. A function that returns can be tested with one line. A function that prints can only be tested by capturing its output, which is far more work. A function that both computes and prints usually cannot be tested at all without restructuring.
+This explains why the course has insisted on keeping calculation apart from printing. A function that returns can be tested in one line. A function that prints can only be tested by capturing its output, which is much more work. A function that both calculates and prints usually cannot be tested at all until it is restructured.
 
 So the design advice and the testing advice are the same advice: keep the logic in pure functions, and keep printing at the edges.
 
 ## Testing does not prove correctness
 
-An important limit. Tests show that specific cases produce specific answers. They cannot show that *all* cases do.
+Here is an important limit. Tests show that particular cases give particular answers. They cannot show that *every* case does.
 
-A function passing twenty tests may still fail on the twenty-first input. Tests reduce risk; they do not eliminate it, and treating a green test suite as proof of correctness is a mistake.
+A function that passes twenty tests may still fail on the twenty-first input. Tests lower the risk. They do not remove it, and treating a set of passing tests as proof of correctness is a mistake.
 
-The response is not to give up but to choose cases deliberately, which is the next stage.
+The answer is not to give up but to choose your cases on purpose, and that is the next stage.
 
 ## Summary
 
-Manual checking does not scale, is not repeatable, and covers only what you thought to try. A test is code that checks code and reports a verdict. The real value is the confidence to change code and an executable record of intent. Tests reduce risk; they never prove correctness.`,
+Checking by hand does not grow with the program, cannot be repeated exactly, and covers only what you thought to try. A test is code that checks code and reports a verdict. Its real value is the confidence to change code, and a record of intent that you can run. Tests lower risk. They never prove correctness.`,
         },
         {
           type: "lesson",
           title: "Choosing Test Cases",
-          description: "Which inputs actually find defects, and which merely feel reassuring.",
+          description: "Which inputs really find faults, and which only feel comforting.",
           instructions: `## Not all tests are equal
 
-Given \`add(a, b)\`, these tests are nearly worthless:
+Given \`add(a, b)\`, these tests are almost worthless:
 
 \`\`\`python
 def add(a, b):
@@ -125,21 +125,21 @@ print("done")
 done
 \`\`\`
 
-Three tests, one scenario. Any defect surviving the first survives all three.
+Three tests, one situation. Any fault that survives the first one survives all three.
 
-Useful tests probe *different* aspects. Three categories cover most of what matters.
+Useful tests examine *different* things. Three kinds cover most of what matters.
 
 ## Normal cases
 
-The inputs the function will usually receive. These confirm the basic idea works.
+These are the inputs the function will usually receive. They show that the basic idea works.
 
-One or two are enough. Adding a fifth normal case almost never finds anything.
+One or two are enough. Adding a fifth normal case almost never finds anything new.
 
 ## Boundary cases
 
-The inputs where behaviour changes. These are where most defects live.
+These are the inputs where the behaviour changes. Most faults live here.
 
-For a function classifying scores with a pass mark of 60, the boundaries are \`59\`, \`60\`, and \`61\`:
+For a function that sorts scores with a pass mark of 60, the boundaries are \`59\`, \`60\`, and \`61\`:
 
 \`\`\`python
 def classify(score):
@@ -160,13 +160,13 @@ boundaries checked
 
 Those three catch the off-by-one mistake of writing \`>\` instead of \`>=\`. A test with \`80\` never would.
 
-Boundaries to look for: the smallest and largest valid inputs, the exact threshold in any comparison, the first and last item of a collection, and zero.
+Boundaries to look for: the smallest and the largest valid input, the exact limit in any comparison, the first and last item of a collection, and zero.
 
-## Degenerate cases
+## Emptiest cases
 
-The emptiest or smallest possible input: an empty list, an empty string, zero, a single item.
+These are the emptiest or smallest possible inputs: an empty list, an empty string, zero, a single item.
 
-These are forgotten most often and fail most often:
+They are the ones people forget most often, and the ones that fail most often:
 
 \`\`\`python
 def mean(values):
@@ -185,11 +185,11 @@ print("degenerate cases checked")
 degenerate cases checked
 \`\`\`
 
-Without the guard, the third assertion would raise \`ZeroDivisionError\`. Writing the test forces the question "what should this do with no data?" — a question that has to be answered by someone, and is best answered deliberately.
+Without the guard, the third assertion would raise \`ZeroDivisionError\`. Writing the test forces the question "what should this do with no data?" Somebody has to answer that question, and it is best answered on purpose.
 
 ## Invalid cases
 
-Where a function is documented to reject bad input, test that it does:
+Where a function is documented to refuse bad input, test that it really does:
 
 \`\`\`python
 def set_rating(value):
@@ -211,16 +211,16 @@ except ValueError:
 correctly rejected 9
 \`\`\`
 
-Testing that something *fails* correctly is as important as testing that it succeeds. A validation function that never rejects anything passes every happy-path test.
+Testing that something *fails* correctly is as important as testing that it works. A checking function that never refuses anything passes every easy test.
 
-Note the structure: call the function, then a line that should not be reached, then the handler. If no exception is raised, the \`print\` inside \`try\` runs and the test reports the problem.
+Notice the shape: call the function, then a line that should never be reached, then the handler. If no exception is raised, the \`print\` inside \`try\` runs and the test reports the problem.
 
 > **Key idea**
-> A normal case shows the function works. A boundary case shows where it stops working. A degenerate case shows whether anyone thought about emptiness. Write all three.
+> A normal case shows that the function works. A boundary case shows where it stops working. An emptiest case shows whether anyone thought about having no data. Write all three.
 
-## Test the contract, not the implementation
+## Test the promise, not the method
 
-Test what the function promises, not how it happens to work today.
+Test what the function promises, not the way it happens to work today.
 
 \`\`\`python
 def top_scores(scores):
@@ -237,25 +237,25 @@ print("contract checked")
 contract checked
 \`\`\`
 
-Those tests describe what the function returns. If someone rewrites it to use a different sorting approach, the tests still pass, because the promise has not changed. A test tied to internal details fails whenever the code is improved, which teaches people to delete tests.
+Those tests describe what the function returns. If someone rewrites it with a different sorting method, the tests still pass, because the promise has not changed. A test tied to internal details fails whenever the code is improved, and that teaches people to delete tests.
 
-## How many is enough?
+## How many are enough?
 
-There is no formula. A reasonable target for an ordinary function is one or two normal cases, every boundary, the degenerate case, and one invalid case if it rejects anything. That is usually four to six tests.
+There is no formula. A fair target for an ordinary function is one or two normal cases, every boundary, the emptiest case, and one invalid case if the function refuses anything. That is usually four to six tests.
 
-More useful than counting: ask "if I broke this function subtly, would a test notice?" If the honest answer is no, add the test that would.
+More useful than counting: ask "if I broke this function in a small way, would a test notice?" If the honest answer is no, add the test that would.
 
 ## Summary
 
-Choose cases that probe different behaviour: normal, boundary, degenerate, and invalid. Boundaries and empty inputs find the most defects. Test what the function promises, not how it currently works.`,
+Choose cases that examine different behaviour: normal, boundary, emptiest, and invalid. Boundaries and empty inputs find the most faults. Test what the function promises, not the way it works at the moment.`,
         },
         {
           type: "exercise",
           title: "Write Tests That Find a Bug",
-          description: "Add assertions covering boundary and degenerate cases for a subtly wrong function.",
+          description: "Add assertions that cover boundary and empty cases for a function that is slightly wrong.",
           instructions: `## The problem
 
-The function \`band\` in the editor classifies a score. It is **subtly wrong**: it handles ordinary scores correctly and fails at one boundary.
+The function \`band\` in the editor sorts a score into a group. It is **slightly wrong**. It handles ordinary scores correctly and fails at one boundary.
 
 ## The intended behaviour
 
@@ -267,13 +267,13 @@ otherwise    -> "low"
 
 ## Your task
 
-1. Add assertions that check the function against the specification, including every boundary.
-2. Fix the function so all your assertions pass.
+1. Add assertions that check the function against this specification, including every boundary.
+2. Fix the function so that all your assertions pass.
 3. Print \`All tests passed\` at the end.
 
 ## Requirements
 
-Your program must include assertions covering at least these inputs: \`39\`, \`40\`, \`69\`, \`70\`, and \`0\`.
+Your program must hold assertions that cover at least these inputs: \`39\`, \`40\`, \`69\`, \`70\`, and \`0\`.
 
 The final output must be exactly:
 
@@ -283,7 +283,7 @@ All tests passed
 
 ## Guidance
 
-Write the assertions **first**, before looking hard at the function. Run them. One will fail, and the failure tells you exactly which boundary is wrong — which is faster than reading the code and more reliable than guessing.
+Write the assertions **first**, before you study the function closely. Run them. One will fail, and the failure tells you exactly which boundary is wrong. That is faster than reading the code, and safer than guessing.
 
 Remember that a passing assertion prints nothing. If your program prints only the final line, every assertion passed.
 
@@ -300,7 +300,7 @@ Do not change the specification to match the code. Fix the code to match the spe
 
 print("All tests passed")
 `,
-          hint: "The bug is that the high boundary uses > rather than >=, so a score of exactly 70 is classified as medium. Add assert band(70) == \"high\" and the failure appears immediately.",
+          hint: "The bug is that the high boundary uses > instead of >=, so a score of exactly 70 is called medium. Add assert band(70) == \"high\" and the failure appears at once.",
           tests: [
             {
               expectedOutput: "All tests passed",
@@ -330,12 +330,12 @@ print("All tests passed")
 
     lesson(
       "Structuring Tests",
-      "Organising checks so a failure tells you what broke.",
+      "Arranging your checks so that a failure tells you exactly what broke.",
       [
         {
           type: "lesson",
           title: "Arrange, Act, Assert",
-          description: "A three-part shape that makes tests readable, and naming that makes failures diagnostic.",
+          description: "A three-part shape that makes tests readable, and naming that makes failures useful.",
           instructions: `## Grouping tests into functions
 
 Loose assertions work for a handful of checks. Beyond that, group them into named functions:
@@ -369,31 +369,31 @@ print("All tests passed")
 All tests passed
 \`\`\`
 
-Grouping buys two things. Related checks sit together, and — more importantly — each group has a **name**.
+Grouping buys you two things. Related checks sit together, and, more importantly, each group has a **name**.
 
-## Names are the error message
+## The name is the error message
 
-When an assertion fails, the traceback names the function it was in. So the function name is what tells you what broke.
+When an assertion fails, the traceback names the function it was inside. So the name of the function is what tells you what broke.
 
-Compare:
+Compare these two:
 
 \`\`\`text
 AssertionError in test_1
 AssertionError in test_mean_of_empty_list_is_zero
 \`\`\`
 
-The second names the defect. That is why test names are long and descriptive, in a way that would be poor style anywhere else. The convention is \`test_\` followed by what is being checked and what should happen.
+The second one names the fault. That is why test names are long and descriptive, in a way that would be poor style anywhere else. The habit is \`test_\` followed by what is being checked and what should happen.
 
 Good: \`test_shorten_returns_text_unchanged_when_it_fits\`.
 
 Poor: \`test_shorten_2\`.
 
 > **Key idea**
-> A test function's name is the message you get when it fails. Write it as a claim about behaviour, not as a number.
+> The name of a test function is the message you get when it fails. Write it as a claim about behaviour, not as a number.
 
 ## Arrange, act, assert
 
-Within a test, three steps in order:
+Inside a test there are three steps, in order:
 
 \`\`\`python
 def total_with_tax(amounts, rate):
@@ -417,13 +417,13 @@ print("passed")
 passed
 \`\`\`
 
-**Arrange** sets up the inputs. **Act** performs the one operation under test. **Assert** checks the result.
+**Arrange** sets up the inputs. **Act** does the one operation being tested. **Assert** checks the result.
 
-Separating them, with blank lines, makes tests skimmable: a reader sees immediately what was given, what was done, and what was expected. It also encourages one action per test, which is what makes a failure diagnostic.
+Keeping them apart, with blank lines between them, makes tests easy to skim. A reader sees at once what was given, what was done, and what was expected. It also pushes you towards one action for each test, and that is what makes a failure tell you something.
 
 ## One reason to fail
 
-A test asserting six unrelated things tells you little when it fails, because you learn only that one of six claims is false.
+A test that asserts six unrelated things tells you little when it fails, because you learn only that one of the six claims is false.
 
 \`\`\`python
 def shorten(text, limit):
@@ -458,11 +458,11 @@ print("All tests passed")
 All tests passed
 \`\`\`
 
-Three tests, three names, three distinct claims. The second contains two assertions, which is fine because both describe the same behaviour: the result is correct *and* it has the promised length.
+Three tests, three names, three separate claims. The second one holds two assertions, and that is fine, because both describe the same behaviour: the result is correct *and* it has the promised length.
 
 The rule is one *reason* to fail, not one assertion.
 
-## Testing that something raises
+## Testing that something raises an error
 
 \`\`\`python
 def set_rating(value):
@@ -487,17 +487,17 @@ print("passed")
 passed
 \`\`\`
 
-The structure matters. If the call raises, \`except\` catches it and \`return\` ends the test successfully. If it does *not* raise, execution reaches \`assert False\`, which fails with a message explaining what was expected.
+The shape matters. If the call raises, \`except\` catches it and \`return\` ends the test successfully. If it does *not* raise, the program reaches \`assert False\`, which fails with a message explaining what was expected.
 
-Without that final line the test would pass whether or not the exception was raised, which is worse than having no test at all — it reports success while checking nothing.
+Without that last line, the test would pass whether or not the exception was raised. That is worse than having no test at all, because it reports success while checking nothing.
 
-\`assert condition, "message"\` attaches an explanation shown when the assertion fails. Worth using wherever the reason would not be obvious.
+\`assert condition, "message"\` attaches an explanation that is shown when the assertion fails. It is worth using wherever the reason would not be obvious.
 
-## Independence
+## Tests must not depend on each other
 
-Each test must pass regardless of whether others ran, and in any order. A test depending on state left behind by another will fail mysteriously when tests are reordered or run alone.
+Each test must pass whether or not the others ran, and in any order. A test that depends on data left behind by another test will fail in a puzzling way when the tests are reordered or run alone.
 
-In practice: create the data each test needs inside that test, and do not share mutable state between them.
+In practice this means: create the data each test needs inside that test, and do not share changeable data between tests.
 
 \`\`\`python
 def add_entry(entries, name):
@@ -524,21 +524,21 @@ print("All tests passed")
 All tests passed
 \`\`\`
 
-Each test builds its own \`entries\`. The second also demonstrates a valuable kind of check: confirming that a function does *not* modify its argument.
+Each test builds its own \`entries\`. The second one also shows a valuable kind of check: making sure a function does *not* change its argument.
 
 ## Summary
 
-Group assertions into named test functions; the name is the failure message. Arrange, act, assert, separated by blank lines. Aim for one reason to fail. Test that invalid input raises, and make the test fail when it does not. Keep tests independent.`,
+Group assertions into named test functions, because the name is the failure message. Arrange, act, assert, with blank lines between them. Aim for one reason to fail. Test that invalid input raises an error, and make the test fail when it does not. Keep tests independent of each other.`,
         },
         {
           type: "lesson",
           title: "pytest, Regression Tests, and Refactoring",
-          description: "How tests are run in practice, and the two habits that make them pay.",
+          description: "How tests are run in real projects, and the two habits that make them pay.",
           instructions: `## Running tests automatically
 
-Calling every test function by hand does not scale either. Real projects use a **test runner**: a tool that finds test functions, runs them, and reports results.
+Calling every test function by hand does not work for long either. Real projects use a **test runner**: a tool that finds the test functions, runs them, and reports the results.
 
-The standard choice for Python is **pytest**, a third-party package installed with \`pip install pytest\`.
+The usual choice for Python is **pytest**, a third-party package installed with \`pip install pytest\`.
 
 With pytest, tests go in a file whose name starts with \`test_\`, and the runner finds them:
 
@@ -555,16 +555,16 @@ def test_whole_hours():
     assert format_duration(120) == "2h"
 \`\`\`
 
-Running \`pytest\` in that directory discovers both functions and reports:
+Running \`pytest\` in that folder finds both functions and reports:
 
 \`\`\`text
 test_durations.py ..                    [100%]
 2 passed in 0.01s
 \`\`\`
 
-No calls at the bottom of the file. The runner finds anything named \`test_*\` and runs it.
+There are no calls at the bottom of the file. The runner finds anything named \`test_*\` and runs it.
 
-When something fails, pytest shows the assertion, the values involved, and the exact line — considerably more useful than a bare \`AssertionError\`.
+When something fails, pytest shows you the assertion, the values involved, and the exact line. That is far more useful than a bare \`AssertionError\`.
 
 \`\`\`text
 E       assert '2h 0m' == '2h'
@@ -572,22 +572,22 @@ E         - 2h
 E         + 2h 0m
 \`\`\`
 
-**pytest is not available in this course's environment**, which runs Python in your browser with the standard library only. The exercises here therefore call test functions explicitly and print a summary. Everything about *how to write* a test transfers unchanged; only the mechanism for running them differs.
+**pytest is not available in this course's environment**, which runs Python in your browser with the standard library only. So the exercises here call the test functions themselves and print a summary. Everything about *how to write* a test carries over unchanged. Only the way you run them is different.
 
-The standard library also includes \`unittest\`, which needs no installation but is more verbose. Most modern projects use pytest.
+The standard library also includes \`unittest\`, which needs no installation but takes more typing. Most modern projects use pytest.
 
-## Regression tests
+## Tests against old bugs
 
-A **regression** is a defect that reappears after being fixed. Regression tests prevent them.
+A **regression** is a fault that comes back after it was fixed. Tests kept from old bugs prevent that.
 
-The discipline is simple and repays itself immediately. When you find a bug:
+The routine is simple, and it pays for itself at once. When you find a bug:
 
-1. Write a test that reproduces it. Watch it fail.
+1. Write a test that causes it. Watch it fail.
 2. Fix the bug.
 3. Watch the test pass.
-4. Keep the test forever.
+4. Keep the test for ever.
 
-Step 1 matters more than it appears. A test you have watched fail is a test you know actually checks something. A test written after the fix might pass for the wrong reason, and you would never know.
+Step 1 matters more than it looks. A test you have watched fail is a test you know really checks something. A test written after the fix might pass for the wrong reason, and you would never find out.
 
 \`\`\`python
 def split_name(full_name):
@@ -616,20 +616,20 @@ print("All tests passed")
 All tests passed
 \`\`\`
 
-Both tests came from real failures: the original version raised \`IndexError\` on a single word and on empty input. Now those cases cannot break again without something noticing.
+Both tests came from real failures. The first version raised \`IndexError\` on a single word and on empty input. Now those cases cannot break again without something noticing.
 
-Over time a project's test suite becomes a record of every mistake anyone has made in it. That is a genuinely valuable asset.
+Over time, the tests of a project become a record of every mistake anyone has made in it. That is a genuinely valuable thing to own.
 
-## Refactoring under test
+## Refactoring with tests
 
-Module 6 defined refactoring as changing structure without changing behaviour, and noted that tests are what make it safe. Here is the loop:
+Module 6 said that refactoring means changing structure without changing behaviour, and that tests are what make it safe. Here is the loop:
 
 1. Make sure the tests pass **before** you start. If they do not, you are debugging, not refactoring.
-2. Make one small structural change.
+2. Make one small change to the structure.
 3. Run the tests.
-4. If they pass, continue. If not, undo the change.
+4. If they pass, carry on. If not, undo the change.
 
-The discipline is in step 4. A failing test after a refactoring means the change altered behaviour. Undoing is faster than investigating, because the change was small.
+The discipline is in step 4. A failing test after a refactoring means the change altered the behaviour. Undoing is faster than investigating, because the change was small.
 
 \`\`\`python
 def describe(values):
@@ -657,14 +657,14 @@ print("All tests passed")
 All tests passed
 \`\`\`
 
-With those in place, you can restructure \`describe\` freely — extract helpers, rename variables, change the loop — and know within a second whether you broke it.
+With those in place, you can restructure \`describe\` freely — pull out helpers, rename variables, change the loop — and know within a second whether you broke it.
 
 > **Key idea**
-> Write a failing test before fixing a bug, and keep it. Run the tests before, during, and after any refactoring, and undo rather than investigate when one fails.
+> Write a failing test before you fix a bug, and keep it. Run the tests before, during, and after any refactoring, and undo rather than investigate when one fails.
 
-## Separating logic from interface
+## Keeping logic apart from input and output
 
-One design decision affects testability more than any other: keeping the logic separate from input and output.
+One design decision affects how testable your code is more than any other: keeping the logic separate from input and output.
 
 \`\`\`python
 def parse_line(line):
@@ -696,21 +696,21 @@ main()
 Winner: ana
 \`\`\`
 
-\`parse_line\` and \`best_name\` are pure and trivially testable. \`main\` does the input and output and contains no logic worth testing.
+\`parse_line\` and \`best_name\` are pure, and testing them is easy. \`main\` does the input and output, and it holds no logic worth testing.
 
-This is the same structure recommended in Modules 2, 6, and 8, arrived at from a different direction. Code that is easy to test is code that was well designed, and difficulty in testing is usually a design problem rather than a testing problem.
+This is the same structure recommended in Modules 2, 6, and 8, reached from a different direction. Code that is easy to test is code that was designed well, and trouble in testing is usually a design problem rather than a testing problem.
 
 ## Summary
 
-pytest discovers and runs \`test_*\` functions and reports failures in detail. Write a failing test before fixing a bug and keep it forever. Refactor only with passing tests, in small steps, undoing when one fails. Testability follows from keeping logic separate from input and output.`,
+pytest finds and runs \`test_*\` functions and reports failures in detail. Write a failing test before you fix a bug, and keep it for ever. Refactor only when the tests pass, in small steps, undoing when one fails. Code becomes testable when its logic is kept apart from its input and output.`,
         },
         {
           type: "exercise",
           title: "Test a Function Thoroughly",
-          description: "Write named test functions covering normal, boundary, and degenerate cases.",
+          description: "Write named test functions that cover normal, boundary, and emptiest cases.",
           instructions: `## The problem
 
-The function \`price_band\` is supplied and is **correct**. Your job is to write tests for it.
+The function \`price_band\` is given to you, and it is **correct**. Your job is to write tests for it.
 
 ## The specification
 
@@ -723,9 +723,9 @@ price >= 50      -> "premium"
 
 ## Requirements
 
-1. Write **at least five** test functions, each named \`test_\` followed by a description of what it checks.
-2. Between them, they must cover: a negative price, exactly \`0\`, a value just below \`10\`, exactly \`10\`, exactly \`50\`, and a value above \`50\`.
-3. Each test must contain at least one \`assert\`.
+1. Write **at least five** test functions. Name each one \`test_\` followed by a description of what it checks.
+2. Between them they must cover: a negative price, exactly \`0\`, a value just below \`10\`, exactly \`10\`, exactly \`50\`, and a value above \`50\`.
+3. Each test must hold at least one \`assert\`.
 4. Call every test function.
 5. Print exactly \`All tests passed\` at the end.
 
@@ -737,15 +737,15 @@ All tests passed
 
 ## Guidance
 
-Boundaries are where defects live, so most of your tests should sit on them. \`9.99\` and \`10\` are far more informative than \`25\`.
+Boundaries are where faults live, so most of your tests should sit on them. \`9.99\` and \`10\` tell you far more than \`25\` does.
 
-Name each test as a claim: \`test_price_band_treats_exactly_ten_as_standard\` says what it checks and becomes the message if it ever fails.
+Name each test as a claim. \`test_price_band_treats_exactly_ten_as_standard\` says what it checks, and it becomes the message if it ever fails.
 
-Since the function is already correct, all your tests will pass first time. To confirm they genuinely check something, temporarily change a \`<\` to \`<=\` in the function and watch a test fail — then change it back.
+The function is already correct, so all your tests will pass the first time. To prove that they really check something, change a \`<\` to \`<=\` in the function for a moment and watch a test fail. Then change it back.
 
 ## Constraints
 
-Do not modify \`price_band\`. Passing assertions print nothing, so the only output is the final line.`,
+Do not change \`price_band\`. Passing assertions print nothing, so the only output is the final line.`,
           starterCode: `def price_band(price):
     if price < 0:
         return "invalid"
@@ -758,11 +758,11 @@ Do not modify \`price_band\`. Passing assertions print nothing, so the only outp
 
 print("All tests passed")
 `,
-          hint: "Write functions like def test_price_band_rejects_negative_prices(): assert price_band(-1) == \"invalid\". Cover -1, 0, 9.99, 10, 50 and 75, then call each function before the final print.",
+          hint: "Write functions like def test_price_band_rejects_negative_prices(): assert price_band(-1) == \"invalid\". Cover -1, 0, 9.99, 10, 50, and 75, then call each function before the final print.",
           tests: [
             {
               expectedOutput: "All tests passed",
-              description: "Every test function passes against the supplied implementation",
+              description: "Every test function passes against the function that was given",
             },
           ],
           solution: `def price_band(price):
@@ -812,10 +812,10 @@ print("All tests passed")
         {
           type: "exercise",
           title: "Test That Invalid Input Raises",
-          description: "Write a test that fails when an expected exception is not raised.",
+          description: "Write a test that fails when an expected error is not raised.",
           instructions: `## The problem
 
-The function \`parse_quantity\` should convert text to a whole number and raise \`ValueError\` for anything invalid. It currently returns \`0\` for invalid input instead of raising, which is the bug you must find with a test and then fix.
+The function \`parse_quantity\` should turn text into a whole number and raise \`ValueError\` for anything invalid. At the moment it returns \`0\` for invalid input instead of raising. That is the bug you must catch with a test and then fix.
 
 ## The intended behaviour
 
@@ -829,10 +829,10 @@ The function \`parse_quantity\` should convert text to a whole number and raise 
 
 ## Requirements
 
-1. Write a test function checking that valid text converts correctly.
-2. Write a test function checking that invalid text **raises** \`ValueError\`. It must fail if no exception is raised.
-3. Write a test function checking that a negative quantity raises \`ValueError\`.
-4. Fix \`parse_quantity\` so all your tests pass.
+1. Write a test function that checks valid text converting correctly.
+2. Write a test function that checks invalid text **raising** \`ValueError\`. It must fail if no error is raised.
+3. Write a test function that checks a negative quantity raising \`ValueError\`.
+4. Fix \`parse_quantity\` so that all your tests pass.
 5. Call every test and print exactly \`All tests passed\`.
 
 ## Expected output
@@ -843,13 +843,13 @@ All tests passed
 
 ## Guidance
 
-The structure for testing an exception is: call the function inside \`try\`, \`return\` from the \`except\` block on success, and put \`assert False, "expected ValueError"\` after the \`try\` statement so the test fails when nothing was raised.
+The shape for testing an error is: call the function inside \`try\`, \`return\` from the \`except\` block when it worked, and put \`assert False, "expected ValueError"\` after the \`try\` statement so that the test fails when nothing was raised.
 
-That last line is what makes the test real. Without it the test would pass whether or not the function raised, which is the most dangerous kind of test: one that reports success while checking nothing.
+That last line is what makes the test real. Without it, the test would pass whether or not the function raised anything. That is the most dangerous kind of test: one that reports success while checking nothing.
 
 ## Constraints
 
-\`parse_quantity\` must raise rather than return a sentinel value. A returned \`0\` is indistinguishable from a genuine quantity of zero, which is exactly why raising is correct here.`,
+\`parse_quantity\` must raise instead of returning a special value. A returned \`0\` cannot be told apart from a real quantity of zero, and that is exactly why raising is correct here.`,
           starterCode: `def parse_quantity(raw):
     try:
         return int(raw)
@@ -859,11 +859,11 @@ That last line is what makes the test real. Without it the test would pass wheth
 
 print("All tests passed")
 `,
-          hint: "Replace the except branch with raise ValueError(f\"invalid quantity: {raw}\") and add a check that rejects negatives. For the exception tests, use try/except/return followed by assert False with a message.",
+          hint: "Replace the except branch with raise ValueError(f\"invalid quantity: {raw}\") and add a check that refuses negative values. For the error tests, use try, except, return, followed by assert False with a message.",
           tests: [
             {
               expectedOutput: "All tests passed",
-              description: "Valid conversions succeed and every invalid input raises as the tests require",
+              description: "Valid conversions work, and every invalid input raises an error as the tests require",
             },
           ],
           solution: `def parse_quantity(raw):
@@ -920,17 +920,17 @@ print("All tests passed")
 
     lesson(
       "Readable Code",
-      "Style conventions, and why consistency matters more than preference.",
+      "Shared style habits, and why being consistent matters more than personal taste.",
       [
         {
           type: "lesson",
           title: "PEP 8 and Practical Style",
-          description: "The conventions Python programmers share, and the reasoning behind them.",
-          instructions: `## Code is read more than written
+          description: "The habits that Python programmers share, and the reasons behind them.",
+          instructions: `## Code is read more often than it is written
 
-A line of code is written once and read many times — by colleagues, and by you in six months, when you will remember nothing about it. Optimising for the reader is therefore almost always right.
+A line of code is written once and read many times: by your colleagues, and by you in six months, when you will remember nothing about it. So writing for the reader is almost always right.
 
-Python has a style guide called **PEP 8**. It is a set of conventions, not rules the interpreter enforces, and following it means your code looks like everyone else's, which is the point.
+Python has a style guide called **PEP 8**. It is a set of shared habits, not rules that the interpreter enforces. Following it means your code looks like everyone else's, and that is the point.
 
 ## Naming
 
@@ -950,9 +950,9 @@ print(unread_messages, MAX_RETRIES, format_duration(5))
 12 3 5m
 \`\`\`
 
-Variables and functions use lowercase with underscores. Constants use capitals. Classes, which arrive in Module 12, use capitalised words with no underscores.
+Variables and functions use small letters with underscores. Constants use capital letters. Classes, which arrive in Module 12, use capitalised words with no underscores.
 
-Beyond the mechanics, names should say what a thing *is*:
+Beyond those mechanics, a name should say what a thing *is*:
 
 \`\`\`python
 d = 21
@@ -964,15 +964,15 @@ print(d, days_until_due)
 21 21
 \`\`\`
 
-The second needs no comment. Short names are acceptable only where scope is tiny and meaning is obvious — \`i\` for a loop index, \`_\` for a value you ignore.
+The second name needs no comment. Short names are acceptable only where the scope is tiny and the meaning is obvious: \`i\` for a loop index, \`_\` for a value you ignore.
 
-Avoid names that shadow built-ins. Calling a variable \`list\`, \`str\`, \`sum\`, or \`type\` makes the real one unreachable in that scope and produces confusing failures later.
+Avoid names that hide built-ins. Calling a variable \`list\`, \`str\`, \`sum\`, or \`type\` makes the real one unreachable in that part of the program, and it produces confusing failures later.
 
-## Whitespace
+## Spacing
 
-Four spaces per indentation level. Never mix tabs and spaces.
+Four spaces for each level of indentation. Never mix tabs and spaces.
 
-Spaces around operators and after commas, but not inside brackets:
+Put spaces around operators and after commas, but not just inside brackets:
 
 \`\`\`python
 total = sum([1, 2, 3]) * 2
@@ -984,11 +984,11 @@ print(total, values["a"])
 12 1
 \`\`\`
 
-Two blank lines between top-level definitions, one between logical sections inside a function. Blank lines are punctuation: they group related lines into paragraphs, and code without them is as hard to read as prose without them.
+Leave two blank lines between top-level definitions, and one between sections inside a function. Blank lines are punctuation. They group related lines into paragraphs, and code without them is as hard to read as prose without them.
 
 ## Line length
 
-PEP 8 suggests keeping lines under 79 characters, which many projects relax to around 100. The specific number matters less than having one, so that lines do not sprawl.
+PEP 8 suggests keeping lines under 79 characters, and many projects relax that to about 100. The exact number matters less than having one, so that lines do not sprawl across the screen.
 
 Long expressions break inside brackets:
 
@@ -1005,11 +1005,11 @@ print(len(records))
 3
 \`\`\`
 
-The trailing comma after the last item is conventional in Python: it means adding an entry changes one line rather than two, which makes the change easier to review.
+The comma after the last item is a normal Python habit. It means that adding an entry changes one line instead of two, which makes the change easier to check.
 
 ## Imports
 
-At the top, one per line, grouped: standard library first, then third-party, then your own modules, with a blank line between groups.
+Put them at the top, one for each line, in groups: standard library first, then third-party packages, then your own modules, with a blank line between the groups.
 
 \`\`\`python
 import math
@@ -1042,20 +1042,20 @@ flag is off
 
 Write \`if not values:\` rather than \`if len(values) == 0:\`, and \`if not flag:\` rather than \`if flag == False:\`. Use \`is None\` for \`None\`, never \`== None\`.
 
-## Consistency beats preference
+## Being consistent beats personal taste
 
-Many style choices are arbitrary. Whether to use single or double quotes matters far less than picking one and staying with it.
+Many style choices could have gone either way. Whether you use single or double quotes matters far less than picking one and staying with it.
 
-Consistent code lets a reader stop noticing the formatting and attend to the meaning. Inconsistent code makes every difference look potentially significant.
+Consistent code lets a reader stop noticing the layout and pay attention to the meaning. Inconsistent code makes every small difference look as though it might be important.
 
-This is also why automated tools are widely used. A **formatter** such as Black rewrites code into a standard layout, and a **linter** such as Ruff or Flake8 reports style problems and likely mistakes. Neither is available in this environment, but both are standard in professional work, and the reason is the same: consistency is worth more than any individual's preference, and machines are better at it than people.
+This is also why automatic tools are widely used. A **formatter** such as Black rewrites code into one standard layout. A **linter** such as Ruff or Flake8 reports style problems and likely mistakes. Neither is available in this environment, but both are standard in professional work, and the reason is the same: consistency is worth more than any one person's taste, and machines are better at it than people are.
 
 > **Key idea**
-> Style conventions exist so that readers spend their attention on meaning rather than on layout. Consistency matters more than which convention you pick.
+> Style habits exist so that readers spend their attention on meaning instead of on layout. Being consistent matters more than which habit you choose.
 
 ## Comments that earn their place
 
-Module 1 covered this and it bears repeating in this context. Comments should explain *why*, not *what*:
+Module 1 covered this, and it is worth repeating here. Comments should explain *why*, not *what*:
 
 \`\`\`python
 RETRY_LIMIT = 3
@@ -1069,39 +1069,39 @@ print(RETRY_LIMIT)
 3
 \`\`\`
 
-A comment restating the code is a maintenance liability, because it can become false. Code cannot lie about what it does; comments can.
+A comment that repeats the code is a burden, because it can become false. Code cannot lie about what it does. Comments can.
 
 ## Summary
 
-PEP 8 gives Python a shared style: snake case for names, capitals for constants, four-space indentation, spaces around operators, grouped imports at the top. Names should state what a value is. Consistency matters more than any individual choice, which is why formatters and linters are standard tools.`,
+PEP 8 gives Python a shared style: small letters with underscores for names, capitals for constants, four spaces of indentation, spaces around operators, and grouped imports at the top. Names should say what a value is. Consistency matters more than any single choice, and that is why formatters and linters are standard tools.`,
         },
         {
           type: "exercise",
           title: "Module 9 Checkpoint: Test and Clean a Module",
-          description: "Fix a defect, add regression tests, and improve style without changing behaviour.",
+          description: "Fix a fault, add tests that guard against it, and improve the style without changing behaviour.",
           instructions: `## The problem
 
-The program in the editor computes statistics about study sessions. It has three problems:
+The program in the editor works out statistics about study sessions. It has three problems:
 
-1. A **defect**: \`busiest_subject\` returns the wrong subject when two subjects tie, and crashes on empty input.
+1. A **fault**: \`busiest_subject\` returns the wrong subject when two subjects tie, and it crashes on empty input.
 2. **No tests**.
-3. **Poor style**: unclear names, a magic number, and no documentation.
+3. **Poor style**: unclear names, an unexplained number, and no documentation.
 
 ## Your task
 
-Address all three.
+Deal with all three.
 
 ## Requirements
 
 1. Fix \`busiest_subject\` so that:
    - It returns the subject with the greatest total minutes.
-   - Ties are broken alphabetically.
-   - It returns an empty string for an empty dictionary rather than raising.
-2. Give it a docstring stating those decisions.
-3. Write **at least three** test functions with descriptive \`test_\` names, covering a clear winner, a tie, and empty input. Call them all.
-4. Replace the magic number \`60\` with a named constant in capitals.
+   - Ties are settled alphabetically.
+   - It returns an empty string for an empty dictionary instead of raising an error.
+2. Give it a docstring that records those decisions.
+3. Write **at least three** test functions with clear \`test_\` names, covering a clear winner, a tie, and empty input. Call them all.
+4. Replace the unexplained number \`60\` with a named constant in capital letters.
 5. Rename \`f\` and \`x\` to something meaningful.
-6. Print exactly \`All tests passed\` at the end and nothing else.
+6. Print exactly \`All tests passed\` at the end, and nothing else.
 
 ## Expected output
 
@@ -1111,11 +1111,11 @@ All tests passed
 
 ## Guidance
 
-Write the tie test **first** and watch it fail. That is the regression-test discipline: a test you have seen fail is a test you know works.
+Write the tie test **first** and watch it fail. That is the discipline for a bug test: a test you have seen fail is a test you know works.
 
-For the tie-break, sorting the subjects by a key of the negative total and then the name handles both rules at once — the same pattern used in earlier modules.
+For the tie, sorting the subjects by a key of the negative total and then the name deals with both rules at once. It is the same pattern used in earlier modules.
 
-The style changes must not alter behaviour. Your tests are what prove they did not.
+The style changes must not change the behaviour. Your tests are what prove that they did not.
 
 ## Constraints
 
@@ -1140,7 +1140,7 @@ print("All tests passed")
           tests: [
             {
               expectedOutput: "All tests passed",
-              description: "The tie-breaking and empty-input tests pass against the corrected implementation",
+              description: "The tie test and the empty-input test pass against the corrected function",
             },
           ],
           solution: `MINUTES_PER_HOUR = 60
@@ -1193,10 +1193,10 @@ print("All tests passed")
         {
           type: "exercise",
           title: "Improve Names and Structure",
-          description: "Rewrite working code so a reader can follow it, without changing behaviour.",
+          description: "Rewrite working code so that a reader can follow it, without changing what it does.",
           instructions: `## The problem
 
-The function in the editor is correct. It is also very hard to read: the names say nothing, a magic number appears twice, and there is no documentation.
+The function in the editor is correct. It is also very hard to read. The names say nothing, an unexplained number appears twice, and there is no documentation.
 
 ## Your task
 
@@ -1204,10 +1204,10 @@ Improve it without changing what it does.
 
 ## Requirements
 
-1. Rename \`f\`, \`x\`, \`y\`, and \`z\` to names that state what they hold.
-2. Replace the repeated literal \`1000\` with a named constant in capitals.
-3. Add a docstring stating what the function returns and what it does with an empty list.
-4. Keep the behaviour identical.
+1. Rename \`f\`, \`x\`, \`y\`, and \`z\` to names that say what they hold.
+2. Replace the repeated number \`1000\` with a named constant in capital letters.
+3. Add a docstring saying what the function returns and what it does with an empty list.
+4. Keep the behaviour exactly the same.
 
 ## Expected output
 
@@ -1223,13 +1223,13 @@ One line of whole numbers separated by spaces.
 
 ## Guidance
 
-Run the original first and record its output. Make one change at a time and run again after each, exactly as Module 6 describes. The test proves only that the behaviour did not change — the improvement is in the code, and that is the point.
+Run the original first and write its output down. Make one change at a time and run again after each one, exactly as Module 6 describes. The test proves only that the behaviour did not change. The improvement is in the code, and that is the point.
 
-Ask what each value *means* rather than what type it is. \`x\` holding a count of large values is better named \`large_count\` than \`number\`.
+Ask what each value *means*, not what type it is. If \`x\` holds a count of large values, \`large_count\` is a better name than \`number\`.
 
 ## Constraints
 
-Do not change the function's signature or its results. The empty-list behaviour must stay exactly as it is.`,
+Do not change the function's parameters or its results. The behaviour for an empty list must stay exactly as it is.`,
           starterCode: `def f(a):
     x = 0
     y = 0
@@ -1250,27 +1250,27 @@ print(f"Large: {x}")
 print(f"Total: {y}")
 print(f"Mean: {z}")
 `,
-          hint: "Rename f to something like summarise_readings, a to readings, x to large_count, y to total, z to mean. Add LARGE_THRESHOLD = 1000 at module level and use it in the comparison.",
+          hint: "Rename f to something like summarise_readings, a to readings, x to large_count, y to total, and z to mean. Add LARGE_THRESHOLD = 1000 at the top of the file and use it in the comparison.",
           tests: [
             {
               input: "1200 800 2200\n",
               expectedOutput: "Large: 2\nTotal: 4200\nMean: 1400.0",
-              description: "Behaviour is unchanged for a typical set of readings",
+              description: "The behaviour is unchanged for an ordinary set of readings",
             },
             {
               input: "\n",
               expectedOutput: "Large: 0\nTotal: 0\nMean: 0.0",
-              description: "The empty-list behaviour is preserved rather than raising",
+              description: "The behaviour for an empty list is kept, and no error is raised",
             },
             {
               input: "1000\n",
               expectedOutput: "Large: 1\nTotal: 1000\nMean: 1000.0",
-              description: "The threshold remains inclusive after the constant is introduced",
+              description: "The limit still includes an equal value after the constant is introduced",
             },
             {
               input: "1 2 3\n",
               expectedOutput: "Large: 0\nTotal: 6\nMean: 2.0",
-              description: "Small values count towards the total but not the large count",
+              description: "Small values add to the total but not to the count of large readings",
             },
           ],
           solution: `LARGE_THRESHOLD = 1000

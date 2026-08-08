@@ -2,16 +2,16 @@ import { module, lesson, type ModuleSource } from "../types.ts"
 
 const moduleSix: ModuleSource = module(
   "Functions and Program Design",
-  "Designing programs out of well-chosen functions: arguments in depth, decomposition, structure, documentation, and refactoring.",
+  "Designing programs out of well-chosen functions: arguments in detail, breaking problems down, structure, documentation, and improving code.",
   [
     lesson(
       "Arguments in Depth",
-      "Positional and keyword arguments, defaults, and returning several results.",
+      "Arguments given by position and by name, default values, and returning several results.",
       [
         {
           type: "lesson",
           title: "Keyword Arguments and Defaults",
-          description: "Naming arguments at the call site, and making parameters optional.",
+          description: "Naming arguments where you call a function, and making parameters optional.",
           instructions: `## The problem with positions
 
 A function with several parameters becomes hard to call correctly:
@@ -28,11 +28,11 @@ print(format_entry("Tidal Systems", 320, True, False))
 Tidal Systems | 320p | done=True | star=False
 \`\`\`
 
-The call site is a row of bare values. A reader cannot tell what \`True, False\` means without going to find the definition, and swapping the two produces a wrong result with no error.
+The call is a row of bare values. A reader cannot tell what \`True, False\` means without going to look at the definition. And if you swap the two, you get a wrong result with no error at all.
 
 ## Keyword arguments
 
-You can name arguments at the call:
+You can name the arguments where you call the function:
 
 \`\`\`python
 def format_entry(title, pages, finished, starred):
@@ -48,15 +48,15 @@ Tidal Systems | 320p | done=True | star=False
 Coastal Birds | 180p | done=False | star=True
 \`\`\`
 
-Two things changed. The meaning of each value is now visible, and the order no longer matters — the second call supplies \`starred\` before \`finished\` and still works.
+Two things changed. The meaning of each value is now visible. And the order no longer matters: the second call gives \`starred\` before \`finished\`, and it still works.
 
-The rule is that **positional arguments must come before keyword arguments**. \`format_entry(title="x", 320)\` is a syntax error.
+The rule is that **arguments given by position must come before arguments given by name**. \`format_entry(title="x", 320)\` is a syntax error.
 
-The convention worth adopting: pass the obvious arguments positionally, and name anything whose meaning would not be clear at a glance. A bare \`True\` or \`False\` in a call is almost always worth naming.
+Here is a habit worth taking up. Pass the obvious arguments by position, and name anything whose meaning would not be clear at first glance. A bare \`True\` or \`False\` in a call is almost always worth naming.
 
 ## Default values
 
-A parameter may have a default, used when the caller omits it:
+A parameter may have a default value. It is used when the caller leaves that argument out:
 
 \`\`\`python
 def format_entry(title, pages, finished=False, starred=False):
@@ -72,13 +72,13 @@ Tidal Systems | 320p | done=False | star=False
 Coastal Birds | 180p | done=True | star=False
 \`\`\`
 
-Defaults make the common case short while keeping the unusual case possible. Choose the default that is right most of the time.
+Defaults keep the common case short while leaving the unusual case possible. Choose the value that is right most of the time.
 
-Parameters with defaults must come **after** those without, since Python could not otherwise tell which positional argument belongs where.
+Parameters with defaults must come **after** those without. Otherwise Python could not tell which positional argument belongs where.
 
-## A trap: mutable defaults
+## A trap: default values that can change
 
-This looks reasonable and is a genuine bug:
+This looks reasonable, and it is a real bug:
 
 \`\`\`python
 def add_reading(value, readings=[]):
@@ -95,11 +95,11 @@ print(add_reading(2))
 [1, 2]
 \`\`\`
 
-The second call was expected to produce \`[2]\`. Instead it produced \`[1, 2]\`.
+The second call should have given \`[2]\`. It gave \`[1, 2]\` instead.
 
-The default value is created **once**, when the function is defined, not each time it is called. Every call that omits the argument shares one list, and appending to it accumulates across calls.
+The default value is created **once**, when the function is defined. It is not created again on each call. So every call that leaves the argument out shares one list, and the appends build up across calls.
 
-The fix is to default to \`None\` and create the list inside:
+The repair is to default to \`None\` and create the list inside the function:
 
 \`\`\`python
 def add_reading(value, readings=None):
@@ -118,14 +118,14 @@ print(add_reading(2))
 [2]
 \`\`\`
 
-Note \`is None\` rather than \`== None\`: this is exactly the case where identity is the right test, as promised in Module 3.
+Note \`is None\` rather than \`== None\`. This is exactly the case where identity is the right test, as promised in Module 3.
 
 > **Key idea**
-> Never use a list, dictionary, or set as a default value. Default to \`None\` and create the collection inside the function.
+> Never use a list, a dictionary, or a set as a default value. Default to \`None\` and create the collection inside the function.
 
 ## Reading a call correctly
 
-You have been using keyword arguments since Module 5 without the name:
+You have been using keyword arguments since Module 5, without knowing the name:
 
 \`\`\`python
 words = ["banana", "fig", "cherry"]
@@ -136,19 +136,19 @@ print(sorted(words, key=len, reverse=True))
 ['banana', 'cherry', 'fig']
 \`\`\`
 
-\`key\` and \`reverse\` are parameters of \`sorted\` with defaults. Supplying them by name is why that call reads clearly. Now you can write functions with the same quality of interface.
+\`key\` and \`reverse\` are parameters of \`sorted\` that have defaults. Giving them by name is why that call reads so clearly. Now you can write functions that are just as easy to call.
 
 ## Summary
 
-Keyword arguments name values at the call site, making meaning visible and order irrelevant. Defaults make parameters optional and must follow non-default parameters. Never default to a mutable value; use \`None\` and create it inside.`,
+Keyword arguments name values at the call, which makes the meaning visible and the order unimportant. Defaults make parameters optional, and they must come after parameters without defaults. Never default to a value that can change. Use \`None\` and create it inside.`,
         },
         {
           type: "lesson",
           title: "Composition and Multiple Returns",
-          description: "Building larger operations by combining small ones.",
+          description: "Building bigger operations by joining small ones together.",
           instructions: `## Functions calling functions
 
-A function may call another. This is how programs are built: small, reliable operations combined into larger ones.
+A function may call another function. This is how programs are built: small, reliable jobs joined into larger ones.
 
 \`\`\`python
 def clean(text):
@@ -168,7 +168,7 @@ True
 False
 \`\`\`
 
-\`is_yes\` does not know how cleaning works, only that \`clean\` does it. If the cleaning rule changes — say, also removing full stops — one function changes and every caller benefits.
+\`is_yes\` does not know how the cleaning works. It only knows that \`clean\` does it. If the cleaning rule changes later — say it must also remove full stops — one function changes, and every caller gets the benefit.
 
 ## Composition
 
@@ -190,15 +190,15 @@ print(unique_count(words_of("Red blue RED green")))
 3
 \`\`\`
 
-Read the last line from the inside out: \`words_of\` produces a list, which \`unique_count\` receives.
+Read the last line from the inside out. \`words_of\` produces a list, and \`unique_count\` receives it.
 
-This only works because both functions are pure: they take input and return output without printing or modifying anything. A function that printed instead of returning could not be composed at all. That is the practical payoff of the rule introduced in Module 2.
+This works only because both functions are pure. They take input and return output, without printing or changing anything. A function that printed instead of returning could not be composed at all. That is the practical reward for the rule introduced in Module 2.
 
 ## Helper functions
 
-A **helper function** exists to make another function simpler. It is usually small and specific.
+A **helper function** exists to make another function simpler. It is usually small and does one particular thing.
 
-Consider validating and summarising a set of readings. Written as one function:
+Think about checking and summarising a set of readings. Written as one function:
 
 \`\`\`python
 def summarise(raw):
@@ -220,7 +220,7 @@ print(summarise("12 x 8 -4"))
 3 readings, total 16, mean 5.3
 \`\`\`
 
-It works, but it does two unrelated jobs: parsing text and computing statistics. Split them:
+It works, but it does two unrelated jobs: reading numbers out of text, and working out statistics. Split them:
 
 \`\`\`python
 def parse_readings(raw):
@@ -246,13 +246,13 @@ print(describe(parse_readings("12 x 8 -4")))
 3 readings, total 16, mean 5.3
 \`\`\`
 
-The behaviour is identical. What improved is that each function can now be understood, tested, and changed on its own. \`describe\` can summarise readings from anywhere, not only from a string.
+The behaviour is exactly the same. What improved is that each function can now be understood, tested, and changed on its own. \`describe\` can summarise readings from anywhere, not only from a string.
 
-\`part.lstrip("-")\` removes leading hyphens so that \`-4\` is recognised as a number; \`isdigit()\` alone would reject it.
+\`part.lstrip("-")\` removes hyphens from the front, so that \`-4\` counts as a number. \`isdigit()\` alone would refuse it.
 
 ## Returning several values
 
-Module 5 introduced returning a tuple. It is worth revisiting as a design tool:
+Module 5 showed you how to return a tuple. It is worth looking at again as a design tool:
 
 \`\`\`python
 def split_valid(parts):
@@ -276,42 +276,42 @@ print(rejected)
 ['x']
 \`\`\`
 
-One pass, two results, no global state, and the caller decides what to do with each. That is often better than two functions that each iterate, or one that prints its findings.
+One pass through the data, two results, no global data, and the caller decides what to do with each result. That is often better than two functions that each walk the data, or one function that prints what it found.
 
-Keep the number small. A function returning five values is usually one that should return a dictionary, or that is trying to do too much.
+Keep the number of returned values small. A function that returns five values is usually one that should return a dictionary, or one that is trying to do too much.
 
 ## How small should a function be?
 
 There is no fixed number of lines. Two questions are more useful.
 
-*Can you name it precisely?* If the honest name is \`process_data\` or \`do_everything\`, the function has no single purpose and should be split.
+*Can you name it exactly?* If the honest name is \`process_data\` or \`do_everything\`, the function has no single purpose, and it should be split.
 
-*Can you describe what it does in one sentence, without using "and"?* If not, that sentence's "and" marks the seam.
+*Can you say what it does in one sentence, without using "and"?* If not, that "and" shows you where the seam is.
 
-By that test, \`parse_readings\` reads "extracts whole numbers from a string" and \`describe\` reads "summarises a list of numbers as a sentence". Both pass. The original \`summarise\` needed an "and", which is why splitting improved it.
+By that test, \`parse_readings\` reads as "takes whole numbers out of a string", and \`describe\` reads as "summarises a list of numbers as a sentence". Both pass. The original \`summarise\` needed an "and", which is why splitting it made it better.
 
 > **Key idea**
-> A function should do one thing you can name. When the natural description contains "and", you have found where to split it.
+> A function should do one thing that you can name. When the natural description contains "and", you have found the place to split it.
 
 ## Summary
 
-Functions call other functions, and composition passes one's result to another. Helper functions keep each piece nameable and testable. Return a tuple for a small number of related results. Judge a function's size by whether you can name it precisely.`,
+Functions call other functions, and composition passes the result of one into another. Helper functions keep each piece easy to name and to test. Return a tuple for a small number of related results. Judge the size of a function by whether you can name it exactly.`,
         },
         {
           type: "exercise",
           title: "Build a Flexible Formatter",
-          description: "Write a function with default parameters that callers can override by name.",
+          description: "Write a function with default parameters that callers can replace by name.",
           instructions: `## The problem
 
-Write a function that formats a label and a value, with several presentation options.
+Write a function that formats a label and a value, with several choices about how it looks.
 
 ## Requirements
 
 Define a function \`render(label, value, width=12, fill=".", upper=False)\` that **returns** a string:
 
-1. The label, left-aligned in a field of \`width\` characters, padded with the \`fill\` character.
-2. Followed immediately by the value.
-3. If \`upper\` is true, the label is converted to uppercase **before** padding.
+1. The label, placed on the left of a space \`width\` characters wide, with the rest filled by the \`fill\` character.
+2. The value comes straight after it.
+3. If \`upper\` is true, the label is changed to capital letters **before** the filling is done.
 
 ## Then
 
@@ -331,13 +331,13 @@ status------ok
 TOTAL.....45
 \`\`\`
 
-Check the last line against its call. It overrides \`width\` and \`upper\` but not \`fill\`, so it keeps the default \`.\` and pads the uppercased label to ten characters.
+Check the last line against its call. It replaces \`width\` and \`upper\` but not \`fill\`, so it keeps the default \`.\` and fills the capital-letter label to ten characters.
 
 ## Guidance
 
-An f-string can take the width and fill from variables using nested braces: \`f"{label:{fill}<{width}}"\` pads \`label\` to \`width\` characters with \`fill\`, left-aligned.
+An f-string can take the width and the fill character from variables, using braces inside braces. \`f"{label:{fill}<{width}}"\` puts \`label\` on the left of a space \`width\` characters wide and fills the rest with \`fill\`.
 
-Apply the uppercase conversion before padding, or the field width will be applied to the wrong text.
+Change the label to capital letters before the filling, or the width will be applied to the wrong text.
 
 ## Constraints
 
@@ -348,11 +348,11 @@ The function must return its result. Do not print inside it.`,
 
 print(render("pages", 320))
 `,
-          hint: "Inside the function: text = label.upper() if upper else label, then return f\"{text:{fill}<{width}}{value}\". The nested braces let the fill character and width come from parameters.",
+          hint: "Inside the function: text = label.upper() if upper else label, then return f\"{text:{fill}<{width}}{value}\". The braces inside braces let the fill character and the width come from parameters.",
           tests: [
             {
               expectedOutput: "pages.......320\ntitle...Tidal Systems\nstatus------ok\nTOTAL.....45",
-              description: "All four calls use the correct mixture of defaults and overridden keyword arguments",
+              description: "All four calls use the right mixture of defaults and named arguments",
             },
           ],
           solution: `def render(label, value, width=12, fill=".", upper=False):
@@ -369,22 +369,22 @@ print(render("total", 45, width=10, upper=True))
         {
           type: "exercise",
           title: "Split One Function Into Two",
-          description: "Refactor a function that does two jobs into two composable functions.",
+          description: "Rework a function that does two jobs into two functions that can be joined.",
           instructions: `## The problem
 
-The function in the editor works. It does two unrelated things: it extracts numbers from a string, and it summarises them. Because those jobs are fused, neither can be used on its own.
+The function in the editor works. It does two unrelated things: it takes numbers out of a string, and it summarises them. Because those two jobs are joined together, neither can be used on its own.
 
 ## Your task
 
-Split it into two functions, then compose them.
+Split it into two functions, then join them where you call them.
 
 ## Requirements
 
-1. Define \`parse_scores(raw)\` which takes a string and **returns a list of integers**, keeping only the whitespace-separated parts made entirely of digits.
-2. Define \`describe(values)\` which takes a list of integers and **returns a string**:
+1. Define \`parse_scores(raw)\`, which takes a string and **returns a list of integers**, keeping only the space-separated parts made entirely of digits.
+2. Define \`describe(values)\`, which takes a list of integers and **returns a string**:
    - \`No valid scores\` when the list is empty.
-   - Otherwise \`3 scores, highest 90, mean 76.7\` with the mean to one decimal place.
-3. Read one line of input and print the result of composing the two.
+   - Otherwise \`3 scores, highest 90, mean 76.7\`, with the average to one decimal place.
+3. Read one line of input and print the result of joining the two functions.
 
 ## Examples
 
@@ -394,7 +394,7 @@ Given \`70 x 90 -5 70\`, the output is:
 3 scores, highest 90, mean 76.7
 \`\`\`
 
-The \`x\` is not numeric and \`-5\` contains a hyphen, so neither is kept.
+The \`x\` is not a number, and \`-5\` holds a hyphen, so neither one is kept.
 
 Given \`nothing here\`, the output is:
 
@@ -404,13 +404,13 @@ No valid scores
 
 ## Guidance
 
-\`isdigit()\` is true only when every character is a digit, which is exactly the rule required: it rejects \`x\` and \`-5\` alike.
+\`isdigit()\` is true only when every character is a digit, which is exactly the rule needed here. It refuses \`x\` and \`-5\` alike.
 
-Guard the empty case at the top of \`describe\` before calling \`max\` or dividing, both of which fail on an empty list.
+Guard the empty case at the top of \`describe\`, before you call \`max\` or divide. Both of those fail on an empty list.
 
 ## Why this matters
 
-After the split, \`describe\` can summarise scores from any source, and \`parse_scores\` can feed anything. That is the practical value of separating jobs, and the tests prove the behaviour did not change.`,
+After the split, \`describe\` can summarise scores from any source, and \`parse_scores\` can feed anything. That is the practical value of keeping jobs apart, and the tests prove that the behaviour did not change.`,
           starterCode: `def summarise(raw):
     values = []
     for part in raw.split():
@@ -424,17 +424,17 @@ After the split, \`describe\` can summarise scores from any source, and \`parse_
 
 print(summarise(input()))
 `,
-          hint: "Move the loop into parse_scores and have it return values. Move everything after it into describe(values). The last line becomes print(describe(parse_scores(input()))).",
+          hint: "Move the loop into parse_scores and let it return values. Move everything after the loop into describe(values). The last line becomes print(describe(parse_scores(input()))).",
           tests: [
             {
               input: "70 x 90 -5 70\n",
               expectedOutput: "3 scores, highest 90, mean 76.7",
-              description: "Non-numeric and negative parts are skipped and the rest summarised",
+              description: "Parts that are not plain digits are skipped, and the rest are summarised",
             },
             {
               input: "nothing here\n",
               expectedOutput: "No valid scores",
-              description: "A line with no numbers reports the empty message",
+              description: "A line with no numbers gives the empty message",
             },
             {
               input: "100\n",
@@ -444,7 +444,7 @@ print(summarise(input()))
             {
               input: "\n",
               expectedOutput: "No valid scores",
-              description: "An entirely empty line is handled by the guard",
+              description: "A completely empty line is handled by the guard",
             },
           ],
           solution: `def parse_scores(raw):
@@ -470,7 +470,7 @@ print(describe(parse_scores(input())))
 
     lesson(
       "Decomposition and Design",
-      "Turning a stated problem into a set of functions before writing any code.",
+      "Turning a stated problem into a set of functions before you write any code.",
       [
         {
           type: "lesson",
@@ -478,36 +478,36 @@ print(describe(parse_scores(input())))
           description: "A method for getting from a requirement to a structure.",
           instructions: `## Starting from a requirement
 
-Beginners usually begin typing at line 1 and work downwards, discovering the structure as they go. For anything past twenty lines this produces a tangle.
+Beginners usually start typing at line 1 and work downwards, finding the structure as they go. For anything longer than twenty lines, this produces a tangle.
 
-The alternative is not to plan everything in advance — that fails for different reasons — but to spend a few minutes identifying the *pieces* before writing any of them.
+The other way is not to plan everything in advance, which fails for its own reasons. It is to spend a few minutes finding the *pieces* before you write any of them.
 
 Take a requirement:
 
-> Read a series of study sessions, each with a subject and a duration in minutes. Report total time per subject, sorted by time spent, and identify the subject with the longest single session.
+> Read a series of study sessions. Each has a subject and a length in minutes. Report the total time for each subject, sorted by time spent, and find the subject with the longest single session.
 
-## Step one: find the nouns and verbs
+## Step one: find the nouns and the verbs
 
-The nouns suggest the data: sessions, subject, duration, totals.
+The nouns suggest the data: sessions, subject, length, totals.
 
-The verbs suggest the operations: read, group, total, sort, identify.
+The verbs suggest the operations: read, group, total, sort, find.
 
-That is not yet a design, but it is a list of things the program must do, which is more than a blank editor offers.
+That is not a design yet. But it is a list of the things the program must do, and that is more than an empty editor gives you.
 
 ## Step two: name the operations
 
 Turn each verb into a function name, and say what goes in and what comes out:
 
-1. \`parse_session(line)\` — takes a line of text, returns a subject and a duration.
-2. \`group_sessions(sessions)\` — takes many sessions, returns a dictionary of subject to list of durations.
+1. \`parse_session(line)\` — takes a line of text, returns a subject and a length.
+2. \`group_sessions(sessions)\` — takes many sessions, returns a dictionary from subject to a list of lengths.
 3. \`totals_by_subject(grouped)\` — takes that dictionary, returns subject-and-total pairs sorted by total.
-4. \`longest_session(grouped)\` — takes that dictionary, returns the subject with the largest single duration.
+4. \`longest_session(grouped)\` — takes that dictionary, returns the subject with the largest single length.
 
-Naming the inputs and outputs is the part that does the work. If you cannot say what a function returns, you do not yet understand the piece.
+Naming the inputs and the outputs is the part that does the real work. If you cannot say what a function returns, you do not yet understand that piece.
 
 ## Step three: write the outline
 
-Sketch the whole program as calls, before implementing any of them:
+Sketch the whole program as calls, before you build any of them:
 
 \`\`\`python
 def parse_session(line):
@@ -528,13 +528,13 @@ for line in report(grouped):
     print(line)
 \`\`\`
 
-That program runs. It produces nothing useful, but it establishes the shape, and every function has a signature you can now fill in one at a time, testing as you go.
+That program runs. It produces nothing useful, but it fixes the shape, and every function now has a form that you can fill in one at a time, testing as you go.
 
-This is called writing a **stub**: a function with the right name and shape whose body is a placeholder. Stubs let you check that the pieces fit before investing in any of them.
+This is called writing a **stub**: a function with the right name and shape, whose body is only a placeholder. Stubs let you check that the pieces fit together before you spend time on any one of them.
 
-## Step four: implement one piece at a time
+## Step four: build one piece at a time
 
-Take the innermost, most independent function first — usually the one that depends on nothing else. Implement it, test it directly, and move on.
+Take the innermost, most independent function first. That is usually the one that depends on nothing else. Build it, test it directly, and move on.
 
 \`\`\`python
 def parse_session(line):
@@ -551,16 +551,16 @@ print(parse_session("biology 25"))
 ('biology', 25)
 \`\`\`
 
-Two calls with known answers confirm it works. That takes fifteen seconds and eliminates it as a suspect for the rest of the session.
+Two calls with known answers show that it works. That takes fifteen seconds, and it removes this function from the list of suspects for the rest of the session.
 
-Working outwards from the bottom means that at every moment you are building on something already verified. Working top-down means everything is unverified until the very end, when a single wrong answer could come from any of five functions.
+Working outwards from the bottom means that at every moment you are building on something already checked. Working from the top down means nothing is checked until the very end, when one wrong answer could come from any of five functions.
 
 > **Key idea**
-> Identify the pieces and their inputs and outputs before writing bodies. Implement from the bottom up, checking each piece as you finish it.
+> Find the pieces and their inputs and outputs before you write any bodies. Build from the bottom up, and check each piece as you finish it.
 
 ## Pseudocode
 
-For an individual function whose logic is unclear, write the steps in English first:
+When the logic of one function is unclear, write the steps in English first:
 
 \`\`\`text
 group sessions:
@@ -572,7 +572,7 @@ group sessions:
   return the dictionary
 \`\`\`
 
-Then translate line by line:
+Then translate it line by line:
 
 \`\`\`python
 def parse_session(line):
@@ -597,23 +597,23 @@ print(group_sessions(["history 40", "biology 25", "history 15"]))
 {'history': [40, 15], 'biology': [25]}
 \`\`\`
 
-The value of pseudocode is that it separates two hard things: deciding what the steps are, and expressing them in Python. Doing them one at a time is easier than doing both at once.
+The value of pseudocode is that it keeps two hard things apart: deciding what the steps are, and writing them in Python. Doing them one at a time is easier than doing both at once.
 
 ## Summary
 
-Extract the nouns and verbs of a requirement to find the data and the operations. Name each function with its inputs and outputs, sketch the program as stubs, then implement from the bottom up, verifying each piece. Use pseudocode when a function's logic is unclear.`,
+Take the nouns and verbs out of a requirement to find the data and the operations. Name each function with its inputs and outputs, sketch the program as stubs, then build from the bottom up and check each piece. Use pseudocode when the logic of a function is unclear.`,
         },
         {
           type: "lesson",
           title: "Designing From Examples",
-          description: "Using concrete cases to pin down behaviour before implementing it.",
-          instructions: `## Vague requirements
+          description: "Using real cases to fix the behaviour before you build it.",
+          instructions: `## Requirements that are not clear
 
-A requirement like "format the duration nicely" cannot be implemented, because it does not say what "nicely" means. The fastest way to find out is to write down specific examples.
+A requirement like "format the duration nicely" cannot be built, because it does not say what "nicely" means. The fastest way to find out is to write down exact examples.
 
 ## Worked examples as a specification
 
-Suppose you must format a duration in minutes. Write the cases:
+Suppose you must format a length of time in minutes. Write the cases:
 
 \`\`\`text
 0    -> "0m"
@@ -623,9 +623,9 @@ Suppose you must format a duration in minutes. Write the cases:
 120  -> "2h"
 \`\`\`
 
-Writing five lines has already answered three questions the original requirement left open. Whole hours omit the minutes. Durations under an hour omit the hours. Zero produces \`0m\` rather than an empty string.
+Writing five lines has already answered three questions that the original requirement left open. Whole hours show no minutes. Times under an hour show no hours. Zero gives \`0m\` instead of an empty string.
 
-Those decisions had to be made by someone. Making them deliberately, in advance, is better than making them accidentally while typing.
+Somebody had to make those decisions. Making them on purpose, in advance, is better than making them by accident while typing.
 
 ## Examples become tests
 
@@ -657,26 +657,26 @@ print(format_duration(120))
 2h
 \`\`\`
 
-Every example matches. Module 9 turns this into an automatic check; the habit starts here.
+Every example matches. Module 9 turns this into an automatic check. The habit starts here.
 
-Note the shape of the function: two guard clauses handling the special cases, then the general case last. Working from examples tends to produce that structure naturally, because the examples are what reveal the special cases.
+Look at the shape of the function: two guard clauses for the special cases, then the general case last. Working from examples tends to give you that shape naturally, because the examples are what show up the special cases.
 
-## Choosing examples deliberately
+## Choosing examples on purpose
 
-Not all examples are equally useful. Three categories are worth covering every time.
+Not all examples are equally useful. Three kinds are worth covering every time.
 
 **Typical cases** — what the function will usually receive. \`75\` above.
 
-**Boundary cases** — where behaviour changes. \`59\`, \`60\`, and \`61\` are all worth checking for a function that splits hours from minutes, because the rule changes between them.
+**Boundary cases** — the places where the behaviour changes. For a function that splits hours from minutes, \`59\`, \`60\`, and \`61\` are all worth checking, because the rule changes between them.
 
-**Degenerate cases** — the smallest or emptiest input. Zero, an empty string, an empty list. These are where most bugs live, and they are the ones people forget.
+**Emptiest cases** — the smallest or emptiest possible input. Zero, an empty string, an empty list. This is where most bugs live, and this is the kind people forget.
 
-Consider a function averaging a list. The typical case is easy. The boundary case is a single item. The degenerate case is an empty list — and that one raises \`ZeroDivisionError\` unless you decided in advance what it should do.
+Think about a function that averages a list. The typical case is easy. The boundary case is a list with one item. The emptiest case is an empty list, and that one raises \`ZeroDivisionError\` unless you decided in advance what it should do.
 
 > **Key idea**
-> Before implementing, write down what the function should return for a typical input, a boundary input, and the emptiest possible input. The third almost always exposes a decision you had not made.
+> Before you build a function, write down what it should return for a typical input, a boundary input, and the emptiest possible input. The third one almost always shows a decision you had not made.
 
-## An example of a decision surfaced early
+## A decision found early
 
 Take "report the most common word in a line". Examples:
 
@@ -686,13 +686,13 @@ Take "report the most common word in a line". Examples:
 ""                   -> ?
 \`\`\`
 
-The second and third have no obvious answer. Does a tie return the first alphabetically, or the first seen? Does empty input return an empty string, or a message?
+The second and third have no obvious answer. When two words tie, do you return the first in alphabetical order, or the first one seen? Does empty input give an empty string, or a message?
 
-There is no correct answer; there is only a decision. Finding it before implementing costs a minute. Finding it afterwards, because a test failed or a user complained, costs much more.
+There is no correct answer here. There is only a decision. Finding it before you build costs a minute. Finding it afterwards, because a test failed or a user complained, costs much more.
 
 ## Writing the specification down
 
-For anything non-trivial, record the decisions in the function itself:
+For anything that is not trivial, record the decisions inside the function itself:
 
 \`\`\`python
 def most_common(text):
@@ -721,21 +721,21 @@ blue
 
 The third call returns an empty string, so the third line of output is blank.
 
-That triple-quoted text is a **docstring**, the subject of the next lesson. Note what it contains: not a description of how the code works, which the code already provides, but the decisions a reader could not otherwise recover.
+The text inside triple quotes is a **docstring**, and it is the subject of the next lesson. Notice what it holds. It does not describe how the code works, because the code already shows that. It records the decisions that a reader could not work out for themselves.
 
 ## Summary
 
-Turn a vague requirement into concrete examples before implementing. Cover typical, boundary, and degenerate inputs. The degenerate case usually exposes an unmade decision. Record the decisions where the next reader will find them.`,
+Turn an unclear requirement into exact examples before you build it. Cover typical, boundary, and emptiest inputs. The emptiest case usually shows a decision nobody has made. Record those decisions where the next reader will find them.`,
         },
         {
           type: "exercise",
           title: "Implement From a Specification",
-          description: "Write a function whose behaviour is fully pinned down by worked examples.",
+          description: "Write a function whose behaviour is fully fixed by worked examples.",
           instructions: `## The problem
 
-Implement a function that shortens a piece of text for display.
+Write a function that shortens a piece of text so that it fits a given width.
 
-## Specification by example
+## The specification, as examples
 
 \`\`\`text
 shorten("Coastal Birds", 20)  -> "Coastal Birds"
@@ -746,15 +746,15 @@ shorten("Coastal Birds", 2)   -> ".."
 shorten("", 5)                -> ""
 \`\`\`
 
-## The rules those examples imply
+## The rules those examples give you
 
-1. If the text already fits within \`limit\` characters, return it unchanged.
-2. Otherwise, return the text cut short and ending with \`...\`, such that the result is **exactly** \`limit\` characters long.
-3. When \`limit\` is 3 or less, there is no room for any text, so return only as many dots as fit.
+1. If the text already fits inside \`limit\` characters, return it unchanged.
+2. Otherwise, return the text cut short and ending with \`...\`, so that the result is **exactly** \`limit\` characters long.
+3. When \`limit\` is 3 or less, there is no room for any text, so return only as many dots as will fit.
 
 ## Requirements
 
-Define \`shorten(text, limit)\` returning a string. Then read two lines — the text, then the limit as a whole number — and print the result.
+Define \`shorten(text, limit)\`, which returns a string. Then read two lines — the text, then the limit as a whole number — and print the result.
 
 ## Examples
 
@@ -764,9 +764,9 @@ Given \`Coastal Birds\` and \`20\`, the output is \`Coastal Birds\`.
 
 ## Guidance
 
-Work through the examples before writing code. The third rule only becomes visible once you ask what happens when the limit is smaller than the ellipsis itself — a degenerate case that is easy to miss and easy to test.
+Work through the examples before you write any code. The third rule only appears when you ask what happens if the limit is smaller than the three dots themselves. That is an emptiest case which is easy to miss and easy to test.
 
-For the ordinary case, the amount of text you can keep is the limit minus the three characters the dots occupy.
+For the ordinary case, the amount of text you can keep is the limit minus the three characters used by the dots.
 
 ## Constraints
 
@@ -784,7 +784,7 @@ print(shorten(text, limit))
             {
               input: "Coastal Birds\n20\n",
               expectedOutput: "Coastal Birds",
-              description: "Text shorter than the limit is returned unchanged",
+              description: "Text shorter than the limit comes back unchanged",
             },
             {
               input: "Coastal Birds\n13\n",
@@ -794,23 +794,23 @@ print(shorten(text, limit))
             {
               input: "Coastal Birds\n10\n",
               expectedOutput: "Coastal...",
-              description: "A shortened result is exactly the limit in length",
+              description: "A shortened result is exactly as long as the limit",
             },
             {
               input: "Coastal Birds\n3\n",
               expectedOutput: "...",
-              description: "A limit of three leaves room only for the ellipsis",
+              description: "A limit of three leaves room only for the three dots",
             },
             {
               input: "Coastal Birds\n2\n",
               expectedOutput: "..",
-              description: "A limit below three returns only as many dots as fit",
+              description: "A limit below three gives only as many dots as fit",
             },
             {
               input: "\n5\n",
               expectedOutput: "",
               expectEmpty: true,
-              description: "Empty text is returned unchanged whatever the limit",
+              description: "Empty text comes back unchanged, whatever the limit is",
             },
           ],
           solution: `def shorten(text, limit):
@@ -829,22 +829,22 @@ print(shorten(text, limit))
         {
           type: "exercise",
           title: "Decompose a Reporting Task",
-          description: "Turn a single requirement into three functions and compose them.",
+          description: "Turn one requirement into three functions and join them together.",
           instructions: `## The problem
 
-Build a small report from study session records, using the decomposition method from this lesson.
+Build a small report from study session records, using the method from this lesson.
 
 ## Input
 
-A series of lines, each in the form \`subject minutes\`, ending with the line \`end\`.
+A series of lines, each in the form \`subject minutes\`. The list ends with the line \`end\`.
 
 ## Requirements
 
 Write **three** functions:
 
 1. \`parse_session(line)\` — returns a tuple of the subject and the minutes as an integer.
-2. \`group_sessions(lines)\` — takes a list of session lines and returns a dictionary mapping each subject to a list of its durations.
-3. \`format_report(grouped)\` — returns a **list of strings**, one per subject, sorted by total minutes descending and then by subject name, each in the form \`history: 55 minutes over 2 sessions\`.
+2. \`group_sessions(lines)\` — takes a list of session lines and returns a dictionary joining each subject to a list of its lengths.
+3. \`format_report(grouped)\` — returns a **list of strings**, one for each subject, sorted by total minutes with the highest first, then by subject name. Each string has the form \`history: 55 minutes over 2 sessions\`.
 
 Then read the lines, call the three functions, and print each line of the report.
 
@@ -861,17 +861,17 @@ Given only \`end\`, the output is nothing at all.
 
 ## Guidance
 
-Collect the input lines into a list first, stopping at \`end\`. Then pass that list to \`group_sessions\`.
+Collect the input lines into a list first, stopping at \`end\`. Then give that list to \`group_sessions\`.
 
-\`format_report\` returns a list of strings rather than printing. That is what allows the report to be tested, reused, or written to a file later without changing the function.
+\`format_report\` returns a list of strings instead of printing. That is what lets the report be tested, reused, or written to a file later, without changing the function.
 
-For the ordering, sort the subjects with a key returning a tuple of the negative total and the name.
+For the order, sort the subjects with a key that returns a tuple of the negative total and the name.
 
 ## Constraints
 
 Only the final loop prints. All three functions return their results.
 
-Note that the output says \`1 sessions\` rather than \`1 session\`. Match the specification exactly, even where the English is imperfect — a specification you disagree with is still the specification.`,
+Note that the output says \`1 sessions\` rather than \`1 session\`. Match the specification exactly, even where the English is not perfect. A specification you disagree with is still the specification.`,
           starterCode: `def parse_session(line):
     return ("", 0)
 
@@ -887,24 +887,24 @@ def format_report(grouped):
 lines = []
 line = input()
 `,
-          hint: "Collect lines until \"end\". In group_sessions, call parse_session for each line and append into a dictionary of lists. In format_report, sort with key=lambda name: (-sum(grouped[name]), name) and build one f-string per subject.",
+          hint: "Collect lines until \"end\". In group_sessions, call parse_session for each line and append into a dictionary of lists. In format_report, sort with key=lambda name: (-sum(grouped[name]), name) and build one f-string for each subject.",
           tests: [
             {
               input: "history 40\nbiology 25\nhistory 15\nend\n",
               expectedOutput: "history: 55 minutes over 2 sessions\nbiology: 25 minutes over 1 sessions",
-              description: "Sessions are grouped, totalled, and ordered by time spent",
+              description: "Sessions are grouped, added up, and ordered by time spent",
             },
             {
               input: "end\n",
               expectedOutput: "",
               expectEmpty: true,
-              description: "No sessions produces no output lines at all",
+              description: "No sessions gives no output lines at all",
               match: "exact",
             },
             {
               input: "maths 30\nart 30\nend\n",
               expectedOutput: "art: 30 minutes over 1 sessions\nmaths: 30 minutes over 1 sessions",
-              description: "Equal totals are broken alphabetically",
+              description: "Equal totals are separated by alphabetical order",
             },
             {
               input: "physics 90\nend\n",
@@ -951,15 +951,15 @@ for entry in format_report(group_sessions(lines)):
 
     lesson(
       "Structuring a Program",
-      "Where a program starts, how it is documented, and how types are declared.",
+      "Where a program starts, how it is documented, and how types are written down.",
       [
         {
           type: "lesson",
           title: "main() and the Entry Point",
-          description: "Separating definitions from the code that runs, and the standard Python idiom for it.",
+          description: "Keeping definitions apart from the code that runs, and the standard Python way to do it.",
           instructions: `## Definitions and actions mixed together
 
-A program written without structure interleaves definitions and actions:
+A program written without structure mixes definitions and actions:
 
 \`\`\`python
 def clean(text):
@@ -982,11 +982,11 @@ field notes
 FIELD NOTES
 \`\`\`
 
-It works, and it is hard to read. A reader cannot tell at a glance where the program actually begins, and the definitions are scattered among the statements that use them.
+It works, and it is hard to read. A reader cannot see at a glance where the program really starts, and the definitions are scattered among the statements that use them.
 
 ## Collecting the actions into main()
 
-The convention is to put every action inside a function called \`main\`, defined last among the definitions and called at the very bottom:
+The usual practice is to put every action inside a function called \`main\`. It is defined last among the definitions, and it is called at the very bottom of the file:
 
 \`\`\`python
 def clean(text):
@@ -1011,9 +1011,9 @@ field notes
 FIELD NOTES
 \`\`\`
 
-The file now reads in a predictable order: helper functions, then \`main\`, then a single line that starts everything. The last line of the file is where the program begins, and every reader of Python knows to look there.
+The file now reads in a familiar order: helper functions, then \`main\`, then a single line that starts everything. The last line of the file is where the program begins, and every Python reader knows to look there.
 
-There is a second benefit. Names created inside \`main\` are local to it, so a program structured this way has almost no global variables. That prevents a whole category of bug in which one part of a program quietly depends on a name another part happened to create.
+There is a second benefit. Names created inside \`main\` are local to it, so a program built this way has almost no global variables. That prevents a whole family of bugs in which one part of a program quietly depends on a name that another part happened to create.
 
 ## The __name__ guard
 
@@ -1032,14 +1032,14 @@ if __name__ == "__main__":
 Running as a program
 \`\`\`
 
-\`__name__\` is a variable Python sets automatically. When a file is run directly, it is set to the string \`"__main__"\`. When a file is *imported* by another file, it is set to the module's name instead.
+\`__name__\` is a variable that Python sets for you. When a file is run directly, it is set to the string \`"__main__"\`. When a file is *imported* by another file, it is set to the name of the module instead.
 
 So the guard means: **run \`main()\` only when this file is being run directly, not when it is being imported.**
 
-That matters because importing a module runs its top-level code. Without the guard, importing a file to reuse one of its functions would also execute its whole program — printing output, reading input, and generally causing chaos. Module 8 covers importing properly; the guard is what makes a file safe to import.
+That matters because importing a module runs the code at its top level. Without the guard, importing a file just to use one of its functions would also run its whole program: printing output, reading input, and generally causing chaos. Module 8 covers importing properly. The guard is what makes a file safe to import.
 
 > **Key idea**
-> Put the program's actions in \`main()\` and call it under \`if __name__ == "__main__":\`. This makes the entry point obvious and lets other files reuse your functions without running your program.
+> Put the actions of your program in \`main()\` and call it under \`if __name__ == "__main__":\`. This makes the starting point obvious, and it lets other files use your functions without running your program.
 
 ## The shape of a well-structured file
 
@@ -1070,17 +1070,17 @@ if __name__ == "__main__":
 Total: 65 minutes
 \`\`\`
 
-Reading top to bottom: a description of the file, the helpers in dependency order, \`main\` describing the program as a sequence of steps, and the guard.
+Reading from top to bottom: a description of the file, the helpers in the order they depend on each other, \`main\` describing the program as a series of steps, and the guard.
 
-Note that \`main\` contains no clever logic. It reads almost like the pseudocode from the previous lesson. That is the goal: \`main\` coordinates, and the helpers do the work.
+Notice that \`main\` holds no clever logic. It reads almost like the pseudocode from the previous lesson. That is the aim. \`main\` arranges the work, and the helpers do it.
 
-## In this course's exercises
+## In the exercises of this course
 
-The exercises here often read input at the top level rather than inside \`main\`, because they are small and the extra structure would obscure the point being taught. From this module on, when an exercise asks for a \`main\` function, structure it this way. The capstone in Module 13 requires it.
+The exercises here often read input at the top level instead of inside \`main\`, because they are small and the extra structure would hide the point being taught. From this module on, when an exercise asks for a \`main\` function, build it this way. The capstone in Module 13 requires it.
 
 ## Summary
 
-Put actions in \`main()\` and definitions above it. Call \`main()\` under \`if __name__ == "__main__":\` so the file can be imported without running. This makes the entry point obvious and keeps variables out of the global scope.`,
+Put actions in \`main()\` and definitions above it. Call \`main()\` under \`if __name__ == "__main__":\`, so the file can be imported without running. This makes the starting point obvious and keeps variables out of the global scope.`,
         },
         {
           type: "lesson",
@@ -1088,7 +1088,7 @@ Put actions in \`main()\` and definitions above it. Call \`main()\` under \`if _
           description: "Recording what a function promises, for readers and for tools.",
           instructions: `## Documenting a function
 
-A **docstring** is a string placed as the first thing in a function body. By convention it uses triple quotes:
+A **docstring** is a string placed as the very first thing inside a function body. By habit it uses triple quotes:
 
 \`\`\`python
 def format_duration(minutes):
@@ -1111,14 +1111,14 @@ print(format_duration.__doc__)
 Return minutes as a compact duration string such as '1h 15m'.
 \`\`\`
 
-Unlike a comment, a docstring is retained at runtime and available as \`__doc__\`. Tools use it: editors show it as you type a call, and \`help(format_duration)\` prints it.
+Unlike a comment, a docstring is kept while the program runs, and it is available as \`__doc__\`. Tools use it. Editors show it as you type a call, and \`help(format_duration)\` prints it.
 
 ## What to write in one
 
-A useful docstring answers what a comment cannot recover from the code:
+A useful docstring answers what a reader cannot work out from the code:
 
-- What the function returns, stated as a claim.
-- What its parameters mean, where the names are not self-explanatory.
+- What the function returns, said as a plain claim.
+- What its parameters mean, where the names do not explain themselves.
 - What it does in unusual cases.
 - Anything a caller must know, such as an assumption or a side effect.
 
@@ -1143,15 +1143,15 @@ print(mean([]))
 0.0
 \`\`\`
 
-The second paragraph records a *decision*. Nothing in the code explains why empty input returns zero rather than raising, and without the note a later reader might "fix" it and break every caller.
+The second paragraph records a *decision*. Nothing in the code explains why empty input gives zero instead of raising an error. Without that note, a later reader might "fix" it and break every caller.
 
-Write the first line as a command — "Return the mean" rather than "This function returns the mean" — and end it with a full stop. That is the widespread convention, and consistency helps more than elegance.
+Write the first line as an order — "Return the mean" rather than "This function returns the mean" — and end it with a full stop. That is the common habit, and being consistent helps more than being elegant.
 
-Not every function needs one. A three-line helper with an exact name may be entirely self-explanatory, and a docstring restating the name adds noise.
+Not every function needs a docstring. A three-line helper with an exact name may explain itself completely, and a docstring that only repeats the name adds noise.
 
 ## Type hints
 
-A **type hint** records what types a function expects and returns:
+A **type hint** records the types a function expects and returns:
 
 \`\`\`python
 def format_duration(minutes: int) -> str:
@@ -1170,7 +1170,7 @@ print(format_duration(75))
 
 \`minutes: int\` says the parameter should be an integer. \`-> str\` says the function returns a string.
 
-**Python does not enforce these.** Passing a string to \`format_duration\` will not raise a type error; the hint is documentation that tools can read. Editors use hints to offer completions and warn about mistakes, and separate checking tools can verify a whole program against them.
+**Python does not enforce these.** Passing a string to \`format_duration\` will not raise a type error. The hint is documentation that tools can read. Editors use hints to suggest completions and to warn about mistakes, and separate checking tools can test a whole program against them.
 
 Hints for collections name what is inside:
 
@@ -1194,38 +1194,38 @@ print(lookup({"bolt": 3}, "nut"))
 0
 \`\`\`
 
-\`list[int]\` is a list of integers; \`dict[str, int]\` maps strings to integers.
+\`list[int]\` is a list of integers. \`dict[str, int]\` joins strings to integers.
 
 ## When hints help most
 
-Hints repay their cost on functions used from several places, on anything whose parameter types are not obvious from the names, and on code that will be maintained over time.
+Hints are worth their cost on functions used from several places, on anything whose parameter types are not obvious from the names, and on code that will be looked after for a long time.
 
-They are less useful on tiny local helpers, where they can be more clutter than clarity.
+They help less on tiny local helpers, where they can add more clutter than clarity.
 
-The important thing is that a hint is a promise. A function hinted \`-> int\` that sometimes returns \`None\` is worse than one with no hint at all, because a reader believed it.
+The important thing is that a hint is a promise. A function marked \`-> int\` that sometimes returns \`None\` is worse than one with no hint at all, because a reader believed it.
 
 > **Key idea**
-> A docstring records what the code cannot say: decisions, assumptions, and unusual-case behaviour. A type hint records what types are expected. Neither is enforced, so both must be kept true.
+> A docstring records what the code cannot say: decisions, assumptions, and behaviour in unusual cases. A type hint records which types are expected. Neither is enforced, so you must keep both true.
 
 ## Summary
 
-A docstring is the first string in a function body, retained at runtime and shown by tools. Write it as a claim about what the function returns and record decisions a reader could not recover. Type hints annotate parameters and return values, are not enforced, and must be kept accurate.`,
+A docstring is the first string inside a function body. It is kept while the program runs and shown by tools. Write it as a claim about what the function returns, and record decisions a reader could not work out. Type hints mark parameters and return values, are not enforced, and must be kept accurate.`,
         },
         {
           type: "exercise",
           title: "Structure a Program Properly",
-          description: "Reorganise a working script into documented functions with a main entry point.",
+          description: "Rearrange a working script into documented functions with a main entry point.",
           instructions: `## The problem
 
-The program in the editor works but is written as one undifferentiated block. Restructure it.
+The program in the editor works, but it is written as one undivided block. Rearrange it.
 
 ## Requirements
 
-1. Define \`parse_entry(line: str) -> tuple[str, int]\` which splits a line of the form \`name score\` and returns the name and the score as an integer.
-2. Define \`best_entry(entries: list[tuple[str, int]]) -> str\` which returns the name with the highest score. If several tie, return the one that is alphabetically first. If the list is empty, return \`none\`.
-3. Define \`main() -> None\` containing all the reading and printing.
+1. Define \`parse_entry(line: str) -> tuple[str, int]\`, which splits a line of the form \`name score\` and returns the name and the score as an integer.
+2. Define \`best_entry(entries: list[tuple[str, int]]) -> str\`, which returns the name with the highest score. If several names tie, return the one that comes first in alphabetical order. If the list is empty, return \`none\`.
+3. Define \`main() -> None\`, holding all the reading and printing.
 4. Call \`main()\` under an \`if __name__ == "__main__":\` guard.
-5. Give \`best_entry\` a docstring that states what it returns **and** how ties and empty input are handled.
+5. Give \`best_entry\` a docstring that says what it returns **and** how ties and empty input are handled.
 
 ## Behaviour
 
@@ -1239,19 +1239,19 @@ Winner: ana
 
 Given \`ana 12\`, \`raj 9\`, \`end\`, the output is \`Winner: ana\`.
 
-Given \`raj 9\`, \`ana 9\`, \`end\`, the output is \`Winner: ana\`, because the tie is broken alphabetically.
+Given \`raj 9\`, \`ana 9\`, \`end\`, the output is \`Winner: ana\`, because the tie is settled in alphabetical order.
 
 Given only \`end\`, the output is \`Winner: none\`.
 
 ## Guidance
 
-For the tie-break, sorting by a tuple of the negative score and the name puts the highest score first and resolves ties alphabetically. Alternatively use \`min\` with the same key.
+For the tie, sorting by a tuple of the negative score and the name puts the highest score first and settles ties alphabetically. You could also use \`min\` with the same key.
 
-The docstring is graded only by your own judgement, but write it as if a colleague will rely on it — the tie-breaking rule is exactly the kind of decision that is invisible in the code.
+Nothing checks your docstring automatically, but write it as if a colleague will depend on it. The tie-breaking rule is exactly the kind of decision that is invisible in the code.
 
 ## Constraints
 
-All reading and printing happens inside \`main\`. The two other functions must return their results.`,
+All reading and printing happens inside \`main\`. The other two functions must return their results.`,
           starterCode: `entries = []
 line = input()
 while line != "end":
@@ -1268,7 +1268,7 @@ else:
             best = entry
     print(f"Winner: {best[0]}")
 `,
-          hint: "Move the parsing into parse_entry, the selection into best_entry with sorted(entries, key=lambda pair: (-pair[1], pair[0]))[0][0], and the loop plus print into main(). Finish with the __name__ guard.",
+          hint: "Move the parsing into parse_entry, the choosing into best_entry with sorted(entries, key=lambda pair: (-pair[1], pair[0]))[0][0], and the loop plus the print into main(). Finish with the __name__ guard.",
           tests: [
             {
               input: "ana 12\nraj 9\nend\n",
@@ -1278,17 +1278,17 @@ else:
             {
               input: "raj 9\nana 9\nend\n",
               expectedOutput: "Winner: ana",
-              description: "A tie is broken alphabetically rather than by input order",
+              description: "A tie is settled alphabetically, not by the order of the input",
             },
             {
               input: "end\n",
               expectedOutput: "Winner: none",
-              description: "No entries reports the fallback value",
+              description: "No entries gives the fallback value",
             },
             {
               input: "zoe 3\nabe 1\nmia 7\nend\n",
               expectedOutput: "Winner: mia",
-              description: "The winner is found regardless of position in the input",
+              description: "The winner is found wherever it sits in the input",
             },
           ],
           solution: `def parse_entry(line: str) -> tuple[str, int]:
@@ -1333,16 +1333,16 @@ if __name__ == "__main__":
         {
           type: "lesson",
           title: "Removing Repetition",
-          description: "Recognising duplication and choosing what to extract.",
+          description: "Seeing repeated code, and choosing what to pull out.",
           instructions: `## What refactoring is
 
-**Refactoring** means changing the structure of code without changing its behaviour. The program does the same thing before and after; it is easier to read, change, or test afterwards.
+**Refactoring** means changing the structure of code without changing what it does. The program behaves the same before and after. Afterwards it is easier to read, to change, or to test.
 
-The requirement to preserve behaviour is what makes it safe. It is also what makes tests valuable: without them you are guessing that nothing broke. Module 9 supplies the tools; this lesson supplies the judgement.
+The rule that the behaviour must not change is what makes it safe. It is also why tests are so valuable. Without them you are only guessing that nothing broke. Module 9 gives you the tools. This lesson gives you the judgement.
 
-## Duplication
+## Repeated code
 
-The clearest signal that code needs restructuring is the same logic appearing more than once:
+The clearest sign that code needs restructuring is the same logic appearing more than once:
 
 \`\`\`python
 history_sessions = [40, 15]
@@ -1362,9 +1362,9 @@ history: 55 minutes, mean 27.5
 biology: 25 minutes, mean 25.0
 \`\`\`
 
-The two blocks differ only in their data. Adding a third subject means copying the block again; changing the format means editing it in every copy, and missing one is how output becomes inconsistent.
+The two blocks differ only in their data. Adding a third subject means copying the block again. Changing the format means editing every copy, and missing one is exactly how output becomes inconsistent.
 
-## Extracting a function
+## Pulling out a function
 
 The repeated logic becomes one function, and the differences become parameters:
 
@@ -1384,9 +1384,9 @@ history: 55 minutes, mean 27.5
 biology: 25 minutes, mean 25.0
 \`\`\`
 
-The rule now exists once. A change to the format happens in one place and applies everywhere, and the parallel variable names have gone.
+The rule now exists in one place. A change to the format happens once and applies everywhere, and the near-identical variable names have gone.
 
-## Extracting a loop
+## Pulling out a loop
 
 Once the logic is a function, repeated *calls* can often become a loop over data:
 
@@ -1413,15 +1413,15 @@ biology: 25 minutes, mean 25.0
 statistics: 120 minutes, mean 40.0
 \`\`\`
 
-Adding a subject is now a data change, not a code change. That is usually the right end state: the structure is fixed and the content varies.
+Adding a subject is now a change to the data, not a change to the code. That is usually the right place to finish: the structure is fixed, and the content varies.
 
-## What not to extract
+## What not to pull out
 
-Not all similar-looking code is duplication. Two blocks that look alike but exist for unrelated reasons will need to change independently, and merging them creates a function with a confused purpose and a growing list of flags.
+Not all similar-looking code is repeated logic. Two blocks that look alike but exist for unrelated reasons will need to change separately. Joining them creates a function with a confused purpose and a growing list of switches.
 
-The test is whether the two would always change together. If a change to one would necessarily mean the same change to the other, they are one rule written twice, and extraction is right. If not, leave them alone.
+The test is whether the two would always change together. If a change to one would force the same change to the other, they are one rule written twice, and pulling them out is right. If not, leave them alone.
 
-Beware in particular of a function that gains Boolean parameters to select between behaviours:
+Watch out in particular for a function that grows Boolean parameters to choose between behaviours:
 
 \`\`\`python
 def report(values, as_total, as_mean, with_header):
@@ -1435,12 +1435,12 @@ print(report([1, 2], True, False, True))
 True False True 2
 \`\`\`
 
-A call like that is unreadable, and the function's body will be a thicket of conditionals. Two clear functions beat one that takes a mode.
+A call like that cannot be read, and the body of the function will fill up with conditions. Two clear functions beat one function that takes a mode.
 
 > **Key idea**
-> Extract when two pieces of code express the same rule and would always change together. Leave them separate when they merely resemble each other.
+> Pull code out when two pieces express the same rule and would always change together. Leave them apart when they only look alike.
 
-## Magic numbers and names
+## Unexplained numbers and names
 
 A second common improvement is replacing unexplained values with named ones:
 
@@ -1473,33 +1473,33 @@ print(is_overdue(30))
 True
 \`\`\`
 
-The capitals are a convention meaning "this is a constant, do not reassign it". Python does not enforce it, but every Python programmer reads it that way.
+The capital letters are a habit that means "this is a constant, do not give it a new value". Python does not enforce it, but every Python programmer reads it that way.
 
 ## Refactoring in small steps
 
-Make one change, run the program, confirm the output is unchanged, and only then make the next. A refactoring that changes five things at once and produces wrong output gives you no information about which change caused it.
+Make one change, run the program, check that the output has not changed, and only then make the next change. A refactoring that changes five things at once and gives wrong output tells you nothing about which change caused it.
 
 ## Summary
 
-Refactoring changes structure while preserving behaviour. Extract a function when the same rule appears twice and would always change together; do not merge code that merely looks similar. Replace unexplained literals with named constants. Work in small verified steps.`,
+Refactoring changes structure while keeping behaviour the same. Pull out a function when the same rule appears twice and would always change together. Do not join code that only looks similar. Replace unexplained numbers with named constants. Work in small, checked steps.`,
         },
         {
           type: "exercise",
           title: "Refactor Repeated Logic",
-          description: "Remove duplication from a working program without changing its output.",
+          description: "Remove repeated code from a working program without changing its output.",
           instructions: `## The problem
 
-The program in the editor produces correct output. It contains the same six-line calculation three times, differing only in its data.
+The program in the editor gives correct output. It holds the same six-line calculation three times, and the three copies differ only in their data.
 
 ## Your task
 
-Refactor it so the calculation appears once.
+Rework it so that the calculation appears once.
 
 ## Requirements
 
-1. Define a function that performs the calculation, taking the values that differ as parameters and **returning** the formatted line.
+1. Define a function that does the calculation. It takes the values that differ as parameters, and it **returns** the finished line.
 2. Replace the three repeated blocks with three calls, or with a loop over the data.
-3. Replace the unexplained number \`60\` with a named constant in capitals.
+3. Replace the unexplained number \`60\` with a named constant in capital letters.
 4. The output must be **exactly** what the original produced.
 
 ## Expected output
@@ -1512,13 +1512,13 @@ statistics: 120 min (2.0h) over 3 sessions
 
 ## Guidance
 
-Run the original first and copy its output somewhere. After each step of the refactoring, run again and compare. If the output changes, undo the last step rather than pressing on.
+Run the original first and copy its output somewhere. After each step of your rework, run it again and compare. If the output changes, undo the last step instead of carrying on.
 
-The hours figure is displayed to one decimal place. Keep that formatting exactly as it is.
+The hours figure is shown to one decimal place. Keep that formatting exactly as it is.
 
 ## Why this matters
 
-The test here checks only that the output is unchanged, which is precisely what a refactoring must guarantee. The improvement is in the code, and the test's job is to prove you did not break anything while making it.`,
+The test here checks only that the output has not changed, and that is exactly what a refactoring must promise. The improvement is in the code, and the job of the test is to prove that you did not break anything while making it.`,
           starterCode: `history = [40, 15]
 total = sum(history)
 hours = total / 60
@@ -1534,12 +1534,12 @@ total = sum(statistics)
 hours = total / 60
 print(f"statistics: {total} min ({hours:.1f}h) over {len(statistics)} sessions")
 `,
-          hint: "Write def describe(subject, sessions) returning the f-string, with MINUTES_PER_HOUR = 60 as a module-level constant. Then loop over a dictionary of the three subjects, or make three calls.",
+          hint: "Write def describe(subject, sessions) that returns the f-string, with MINUTES_PER_HOUR = 60 as a constant at the top of the file. Then loop over a dictionary of the three subjects, or make three calls.",
           tests: [
             {
               expectedOutput:
                 "history: 55 min (0.9h) over 2 sessions\nbiology: 25 min (0.4h) over 1 sessions\nstatistics: 120 min (2.0h) over 3 sessions",
-              description: "The refactored program produces byte-identical output to the original",
+              description: "The reworked program gives output that matches the original exactly",
             },
           ],
           solution: `MINUTES_PER_HOUR = 60
@@ -1564,22 +1564,22 @@ for subject, sessions in records.items():
         {
           type: "exercise",
           title: "Module 6 Checkpoint: Reading Log Report",
-          description: "Design a multi-function program from a specification, with main and documentation.",
+          description: "Design a program of several functions from a specification, with main and documentation.",
           instructions: `## The problem
 
-Build a reading log reporter, designing it as a set of functions rather than one block.
+Build a reading log reporter. Design it as a set of functions instead of one block.
 
 ## Input
 
-A series of lines, each in the form \`title|pages|status\` where status is \`done\` or \`reading\`. The sequence ends with the line \`end\`.
+A series of lines, each in the form \`title|pages|status\`, where the status is \`done\` or \`reading\`. The list ends with the line \`end\`.
 
 ## Requirements
 
 Write these functions:
 
 1. \`parse_book(line: str) -> tuple[str, int, str]\` — splits a line on \`|\` and returns the title, the pages as an integer, and the status.
-2. \`finished_pages(books: list) -> int\` — returns the total pages of books whose status is \`done\`.
-3. \`longest_title(books: list) -> str\` — returns the longest title. Ties are broken alphabetically. Returns an empty string for an empty list. Give this function a docstring recording those two decisions.
+2. \`finished_pages(books: list) -> int\` — returns the total pages of the books whose status is \`done\`.
+3. \`longest_title(books: list) -> str\` — returns the longest title. Ties are settled alphabetically. It returns an empty string for an empty list. Give this function a docstring that records both of those decisions.
 4. \`main() -> None\` — reads the lines and prints the report.
 
 Call \`main()\` under an \`if __name__ == "__main__":\` guard.
@@ -1595,7 +1595,7 @@ Pages read: 500
 Longest title: Coastal Bird Atlas
 \`\`\`
 
-Where \`Books\` is the total number of records, \`Finished\` is how many have status \`done\`, \`Pages read\` is the total pages of finished books only, and \`Longest title\` is the longest title among **all** books.
+\`Books\` is the total number of records. \`Finished\` is how many have the status \`done\`. \`Pages read\` is the total pages of the finished books only. \`Longest title\` is the longest title among **all** the books.
 
 ## Example
 
@@ -1610,7 +1610,7 @@ end
 
 the output is the four lines above.
 
-## Edge case
+## Special case
 
 Given only \`end\`, the output is:
 
@@ -1621,17 +1621,17 @@ Pages read: 0
 Longest title:
 \`\`\`
 
-Note the final line has nothing after the colon and a single space before it — that is what an empty title produces in the f-string.
+Note that the last line has nothing after the colon, and one space before it. That is what an empty title produces in the f-string.
 
 ## Guidance
 
-Store each parsed book as a tuple and keep them in a list. Then each reporting function is a short loop or comprehension over that list.
+Keep each parsed book as a tuple, and hold them all in a list. Then each reporting function is a short loop over that list.
 
-For the longest title, sorting by a key of the negative length and then the title handles both rules at once.
+For the longest title, sorting by a key of the negative length and then the title deals with both rules at once.
 
 ## Constraints
 
-Only \`main\` prints. Titles never contain the \`|\` character.`,
+Only \`main\` prints. Titles never hold the \`|\` character.`,
           starterCode: `def parse_book(line: str) -> tuple[str, int, str]:
     return ("", 0, "")
 
@@ -1651,27 +1651,27 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 `,
-          hint: "In main, loop until \"end\" collecting parse_book(line) into a list. Count finished with a loop or sum. For longest_title, guard the empty list then use sorted(books, key=lambda b: (-len(b[0]), b[0]))[0][0].",
+          hint: "In main, loop until \"end\" and collect parse_book(line) into a list. Count the finished books with a loop. For longest_title, guard the empty list, then use sorted(books, key=lambda b: (-len(b[0]), b[0]))[0][0].",
           tests: [
             {
               input: "Tidal Systems|320|done\nCoastal Bird Atlas|180|done\nDeep Water|400|reading\nend\n",
               expectedOutput: "Books: 3\nFinished: 2\nPages read: 500\nLongest title: Coastal Bird Atlas",
-              description: "Only finished books contribute pages, and the longest title spans all books",
+              description: "Only finished books add pages, while the longest title covers every book",
             },
             {
               input: "end\n",
               expectedOutput: "Books: 0\nFinished: 0\nPages read: 0\nLongest title:",
-              description: "An empty log reports zeroes and an empty title",
+              description: "An empty log reports zeros and an empty title",
             },
             {
               input: "Ab|10|done\nCd|20|done\nend\n",
               expectedOutput: "Books: 2\nFinished: 2\nPages read: 30\nLongest title: Ab",
-              description: "Equal-length titles are broken alphabetically",
+              description: "Titles of equal length are settled alphabetically",
             },
             {
               input: "Only One|99|reading\nend\n",
               expectedOutput: "Books: 1\nFinished: 0\nPages read: 0\nLongest title: Only One",
-              description: "An unfinished book counts as a book but contributes no pages",
+              description: "A book still being read counts as a book but adds no pages",
             },
           ],
           solution: `def parse_book(line: str) -> tuple[str, int, str]:
